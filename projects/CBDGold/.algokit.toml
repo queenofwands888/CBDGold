@@ -9,3 +9,21 @@ artifacts = "src/contracts"
 [project.run]
 build = { commands = ['npm run build'], description = 'Build frontend' }
 test = { commands = ['npm run test'], description = 'Run frontend tests' }
+
+[generate.client]
+output_path = "src/contracts/clients"
+
+[[project.contracts]]
+type = "python"
+name = "CBDGoldStaking"
+path = "./contracts/CBDGoldStaking"
+
+[[project.contracts]]
+type = "python"
+name = "CBDGoldPrize"
+path = "./contracts/CBDGoldPrize"
+
+[[project.contracts]]
+type = "python"
+name = "CBDGoldGovernance"
+path = "./contracts/CBDGoldGovernance"

@@ -1,3 +1,66 @@
+## Development
+
+ Run dev server:
+
+### Testing
+### Environment & Security Configuration
+
+Backend `.env` keys:
+```
+PORT=3001
+FRONTEND_URL=http://localhost:5173
+ENABLE_SECURITY_HEADERS=true
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+ADMIN_API_KEY=change_me_to_strong_random
+HF_TOKEN=your_hf_token
+HF_MODEL=your_model_name
+HF_RATE_LIMIT_MAX=15
+HF_TIMEOUT_MS=15000
+```
+
+Frontend `.env.local` keys:
+```
+VITE_API_URL=http://localhost:3001
+VITE_TX_SIM_FAIL_RATE=0.1
+```
+
+Oracle / Pricing System:
+- Tokens: ALGO, HEMP, WEED, USDC
+- Poll interval: 10s (Dashboard tab only; can pause)
+- History: last 90 points (≈15m)
+- Delta alerts: ≥ ±2% with 30s per-token cooldown
+- Fallback values if backend unreachable
+
+Admin Security:
+- All `/admin/*` endpoints now require header `x-admin-key: $ADMIN_API_KEY`.
+- Replace the temporary API-key gate with wallet challenge/JWT before production.
+
+
+Vitest is configured for unit testing.
+
+Run the full test suite:
+
+```bash
+npm test
+```
+
+Watch mode during development:
+
+```bash
+npm run test:watch
+```
+
+### Transaction Simulation
+
+Until real on-chain calls are integrated, UI actions use a simulator (`src/utils/txSimulator.ts`). You can control the default simulated failure rate via an environment variable:
+
+```
+VITE_TX_SIM_FAIL_RATE=0   # always succeed
+VITE_TX_SIM_FAIL_RATE=0.1 # 10% failure (default)
+```
+
+Add this to a `.env.local` file for local development if desired.
 # CBDGold
 
 This starter React project has been generated using AlgoKit. See below for default getting started instructions.

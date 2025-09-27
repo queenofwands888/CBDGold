@@ -1,15 +1,45 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Start AlgoKit LocalNet",
-            "command": "algokit",
-            "args": ["localnet", "start"],
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        }
-    ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start AlgoKit LocalNet",
+			"command": "algokit",
+			"args": [
+				"localnet",
+				"start"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Vite Dev Server",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"dev"
+			],
+			"isBackground": true,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run Backend (env)",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"backend/start-env.sh"
+			],
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		}
+	]
 }

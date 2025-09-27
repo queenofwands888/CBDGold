@@ -1,41 +1,48 @@
 import { AlgoViteClientConfig, AlgoViteKMDConfig } from '../../interfaces/network'
 
-export function getAlgodConfigFromViteEnvironment(): AlgoViteClientConfig {
-  if (!import.meta.env.VITE_ALGOD_SERVER) {
-    throw new Error('Attempt to get default algod configuration without specifying VITE_ALGOD_SERVER in the environment variables')
-  }
 
-  return {
-    server: import.meta.env.VITE_ALGOD_SERVER,
-    port: import.meta.env.VITE_ALGOD_PORT,
-    token: import.meta.env.VITE_ALGOD_TOKEN,
-    network: import.meta.env.VITE_ALGOD_NETWORK,
+export function getAlgodConfigFromViteEnvironment(): AlgoViteClientConfig {
+  const server = import.meta.env.VITE_ALGOD_SERVER;
+  const port = import.meta.env.VITE_ALGOD_PORT;
+  const token = import.meta.env.VITE_ALGOD_TOKEN;
+  const network = import.meta.env.VITE_ALGOD_NETWORK;
+  if (!server || !network) {
+    throw new Error('Algod configuration missing required environment variables.');
   }
+  if (network.toLowerCase() !== 'testnet') {
+    throw new Error('Only Algorand TestNet is supported. Please set VITE_ALGOD_NETWORK=testnet');
+  }
+  return { server, port, token, network };
 }
+
 
 export function getIndexerConfigFromViteEnvironment(): AlgoViteClientConfig {
-  if (!import.meta.env.VITE_INDEXER_SERVER) {
-    throw new Error('Attempt to get default algod configuration without specifying VITE_INDEXER_SERVER in the environment variables')
+  const server = import.meta.env.VITE_INDEXER_SERVER;
+  const port = import.meta.env.VITE_INDEXER_PORT;
+  const token = import.meta.env.VITE_INDEXER_TOKEN;
+  const network = import.meta.env.VITE_ALGOD_NETWORK;
+  if (!server || !network) {
+    throw new Error('Indexer configuration missing required environment variables.');
   }
-
-  return {
-    server: import.meta.env.VITE_INDEXER_SERVER,
-    port: import.meta.env.VITE_INDEXER_PORT,
-    token: import.meta.env.VITE_INDEXER_TOKEN,
-    network: import.meta.env.VITE_ALGOD_NETWORK,
+  if (network.toLowerCase() !== 'testnet') {
+    throw new Error('Only Algorand TestNet is supported. Please set VITE_ALGOD_NETWORK=testnet');
   }
+  return { server, port, token, network };
 }
 
-export function getKmdConfigFromViteEnvironment(): AlgoViteKMDConfig {
-  if (!import.meta.env.VITE_KMD_SERVER) {
-    throw new Error('Attempt to get default kmd configuration without specifying VITE_KMD_SERVER in the environment variables')
-  }
 
-  return {
-    server: import.meta.env.VITE_KMD_SERVER,
-    port: import.meta.env.VITE_KMD_PORT,
-    token: import.meta.env.VITE_KMD_TOKEN,
-    wallet: import.meta.env.VITE_KMD_WALLET,
-    password: import.meta.env.VITE_KMD_PASSWORD,
+export function getKmdConfigFromViteEnvironment(): AlgoViteKMDConfig {
+  const server = import.meta.env.VITE_KMD_SERVER;
+  const port = import.meta.env.VITE_KMD_PORT;
+  const token = import.meta.env.VITE_KMD_TOKEN;
+  const wallet = import.meta.env.VITE_KMD_WALLET;
+  const password = import.meta.env.VITE_KMD_PASSWORD;
+  const network = import.meta.env.VITE_ALGOD_NETWORK;
+  if (!server || !wallet || !network) {
+    throw new Error('KMD configuration missing required environment variables.');
   }
+  if (network.toLowerCase() !== 'testnet') {
+    throw new Error('Only Algorand TestNet is supported. Please set VITE_ALGOD_NETWORK=testnet');
+  }
+  return { server, port, token, wallet, password };
 }

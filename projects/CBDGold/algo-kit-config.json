@@ -1,0 +1,16 @@
+{
+  "contracts": [
+    {
+      "name": "CBDGoldStaking",
+      "path": "./contracts/CBDGoldStaking"
+    },
+    {
+      "name": "CBDGoldPrize",
+      "path": "./contracts/CBDGoldPrize"
+    },
+    {
+      "name": "CBDGoldGovernance",
+      "path": "./contracts/CBDGoldGovernance"
+    }
+  ]
+}

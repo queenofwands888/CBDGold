@@ -1,0 +1,596 @@
+import React, { useState } from 'react';
+import { Wallet, Coins, Gift, Lock, Star, ShoppingCart, Users, TrendingUp, Award, Zap, Crown, Shield, Leaf, Flame, Dice1 } from 'lucide-react';
+
+const HempTokenCBDPlatform = () => {
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [algorandAddress, setAlgorandAddress] = useState('');
+  const [hempTokenBalance, setHempTokenBalance] = useState(0);
+  const [weedTokenBalance, setWeedTokenBalance] = useState(0);
+  const [algoBalance, setAlgoBalance] = useState(0);
+  const [usdcBalance, setUsdcBalance] = useState(0);
+  const [stakedTokens, setStakedTokens] = useState(500000);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [stakingAmount, setStakingAmount] = useState('');
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [spinResult, setSpinResult] = useState(null);
+
+  // Algorand ASA Information
+  const HEMP_ASA_ID = 2675148574;
+  const WEED_ASA_ID = 2676316280;
+  const VAULT_ADDRESS = '420vault.algo';
+  
+  // Mock Algorand wallet connection
+  const connectAlgoWallet = async () => {
+    try {
+      const mockAddress = 'HEMP7X4A3QZXKJYB2NWVF8H5M9GTCR6PLQS1EUDKA8YW3V2TZRI4BJLM6A';
+      setAlgorandAddress(mockAddress);
+      setWalletConnected(true);
+      setHempTokenBalance(12500000);
+      setWeedTokenBalance(2500);
+      setAlgoBalance(150);
+      setUsdcBalance(1250);
+    } catch (error) {
+      console.error('Wallet connection failed:', error);
+    }
+  };
+
+  const disconnectWallet = () => {
+    setWalletConnected(false);
+    setAlgorandAddress('');
+    setHempTokenBalance(0);
+    setWeedTokenBalance(0);
+  };
+
+  // Calculate staking tier based on staked amount
+  const calculateStakingTier = (stakedAmount) => {
+    if (stakedAmount >= 1000000) return { name: 'Gold', discount: 50, apy: 10, shipping: 'Priority', color: 'from-yellow-400 to-yellow-600' };
+    if (stakedAmount >= 500000) return { name: 'Silver', discount: 30, apy: 5, shipping: 'Faster', color: 'from-gray-300 to-gray-500' };
+    if (stakedAmount >= 100000) return { name: 'Bronze', discount: 20, apy: 3, shipping: 'Faster', color: 'from-orange-400 to-orange-600' };
+    return { name: 'None', discount: 0, apy: 0, shipping: 'Standard', color: 'from-gray-600 to-gray-700' };
+  };
+
+  const currentStakingTier = calculateStakingTier(stakedTokens);
+
+  // CBD Gold 510 ceramic vapes
+  const cbdVapes = [
+    {
+      id: 1,
+      name: 'Northern Lights CBD',
+      strain: 'Northern Lights',
+      type: 'Indica-dominant',
+      flavor: 'Sweet Pine & Earth',
+      effects: 'Deeply Relaxing',
+      priceAlgo: 15,
+      priceUsdc: 45.99,
+      hempEarned: 90000,
+      potency: '66.6% CBD',
+      terpenes: ['Myrcene', 'Pinene', 'Caryophyllene'],
+      color: 'from-purple-500 to-indigo-600',
+      emoji: '🌌'
+    },
+    {
+      id: 2,
+      name: 'Sour Diesel CBD',
+      strain: 'Sour Diesel',
+      type: 'Sativa-dominant',
+      flavor: 'Citrus Fuel & Herbs',
+      effects: 'Energizing Focus',
+      priceAlgo: 16,
+      priceUsdc: 47.99,
+      hempEarned: 95000,
+      potency: '66.6% CBD',
+      terpenes: ['Limonene', 'Caryophyllene', 'Myrcene'],
+      color: 'from-yellow-500 to-orange-600',
+      emoji: '⚡'
+    },
+    {
+      id: 3,
+      name: 'OG Kush CBD',
+      strain: 'OG Kush',
+      type: 'Hybrid',
+      flavor: 'Earthy Lemon Pine',
+      effects: 'Balanced Euphoria',
+      priceAlgo: 17,
+      priceUsdc: 49.99,
+      hempEarned: 100000,
+      potency: '66.6% CBD',
+      terpenes: ['Myrcene', 'Limonene', 'Caryophyllene'],
+      color: 'from-green-500 to-emerald-600',
+      emoji: '👑'
+    }
+  ];
+
+  // Staking pools
+  const stakingPools = [
+    {
+      id: 1,
+      name: 'Bronze Tier',
+      minStake: 100000,
+      discount: 20,
+      apy: 3,
+      shipping: 'Faster',
+      benefits: ['20% off CBD Gold Vapes', 'Faster shipping', 'Community access'],
+      color: 'from-orange-400 to-orange-600'
+    },
+    {
+      id: 2,
+      name: 'Silver Tier',
+      minStake: 500000,
+      discount: 30,
+      apy: 5,
+      shipping: 'Faster',
+      benefits: ['30% off CBD Gold Vapes', 'Faster shipping', 'Exclusive strains', 'New releases'],
+      color: 'from-gray-300 to-gray-500'
+    },
+    {
+      id: 3,
+      name: 'Gold Tier',
+      minStake: 1000000,
+      discount: 50,
+      apy: 10,
+      shipping: 'Priority',
+      benefits: ['50% off CBD Gold Vapes', 'Priority shipping', 'VIP event tickets', 'All exclusive access'],
+      color: 'from-yellow-400 to-yellow-600'
+    }
+  ];
+
+  // Governance proposals
+  const governanceProposals = [
+    {
+      id: 1,
+      title: 'New Strain: Zkittlez CBD',
+      description: 'Vote to add Zkittlez-inspired terpene profile with 66.6% CBD potency',
+      votingPower: Math.floor(weedTokenBalance / 0.001),
+      status: 'Active',
+      timeLeft: '5 days',
+      weedRequired: 1
+    },
+    {
+      id: 2,
+      title: 'Limited Edition: 24K Gold Hardware',
+      description: 'Propose gold-plated ceramic tips for premium tier members',
+      votingPower: Math.floor(weedTokenBalance / 0.001),
+      status: 'Active',
+      timeLeft: '12 days',
+      weedRequired: 2.5
+    }
+  ];
+
+  // Slot machine game
+  const spinForGold = async (vape) => {
+    if (isSpinning) return;
+    
+    setIsSpinning(true);
+    setSpinResult(null);
+    
+    setTimeout(() => {
+      const outcomes = [
+        { type: 'hemp', amount: 50000, probability: 0.4 },
+        { type: 'hemp', amount: 100000, probability: 0.25 },
+        { type: 'hemp', amount: 200000, probability: 0.15 },
+        { type: 'discount', amount: 10, probability: 0.1 },
+        { type: 'discount', amount: 25, probability: 0.05 },
+        { type: 'jackpot', amount: 1000000, probability: 0.05 }
+      ];
+      
+      const random = Math.random();
+      let cumulative = 0;
+      
+      for (let outcome of outcomes) {
+        cumulative += outcome.probability;
+        if (random <= cumulative) {
+          if (outcome.type === 'hemp' || outcome.type === 'jackpot') {
+            setHempTokenBalance(prev => prev + outcome.amount);
+          }
+          setSpinResult(outcome);
+          break;
+        }
+      }
+      
+      setIsSpinning(false);
+    }, 3000);
+  };
+
+  const purchaseWithAlgo = (vape) => {
+    const discountedPrice = vape.priceAlgo * (1 - currentStakingTier.discount / 100);
+    
+    if (algoBalance >= discountedPrice) {
+      setAlgoBalance(prev => prev - discountedPrice);
+      setHempTokenBalance(prev => prev + vape.hempEarned);
+      
+      alert(`Purchased ${vape.name} with ALGO!\n\nCost: ${discountedPrice.toFixed(2)} ALGO (${currentStakingTier.discount}% ${currentStakingTier.name} discount)\nEarned: ${vape.hempEarned.toLocaleString()} HEMP\nLP Contribution: ALGO/HEMP pool\nShipping: ${currentStakingTier.shipping}`);
+    } else {
+      alert(`Insufficient ALGO! Need ${discountedPrice.toFixed(2)} ALGO`);
+    }
+  };
+
+  const purchaseWithUsdc = (vape) => {
+    const discountedPrice = vape.priceUsdc * (1 - currentStakingTier.discount / 100);
+    
+    if (usdcBalance >= discountedPrice) {
+      setUsdcBalance(prev => prev - discountedPrice);
+      setHempTokenBalance(prev => prev + vape.hempEarned);
+      
+      alert(`Purchased ${vape.name} with USDC!\n\nCost: $${discountedPrice.toFixed(2)} USDC (${currentStakingTier.discount}% ${currentStakingTier.name} discount)\nEarned: ${vape.hempEarned.toLocaleString()} HEMP\nLP Contribution: USDC/HEMP pool\nWEED tokens purchased for ${VAULT_ADDRESS}\nShipping: ${currentStakingTier.shipping}`);
+    } else {
+      alert(`Insufficient USDC! Need $${discountedPrice.toFixed(2)} USDC`);
+    }
+  };
+
+  const stakeTokens = async (pool) => {
+    const amount = parseInt(stakingAmount);
+    
+    if (amount && amount <= hempTokenBalance && amount >= pool.minStake) {
+      setHempTokenBalance(prev => prev - amount);
+      setStakedTokens(prev => prev + amount);
+      setStakingAmount('');
+      
+      alert(`Successfully staked ${amount.toLocaleString()} HEMP tokens!\n\nTier: ${pool.name}\nDiscount: ${pool.discount}% off CBD Gold Vapes\nAPY: ${pool.apy}% HEMP\nShipping: ${pool.shipping}\nBenefits unlocked: ${pool.benefits.join(', ')}`);
+    } else {
+      alert('Invalid staking amount or insufficient balance!');
+    }
+  };
+
+  const TabButton = ({ id, label, icon: Icon, active, onClick }) => (
+    <button
+      onClick={onClick}
+      className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+        active 
+          ? 'bg-gradient-to-r from-green-400 to-green-600 text-black shadow-lg transform scale-105' 
+          : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
+      }`}
+    >
+      <Icon size={20} />
+      <span>{label}</span>
+    </button>
+  );
+
+  const GlassCard = ({ children, className = '' }) => (
+    <div className={`bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl ${className}`}>
+      {children}
+    </div>
+  );
+
+  const renderDashboard = () => (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <GlassCard className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white flex items-center">
+              <Leaf className="mr-2 text-green-400" />
+              Multi-Token Wallet
+            </h3>
+            <button onClick={disconnectWallet} className="text-sm text-red-400 hover:text-red-300">
+              Disconnect
+            </button>
+          </div>
+          <div className="bg-black/30 rounded-lg p-4 space-y-3">
+            <div>
+              <p className="text-sm text-gray-300">Algorand Address:</p>
+              <p className="font-mono text-xs text-green-400 break-all">{algorandAddress}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-gray-300">HEMP:</p>
+                <p className="text-green-400 font-bold">{hempTokenBalance.toLocaleString()}</p>
+                <p className="text-xs text-gray-500">ASA: {HEMP_ASA_ID}</p>
+              </div>
+              <div>
+                <p className="text-gray-300">WEED:</p>
+                <p className="text-purple-400 font-bold">{weedTokenBalance.toLocaleString()}</p>
+                <p className="text-xs text-gray-500">ASA: {WEED_ASA_ID}</p>
+              </div>
+              <div>
+                <p className="text-gray-300">ALGO:</p>
+                <p className="text-blue-400 font-bold">{algoBalance.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className="text-gray-300">USDC:</p>
+                <p className="text-yellow-400 font-bold">${usdcBalance.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+
+        <GlassCard className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white flex items-center">
+              <Crown className="mr-2 text-orange-400" />
+              Staking Tier Status
+            </h3>
+          </div>
+          <div className={`bg-gradient-to-r ${currentStakingTier.color} rounded-lg p-4 mb-3`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-black font-bold text-lg">{currentStakingTier.name} Tier</p>
+                <p className="text-black/80 text-sm">{currentStakingTier.discount}% Off • {currentStakingTier.apy}% APY</p>
+              </div>
+              <Crown className="text-black" size={32} />
+            </div>
+          </div>
+          <div className="text-sm space-y-1">
+            <div className="flex justify-between">
+              <span className="text-gray-300">Staked HEMP:</span>
+              <span className="text-green-400">{stakedTokens.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-300">Shipping:</span>
+              <span className="text-blue-400">{currentStakingTier.shipping}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-300">Voting Power:</span>
+              <span className="text-purple-400">{Math.floor(weedTokenBalance / 0.001).toLocaleString()}</span>
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <GlassCard className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-300 text-sm">Available HEMP</p>
+              <p className="text-3xl font-bold text-green-400">{(hempTokenBalance / 1000000).toFixed(1)}M</p>
+              <p className="text-xs text-gray-400">Ready to spend</p>
+            </div>
+            <Leaf className="text-green-400" size={32} />
+          </div>
+        </GlassCard>
+
+        <GlassCard className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-300 text-sm">Staked HEMP</p>
+              <p className="text-3xl font-bold text-blue-400">{(stakedTokens / 1000000).toFixed(1)}M</p>
+              <p className="text-xs text-gray-400">Earning {currentStakingTier.apy}% APY</p>
+            </div>
+            <Lock className="text-blue-400" size={32} />
+          </div>
+        </GlassCard>
+
+        <GlassCard className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-300 text-sm">WEED Governance</p>
+              <p className="text-3xl font-bold text-purple-400">{weedTokenBalance.toLocaleString()}</p>
+              <p className="text-xs text-gray-400">{Math.floor(weedTokenBalance / 0.001).toLocaleString()} votes</p>
+            </div>
+            <Users className="text-purple-400" size={32} />
+          </div>
+        </GlassCard>
+
+        <GlassCard className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-300 text-sm">LP Contributions</p>
+              <p className="text-3xl font-bold text-yellow-400">42</p>
+              <p className="text-xs text-gray-400">ALGO & USDC pools</p>
+            </div>
+            <TrendingUp className="text-yellow-400" size={32} />
+          </div>
+        </GlassCard>
+      </div>
+    </div>
+  );
+
+  const renderVapes = () => (
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-white mb-2">CBD Gold 510 Ceramic Vapes</h2>
+        <p className="text-gray-300">Premium CBD 510 ceramic vapes with 66.6% CBD potency</p>
+        <div className="flex justify-center items-center space-x-4 mt-4">
+          <div className={`px-4 py-2 rounded-lg bg-gradient-to-r ${currentStakingTier.color}`}>
+            <span className="text-black font-semibold">{currentStakingTier.name} Tier - {currentStakingTier.discount}% Off All Vapes</span>
+          </div>
+        </div>
+      </div>
+
+      {spinResult && (
+        <GlassCard className="p-6 text-center">
+          <h3 className="text-xl font-bold text-white mb-4">🎰 Spin Result - Verified on Algorand!</h3>
+          <div className="bg-black/30 rounded-lg p-4">
+            {spinResult.type === 'hemp' && (
+              <p className="text-green-400 font-bold">Won {spinResult.amount.toLocaleString()} HEMP tokens!</p>
+            )}
+            {spinResult.type === 'discount' && (
+              <p className="text-yellow-400 font-bold">Won {spinResult.amount}% additional discount!</p>
+            )}
+            {spinResult.type === 'jackpot' && (
+              <p className="text-purple-400 font-bold">🎉 JACKPOT! Won {spinResult.amount.toLocaleString()} HEMP tokens!</p>
+            )}
+          </div>
+        </GlassCard>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {cbdVapes.map(vape => {
+          const discountedAlgoPrice = vape.priceAlgo * (1 - currentStakingTier.discount / 100);
+          const discountedUsdcPrice = vape.priceUsdc * (1 - currentStakingTier.discount / 100);
+
+          return (
+            <GlassCard key={vape.id} className="p-6 overflow-hidden relative">
+              <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${vape.color} opacity-20 rounded-full -mr-10 -mt-10`}></div>
+              
+              <div className="relative">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-3xl">{vape.emoji}</div>
+                  <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    vape.type.includes('Indica') ? 'bg-purple-600 text-white' :
+                    vape.type.includes('Sativa') ? 'bg-yellow-600 text-black' :
+                    'bg-green-600 text-white'
+                  }`}>
+                    {vape.type}
+                  </div>
+                </div>
+
+                <h3 className="font-bold text-white text-lg mb-1">{vape.name}</h3>
+                <p className="text-sm text-gray-300 mb-2">Based on {vape.strain}</p>
+                
+                <div className="bg-black/30 rounded-lg p-3 mb-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-300">Flavor:</span>
+                    <span className="text-yellow-400">{vape.flavor}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-300">Effects:</span>
+                    <span className="text-green-400">{vape.effects}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-300">Potency:</span>
+                    <span className="text-blue-400 font-bold">{vape.potency}</span>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <p className="text-xs text-gray-400 mb-1">Key Terpenes:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {vape.terpenes.map(terpene => (
+                      <span key={terpene} className="px-2 py-1 bg-green-600/30 text-green-300 text-xs rounded-full">
+                        {terpene}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-black/30 rounded-lg p-3 mb-4">
+                  <div className="text-center mb-2">
+                    <p className="text-lg font-bold text-blue-400">{discountedAlgoPrice.toFixed(2)} ALGO</p>
+                    <p className="text-lg font-bold text-yellow-400">${discountedUsdcPrice.toFixed(2)} USDC</p>
+                    {currentStakingTier.discount > 0 && (
+                      <p className="text-xs text-green-400">({currentStakingTier.discount}% {currentStakingTier.name} discount applied)</p>
+                    )}
+                  </div>
+                  <div className="text-xs text-center">
+                    <p className="text-green-300">Earn: {vape.hempEarned.toLocaleString()} HEMP</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => purchaseWithAlgo(vape)}
+                    disabled={algoBalance < discountedAlgoPrice}
+                    className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                      algoBalance >= discountedAlgoPrice
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'
+                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    <Coins className="inline mr-2" size={16} />
+                    Buy with ALGO
+                  </button>
+                  
+                  <button 
+                    onClick={() => purchaseWithUsdc(vape)}
+                    disabled={usdcBalance < discountedUsdcPrice}
+                    className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                      usdcBalance >= discountedUsdcPrice
+                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-black hover:from-yellow-600 hover:to-yellow-700'
+                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    <ShoppingCart className="inline mr-2" size={16} />
+                    Buy with USDC
+                  </button>
+                  
+                  <button 
+                    onClick={() => spinForGold(vape)}
+                    disabled={isSpinning}
+                    className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                      isSpinning
+                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-600 hover:to-pink-700'
+                    }`}
+                  >
+                    <Dice1 className={`inline mr-2 ${isSpinning ? 'animate-spin' : ''}`} size={16} />
+                    {isSpinning ? 'SPINNING...' : 'SPIN FOR GOLD'}
+                  </button>
+                </div>
+              </div>
+            </GlassCard>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const renderStaking = () => (
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-white mb-2">HEMP Token Staking Tiers</h2>
+        <p className="text-gray-300">Stake HEMP tokens to unlock tiered discounts and exclusive benefits</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stakingPools.map(pool => (
+          <GlassCard key={pool.id} className="p-6">
+            <div className="text-center">
+              <div className={`w-16 h-16 bg-gradient-to-br ${pool.color} rounded-full mx-auto mb-4 flex items-center justify-center`}>
+                <Lock className="text-white" size={24} />
+              </div>
+              
+              <h3 className="font-bold text-white text-xl mb-2">{pool.name}</h3>
+              
+              <div className={`inline-block px-4 py-2 rounded-full mb-4 bg-gradient-to-r ${pool.color}`}>
+                <span className="text-black font-bold">{pool.discount}% OFF</span>
+              </div>
+              
+              <div className="bg-black/30 rounded-lg p-3 mb-4">
+                <div className="text-sm space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Min Stake:</span>
+                    <span className="text-green-400">{(pool.minStake / 1000000).toFixed(1)}M HEMP</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">APY:</span>
+                    <span className="text-blue-400">{pool.apy}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Shipping:</span>
+                    <span className="text-purple-400">{pool.shipping}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-black/30 rounded-lg p-3 mb-4">
+                <p className="text-xs text-gray-300 font-semibold mb-2">Benefits:</p>
+                <div className="space-y-1">
+                  {pool.benefits.map((benefit, index) => (
+                    <p key={index} className="text-xs text-yellow-400">• {benefit}</p>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <input
+                  type="number"
+                  placeholder={`Min ${(pool.minStake / 1000000).toFixed(1)}M HEMP`}
+                  value={stakingAmount}
+                  onChange={(e) => setStakingAmount(e.target.value)}
+                  className="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 text-sm"
+                />
+                
+                <button
+                  onClick={() => stakeTokens(pool)}
+                  disabled={!stakingAmount || parseInt(stakingAmount) < pool.minStake || parseInt(stakingAmount) > hempTokenBalance}
+                  className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                    stakingAmount && parseInt(stakingAmount) >= pool.minStake && parseInt(stakingAmount) <= hempTokenBalance
+                      ? `bg-gradient-to-r ${pool.color} text-black hover:opacity-90`
+                      : '
+
+
+Please Check for errors and fix
+add as logo
+add as logo
+Add a few more Active Proposals
+add more products options
+Change all product prices to the following
+
+135 ALGO
+$33.00
+Earn 135,000 HEMP
+delete icons and add as product image on all products 
+Change Based on (strain value) to 3rd Party Lab Tested
+Add a professional footer to site
+delete word vapes from staking benefits 
+Change text to    Hemp Innovation powered by CBD Gold & Algorand
+Change text to      ShopFi

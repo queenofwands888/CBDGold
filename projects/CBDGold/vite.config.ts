@@ -1,15 +1,27 @@
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    react(),
-    nodePolyfills({
-      globals: {
-        Buffer: true,
-      },
-    }),
-  ],
-})
+// Conditional polyfills: only include in dev to reduce bundle size & avoid eval warnings in prod
+export default defineConfig(({ mode }) => {
+  const isDev = mode === 'development';
+  return {
+    plugins: [
+      react(),
+      isDev && nodePolyfills({ globals: { Buffer: true } })
+    ].filter(Boolean),
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ['react', 'react-dom'],
+            algosdk: ['algosdk'],
+            wallet: ['@perawallet/connect', '@txnlab/use-wallet', '@txnlab/use-wallet-react'],
+            ui: ['notistack', 'lucide-react', 'feather-icons']
+          }
+        }
+      }
+    }
+  };
+});
+

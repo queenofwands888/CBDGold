@@ -1,0 +1,45 @@
+{
+  "name": "CBDGoldStaking",
+  "methods": [
+    {
+      "name": "stake_hemp",
+      "args": [
+        "hemp_amount"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "unstake_hemp",
+      "args": [
+        "hemp_amount"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_user_tier",
+      "args": [
+        "user"
+      ],
+      "returns": "string"
+    },
+    {
+      "name": "get_user_discount",
+      "args": [
+        "user"
+      ],
+      "returns": "uint64"
+    },
+    {
+      "name": "claim_rewards",
+      "args": [],
+      "returns": "uint64"
+    },
+    {
+      "name": "get_user_info",
+      "args": [
+        "user"
+      ],
+      "returns": "tuple"
+    }
+  ]
+}

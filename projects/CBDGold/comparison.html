@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBD Gold Comparison</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .frame {
+            flex: 1;
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .label {
+            text-align: center;
+            padding: 10px;
+            background: #333;
+            margin-bottom: 0;
+            font-weight: bold;
+        }
+
+        .react-label {
+            background: #61dafb;
+            color: black;
+        }
+
+        .hf-label {
+            background: #ff6b6b;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-align: center; margin-bottom: 20px;">CBD Gold - React vs Hugging Face Space Comparison</h1>
+    <div class="container">
+        <div class="frame">
+            <div class="label react-label">React Version (localhost:5173)</div>
+            <iframe src="http://localhost:5173/"></iframe>
+        </div>
+        <div class="frame">
+            <div class="label hf-label">Hugging Face Space Original</div>
+            <iframe src="./hf_space_current/index.html"></iframe>
+        </div>
+    </div>
+</body>
+
+</html>

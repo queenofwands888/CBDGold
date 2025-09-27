@@ -25,6 +25,16 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
 
     if (!transactionSigner || !activeAddress) {
       enqueueSnackbar('Please connect wallet first', { variant: 'warning' })
+      setLoading(false)
+      return
+    }
+
+    // Algorand address validation: 58 chars, base32, starts with A-Z2-7
+    const addr = receiverAddress.trim()
+    const algoAddrRegex = /^[A-Z2-7]{58}$/
+    if (!algoAddrRegex.test(addr)) {
+      enqueueSnackbar('Invalid Algorand address. Please check and try again.', { variant: 'error' })
+      setLoading(false)
       return
     }
 
@@ -33,7 +43,7 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
       const result = await algorand.send.payment({
         signer: transactionSigner,
         sender: activeAddress,
-        receiver: receiverAddress,
+        receiver: addr,
         amount: algo(1),
       })
       enqueueSnackbar(`Transaction sent: ${result.txIds[0]}`, { variant: 'success' })
@@ -46,7 +56,7 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
   }
 
   return (
-    <dialog id="transact_modal" className={`modal ${openModal ? 'modal-open' : ''} bg-slate-200`}style={{ display: openModal ? 'block' : 'none' }}>
+    <dialog id="transact_modal" className={`modal ${openModal ? 'modal-open' : ''} bg-slate-200`} style={{ display: openModal ? 'block' : 'none' }}>
       <form method="dialog" className="modal-box">
         <h3 className="font-bold text-lg">Send payment transaction</h3>
         <br />
