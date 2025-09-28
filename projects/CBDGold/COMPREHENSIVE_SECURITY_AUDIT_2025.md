@@ -49,11 +49,11 @@ npm install esbuild@latest vite@latest
 **Files**: `.env`, `backend/.env`
 **Issues Found**:
 ```env
-# Frontend .env - EXPOSED
+# Frontend .env (token redacted in repo; rotate immediately if this value was ever real)
 VITE_HF_TOKEN=<replace_with_your_huggingface_token>
 VITE_ALGOD_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-# Backend .env - Insecure defaults
+# Backend .env - Insecure defaults (example placeholders only)
 HF_TOKEN=<replace_with_backend_token>
 ```
 
