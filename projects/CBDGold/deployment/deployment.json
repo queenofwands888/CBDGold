@@ -1,0 +1,16 @@
+{
+  "network": "testnet",
+  "deployer_address": "CGTC2DCA5GDDRFBT5A7QC6WUQKTAOT2325XOVG6FUSAHAUQJK66GTEYZ2A",
+  "timestamp": "2025-09-27T19:30:31.152454",
+  "contracts": {
+    "CBDGoldStaking": 746492270,
+    "CBDGoldGovernance": 746492276,
+    "CBDGoldPrize": 746492277
+  },
+  "explorer_links": {
+    "CBDGoldStaking": "https://testnet.algoexplorer.io/application/746492270",
+    "CBDGoldGovernance": "https://testnet.algoexplorer.io/application/746492276",
+    "CBDGoldPrize": "https://testnet.algoexplorer.io/application/746492277"
+  },
+  "_security_note": "Mnemonic removed. Treat any previously committed mnemonic as compromised and rotate keys. Do NOT store private keys or mnemonics in version control."
+}

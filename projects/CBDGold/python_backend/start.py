@@ -20,18 +20,18 @@ def main():
         log_level=settings.log_level,
         log_file=settings.log_file
     )
-    
+
     logger = get_logger(__name__)
     logger.info("Starting CBD Gold ShopFi Backend...")
     logger.info(f"Environment: {settings.environment}")
     logger.info(f"Debug mode: {settings.debug}")
     logger.info(f"Host: {settings.host}:{settings.port}")
-    
+
     # Import and start the FastAPI app
     try:
         import uvicorn
         from python_backend.main import app
-        
+
         # Run the server
         uvicorn.run(
             "python_backend.main:app",
@@ -42,7 +42,7 @@ def main():
             access_log=True,
             workers=1 if settings.debug else 4
         )
-        
+
     except ImportError as e:
         logger.error(f"Failed to import required modules: {e}")
         logger.error("Please install required dependencies: pip install -r requirements.txt")

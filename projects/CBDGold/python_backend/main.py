@@ -137,7 +137,7 @@ async def stake_tokens(request: StakeRequest):
         # Validate request
         if not security_manager.validate_wallet_address(request.wallet_address):
             raise HTTPException(status_code=400, detail="Invalid wallet address")
-        
+
         result = await contract_service.stake_tokens(
             wallet_address=request.wallet_address,
             amount=request.amount,
@@ -154,7 +154,7 @@ async def unstake_tokens(request: StakeRequest):
     try:
         if not security_manager.validate_wallet_address(request.wallet_address):
             raise HTTPException(status_code=400, detail="Invalid wallet address")
-        
+
         result = await contract_service.unstake_tokens(
             wallet_address=request.wallet_address,
             amount=request.amount,
@@ -182,7 +182,7 @@ async def vote_on_proposal(request: VoteRequest):
     try:
         if not security_manager.validate_wallet_address(request.wallet_address):
             raise HTTPException(status_code=400, detail="Invalid wallet address")
-        
+
         result = await contract_service.vote_on_proposal(
             wallet_address=request.wallet_address,
             proposal_id=request.proposal_id,
@@ -201,7 +201,7 @@ async def get_wallet_info(address: str):
     try:
         if not security_manager.validate_wallet_address(address):
             raise HTTPException(status_code=400, detail="Invalid wallet address")
-        
+
         wallet_info = await wallet_service.get_wallet_info(address)
         return wallet_info
     except Exception as e:
@@ -215,7 +215,7 @@ async def submit_transaction(request: TransactionRequest):
     try:
         if not security_manager.validate_wallet_address(request.sender):
             raise HTTPException(status_code=400, detail="Invalid sender address")
-        
+
         result = await contract_service.submit_transaction(request)
         return result
     except Exception as e:
@@ -229,7 +229,7 @@ async def spin_for_prize(wallet_address: str):
     try:
         if not security_manager.validate_wallet_address(wallet_address):
             raise HTTPException(status_code=400, detail="Invalid wallet address")
-        
+
         result = await contract_service.spin_for_prize(wallet_address)
         return result
     except Exception as e:
@@ -251,13 +251,13 @@ async def get_prize_winners():
 async def startup_event():
     """Initialize services on startup"""
     logger.info("Starting CBD Gold ShopFi API server...")
-    
+
     # Initialize oracle service
     await oracle_service.initialize()
-    
+
     # Start background price updates
     asyncio.create_task(background_price_updates())
-    
+
     logger.info("API server started successfully")
 
 async def background_price_updates():
@@ -272,14 +272,14 @@ async def background_price_updates():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     # Get configuration from environment
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8000"))
     debug = os.getenv("DEBUG", "false").lower() == "true"
-    
+
     logger.info(f"Starting server on {host}:{port} (debug={debug})")
-    
+
     uvicorn.run(
         "main:app",
         host=host,

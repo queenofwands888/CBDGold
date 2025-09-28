@@ -34,3 +34,99 @@ export const GOVERNANCE_PROPOSALS: GovernanceProposal[] = [
 ];
 
 export const ALGORAND_TESTNET_CONFIG = { server: 'https://testnet-api.algonode.cloud', port: '', token: '', network: 'TestNet' };
+// Add this after the ALGORAND_TESTNET_CONFIG line (around line 36):
+
+// Deployed Smart Contract App IDs on TestNet (September 27, 2025)
+export const CONTRACT_APP_IDS = {
+  STAKING: 746492270,
+  GOVERNANCE: 746492276,
+  PRIZE: 746492277
+} as const;
+
+// Contract Explorer Links for TestNet
+export const CONTRACT_EXPLORER_LINKS = {
+  STAKING: 'https://testnet.algoexplorer.io/application/746492270',
+  GOVERNANCE: 'https://testnet.algoexplorer.io/application/746492276',
+  PRIZE: 'https://testnet.algoexplorer.io/application/746492277'
+} as const;
+
+// Asset IDs for TestNet
+export const ASSET_IDS = {
+  HEMP: 2675148574,
+  WEED: 2676316280,
+  USDC: 31566704
+} as const;
+
+// Deployment Information
+export const DEPLOYMENT_INFO = {
+  network: 'testnet',
+  timestamp: '2025-09-27T19:30:31.152454',
+  deployer: 'CGTC2DCA5GDDRFBT5A7QC6WUQKTAOT2325XOVG6FUSAHAUQJK66GTEYZ2A',
+  transactions: {
+    staking: 'G442PKEBST62YK6B5DOEYYQBM3S2SY6Q72ILFZTRIZKMOKB4N47A',
+    governance: 'GV2FZCGMABZ6S44QDBOQJF4BXEAUABKJYAUTIHLKY5MDCYZSTURA',
+    prize: 'F27PUHGEKWW5WXF6BCQJ7OBG625NI6E665K5GQ4WBA3BQ25MRWSA'
+  }
+} as const;
+
+// Economic & UX Config
+export const ECON_CONFIG = {
+  SPIN_BONUS_DURATION_MS: 10 * 60 * 1000, // 10 minutes
+  MAX_TOTAL_DISCOUNT: 60, // cap composite discount
+  HEMP_REWARD_PER_ALGO: 1000, // heuristic placeholder
+  HEMP_REWARD_PER_USDC: 4000,
+  HEMP_REWARD_PER_SPIN_CREDIT_TX: true // flag to differentiate spin events if needed
+} as const;
+
+// Prize tiers for spin / prize contract alignment (front-end reference only; on-chain validation must occur in contract logic)
+export interface PrizeTier {
+  id: string;
+  label: string;
+  rarity: 'JACKPOT' | 'RARE' | 'LEGENDARY' | 'GOLDEN';
+  type: 'NFT_FULL_RANGE' | 'NFT_SINGLE_VAPE' | 'NFT_COUPON' | 'DISCOUNT_COUPON';
+  discountPct?: number; // for coupon tiers
+  metadataHint: string; // pointer to expected NFT metadata or coupon semantics
+  description: string;
+  displayColor: string; // gradient or token
+}
+
+export const PRIZE_TIERS: PrizeTier[] = [
+  {
+    id: 'jackpot_full_range_nft',
+    label: 'Full Product Range NFT',
+    rarity: 'JACKPOT',
+    type: 'NFT_FULL_RANGE',
+    metadataHint: 'nft:full-range-collection-access',
+    description: 'Redeemable NFT granting entitlement to entire current vape product line (1 of each).',
+    displayColor: 'from-fuchsia-500 to-yellow-400'
+  },
+  {
+    id: 'rare_single_vape_nft',
+    label: '1x CBD Gold Vape NFT',
+    rarity: 'RARE',
+    type: 'NFT_SINGLE_VAPE',
+    metadataHint: 'nft:single-vape-claim',
+    description: 'NFT voucher redeemable for any single CBD Gold vape in the catalog.',
+    displayColor: 'from-indigo-400 to-sky-500'
+  },
+  {
+    id: 'legendary_coupon_25',
+    label: '25% Off NFT Coupon',
+    rarity: 'LEGENDARY',
+    type: 'NFT_COUPON',
+    discountPct: 25,
+    metadataHint: 'coupon:25-off',
+    description: 'Transferable NFT coupon granting 25% off one qualifying purchase.',
+    displayColor: 'from-amber-400 to-orange-600'
+  },
+  {
+    id: 'golden_coupon_7',
+    label: '7% Off Coupon',
+    rarity: 'GOLDEN',
+    type: 'DISCOUNT_COUPON',
+    discountPct: 7,
+    metadataHint: 'coupon:7-off',
+    description: 'Common outcome; 7% discount coupon (non-NFT soft credit if not minted).',
+    displayColor: 'from-yellow-300 to-yellow-500'
+  }
+];

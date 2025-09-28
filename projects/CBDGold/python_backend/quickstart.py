@@ -34,16 +34,16 @@ def run_command(cmd, cwd=None):
 
 def main():
     print_header("CBD Gold ShopFi Python Backend - Quick Start")
-    
+
     # Check if we're in the right directory
     backend_dir = Path(__file__).parent
     os.chdir(backend_dir)
-    
+
     print(f"📂 Working directory: {backend_dir}")
     print(f"🐍 Python executable: {sys.executable}")
-    
+
     print_step(1, "Testing Python Environment")
-    
+
     # Test imports
     packages_to_test = [
         ("fastapi", "FastAPI"),
@@ -54,7 +54,7 @@ def main():
         ("aiohttp", "aiohttp"),
         ("gradio", "Gradio")
     ]
-    
+
     all_imports_ok = True
     for package, name in packages_to_test:
         try:
@@ -63,7 +63,7 @@ def main():
         except ImportError:
             print(f"❌ {name} is NOT available")
             all_imports_ok = False
-    
+
     if not all_imports_ok:
         print("\n⚠️  Some packages are missing. Installing...")
         if run_command(f"{sys.executable} -m pip install -r requirements.txt"):
@@ -71,9 +71,9 @@ def main():
         else:
             print("❌ Failed to install packages")
             return
-    
+
     print_step(2, "Setting up environment")
-    
+
     # Check for .env file
     if not Path(".env").exists():
         if Path(".env.example").exists():
@@ -101,14 +101,14 @@ USDC_ASSET_ID=31566704
 """)
     else:
         print("✅ .env file already exists")
-    
+
     print_step(3, "Testing API Server")
-    
+
     print("🚀 Starting FastAPI server in test mode...")
     print("📍 Server will be available at: http://localhost:8000")
     print("📚 API docs will be at: http://localhost:8000/api/docs")
     print("🏥 Health check: http://localhost:8000/health")
-    
+
     print("\n" + "-"*60)
     print("Choose an option:")
     print("1. Start the server (development mode with auto-reload)")
@@ -116,9 +116,9 @@ USDC_ASSET_ID=31566704
     print("3. Quick health check")
     print("4. Exit")
     print("-"*60)
-    
+
     choice = input("Enter your choice (1-4): ").strip()
-    
+
     if choice == "1":
         print("\n🚀 Starting development server...")
         print("💡 Press Ctrl+C to stop the server")
@@ -128,20 +128,20 @@ USDC_ASSET_ID=31566704
             subprocess.run(cmd, shell=True)
         except KeyboardInterrupt:
             print("\n👋 Server stopped by user")
-    
+
     elif choice == "2":
         print("\n🧪 Running API tests...")
         if run_command(f"{sys.executable} test_api.py"):
             print("✅ All tests completed")
         else:
             print("⚠️  Some tests may have failed")
-    
+
     elif choice == "3":
         print("\n🏥 Performing quick health check...")
         try:
             import aiohttp
             import asyncio
-            
+
             async def health_check():
                 try:
                     async with aiohttp.ClientSession() as session:
@@ -161,22 +161,22 @@ USDC_ASSET_ID=31566704
                 except Exception as e:
                     print(f"❌ Health check failed: {e}")
                     return False
-            
+
             # Try health check
             if not asyncio.run(health_check()):
                 print("\n💡 To start the server, run:")
                 print(f"   {sys.executable} start.py")
-                
+
         except ImportError:
             print("❌ Cannot perform health check (aiohttp not available)")
-    
+
     elif choice == "4":
         print("\n👋 Goodbye!")
         return
-    
+
     else:
         print("❌ Invalid choice. Please run the script again.")
-    
+
     print("\n" + "="*60)
     print("📚 Useful commands:")
     print(f"   Start server: {sys.executable} start.py")

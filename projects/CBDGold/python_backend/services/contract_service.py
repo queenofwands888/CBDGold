@@ -19,17 +19,17 @@ class ContractService:
         self.algod_address = "https://testnet-api.algonode.cloud"
         self.algod_token = ""
         self.algod_client = algod.AlgodClient(self.algod_token, self.algod_address)
-        
+
         # Mock contract IDs (replace with actual deployed contracts)
         self.staking_app_id = 123456789
         self.governance_app_id = 123456790
         self.prize_app_id = 123456791
-        
+
         # Asset IDs
         self.hemp_asset_id = 2675148574
         self.weed_asset_id = 2676316280
         self.usdc_asset_id = 31566704
-        
+
         # Mock data
         self.mock_staking_pools = [
             StakingPool(
@@ -69,7 +69,7 @@ class ContractService:
                 total_stakers=42
             )
         ]
-        
+
         self.mock_proposals = [
             GovernanceProposal(
                 id=1,
@@ -100,9 +100,9 @@ class ContractService:
                 ends_at=datetime.utcnow() + timedelta(days=12)
             )
         ]
-        
+
         self.prize_winners: List[PrizeWinner] = []
-    
+
     async def health_check(self) -> Dict[str, Any]:
         """Check contract service health"""
         try:
@@ -119,11 +119,11 @@ class ContractService:
                 "status": "error",
                 "error": str(e)
             }
-    
+
     async def get_staking_pools(self) -> List[StakingPool]:
         """Get all staking pools"""
         return self.mock_staking_pools
-    
+
     async def stake_tokens(self, wallet_address: str, amount: int, pool_id: int) -> Dict[str, Any]:
         """Stake HEMP tokens in a pool"""
         try:
@@ -131,19 +131,19 @@ class ContractService:
             pool = next((p for p in self.mock_staking_pools if p.id == pool_id), None)
             if not pool:
                 raise ValueError(f"Pool {pool_id} not found")
-            
+
             if amount < pool.min_stake:
                 raise ValueError(f"Amount {amount} below minimum stake {pool.min_stake}")
-            
+
             # Simulate transaction
             tx_id = self._generate_mock_tx_id()
-            
+
             # Update pool stats
             pool.total_staked += amount
             pool.total_stakers += 1  # Simplified - would check if new staker
-            
+
             logger.info(f"Staked {amount} HEMP in pool {pool_id} for {wallet_address}")
-            
+
             return {
                 "status": "success",
                 "tx_id": tx_id,
@@ -151,14 +151,14 @@ class ContractService:
                 "pool_id": pool_id,
                 "new_tier": self._calculate_tier(amount)
             }
-            
+
         except Exception as e:
             logger.error(f"Error staking tokens: {e}")
             return {
                 "status": "error",
                 "error": str(e)
             }
-    
+
     async def unstake_tokens(self, wallet_address: str, amount: int, pool_id: int) -> Dict[str, Any]:
         """Unstake HEMP tokens from a pool"""
         try:
@@ -166,34 +166,34 @@ class ContractService:
             pool = next((p for p in self.mock_staking_pools if p.id == pool_id), None)
             if not pool:
                 raise ValueError(f"Pool {pool_id} not found")
-            
+
             # Simulate transaction
             tx_id = self._generate_mock_tx_id()
-            
+
             # Update pool stats
             pool.total_staked = max(0, pool.total_staked - amount)
-            
+
             logger.info(f"Unstaked {amount} HEMP from pool {pool_id} for {wallet_address}")
-            
+
             return {
                 "status": "success",
                 "tx_id": tx_id,
                 "amount_unstaked": amount,
                 "pool_id": pool_id
             }
-            
+
         except Exception as e:
             logger.error(f"Error unstaking tokens: {e}")
             return {
                 "status": "error",
                 "error": str(e)
             }
-    
+
     async def get_governance_proposals(self) -> List[GovernanceProposal]:
         """Get all governance proposals"""
         return self.mock_proposals
-    
-    async def vote_on_proposal(self, wallet_address: str, proposal_id: int, 
+
+    async def vote_on_proposal(self, wallet_address: str, proposal_id: int,
                              vote_choice: str, weed_amount: int) -> Dict[str, Any]:
         """Vote on a governance proposal"""
         try:
@@ -201,10 +201,10 @@ class ContractService:
             proposal = next((p for p in self.mock_proposals if p.id == proposal_id), None)
             if not proposal:
                 raise ValueError(f"Proposal {proposal_id} not found")
-            
+
             if weed_amount < proposal.weed_required:
                 raise ValueError(f"Insufficient WEED tokens. Required: {proposal.weed_required}")
-            
+
             # Update vote counts
             if vote_choice.lower() == "yes":
                 proposal.votes_yes += weed_amount
@@ -212,14 +212,14 @@ class ContractService:
                 proposal.votes_no += weed_amount
             else:
                 proposal.votes_abstain += weed_amount
-            
+
             proposal.total_votes += weed_amount
-            
+
             # Simulate transaction
             tx_id = self._generate_mock_tx_id()
-            
+
             logger.info(f"Vote recorded: {vote_choice} on proposal {proposal_id} with {weed_amount} WEED")
-            
+
             return {
                 "status": "success",
                 "tx_id": tx_id,
@@ -227,20 +227,20 @@ class ContractService:
                 "weed_used": weed_amount,
                 "proposal_id": proposal_id
             }
-            
+
         except Exception as e:
             logger.error(f"Error voting on proposal: {e}")
             return {
                 "status": "error",
                 "error": str(e)
             }
-    
+
     async def spin_for_prize(self, wallet_address: str) -> Dict[str, Any]:
         """Spin for a prize"""
         try:
             # Simple prize logic
             rand = random.random()
-            
+
             if rand < 0.01:  # 1% chance for legendary
                 prize_type = "legendary"
                 prize_name = "Physical CBD Gold Vape"
@@ -257,7 +257,7 @@ class ContractService:
                 prize_type = "none"
                 prize_name = "Better luck next time!"
                 prize_desc = "No prize this time, try again soon"
-            
+
             # Record winner if they won something
             if prize_type != "none":
                 winner = PrizeWinner(
@@ -272,7 +272,7 @@ class ContractService:
                 self.prize_winners.insert(0, winner)
                 # Keep only last 50 winners
                 self.prize_winners = self.prize_winners[:50]
-            
+
             return {
                 "status": "success",
                 "prize_type": prize_type,
@@ -280,50 +280,50 @@ class ContractService:
                 "prize_description": prize_desc,
                 "won_prize": prize_type != "none"
             }
-            
+
         except Exception as e:
             logger.error(f"Error spinning for prize: {e}")
             return {
                 "status": "error",
                 "error": str(e)
             }
-    
+
     async def get_prize_winners(self) -> List[PrizeWinner]:
         """Get recent prize winners"""
         return self.prize_winners[:25]  # Return last 25 winners
-    
+
     async def submit_transaction(self, request: TransactionRequest) -> Dict[str, Any]:
         """Submit a transaction to the network"""
         try:
             # This would implement actual transaction submission
             # For now, just simulate success/failure
-            
+
             tx_id = self._generate_mock_tx_id()
-            
+
             # Simulate occasional failures
             if random.random() < 0.05:  # 5% failure rate
                 return {
                     "status": "failed",
                     "error": "Transaction simulation failed"
                 }
-            
+
             return {
                 "status": "confirmed",
                 "tx_id": tx_id,
                 "block": random.randint(1000000, 2000000)
             }
-            
+
         except Exception as e:
             logger.error(f"Error submitting transaction: {e}")
             return {
                 "status": "error",
                 "error": str(e)
             }
-    
+
     def _generate_mock_tx_id(self) -> str:
         """Generate a mock transaction ID"""
         return "".join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567", k=52))
-    
+
     def _calculate_tier(self, staked_amount: int) -> int:
         """Calculate staking tier based on amount"""
         if staked_amount >= 1_000_000_000:  # 1B HEMP

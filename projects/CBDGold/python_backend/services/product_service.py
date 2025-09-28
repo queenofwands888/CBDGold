@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 class ProductService:
     def __init__(self):
         self.products = self._initialize_products()
-    
+
     def _initialize_products(self) -> List[Product]:
         """Initialize with mock CBD Gold products"""
         return [
@@ -128,7 +128,7 @@ class ProductService:
                 in_stock=True
             )
         ]
-    
+
     async def health_check(self) -> Dict[str, Any]:
         """Check product service health"""
         return {
@@ -136,19 +136,19 @@ class ProductService:
             "products_loaded": len(self.products),
             "categories": list(set(p.category for p in self.products))
         }
-    
+
     async def get_all_products(self) -> List[Product]:
         """Get all products"""
         return [p for p in self.products if p.in_stock]
-    
+
     async def get_product_by_id(self, product_id: int) -> Optional[Product]:
         """Get a specific product by ID"""
         return next((p for p in self.products if p.id == product_id), None)
-    
+
     async def get_products_by_category(self, category: str) -> List[Product]:
         """Get products by category"""
         return [p for p in self.products if p.category == category and p.in_stock]
-    
+
     async def search_products(self, query: str) -> List[Product]:
         """Search products by name, strain, or effects"""
         query = query.lower()

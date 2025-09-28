@@ -14,17 +14,17 @@ class CBDGoldIntegration:
         self.backend_dir = Path(__file__).parent
         self.frontend_dir = self.backend_dir.parent / "src"
         self.contracts_dir = self.backend_dir.parent / "contracts"
-        
+
     def sync_product_data(self):
         """Sync product data between backend and frontend"""
         print("🔄 Syncing product data...")
-        
+
         # Read products from backend
         backend_products = self._get_backend_products()
-        
+
         # Generate frontend-compatible data
         frontend_data = self._convert_to_frontend_format(backend_products)
-        
+
         # Write to frontend constants file
         constants_file = self.frontend_dir / "data" / "constants.ts"
         if constants_file.parent.exists():
@@ -32,7 +32,7 @@ class CBDGoldIntegration:
             print("✅ Product data synced to frontend")
         else:
             print("⚠️  Frontend constants directory not found")
-    
+
     def _get_backend_products(self) -> List[Dict[str, Any]]:
         """Get products from backend service"""
         # This would normally call the backend API
@@ -70,11 +70,11 @@ class CBDGoldIntegration:
             },
             # Add more products as needed
         ]
-    
+
     def _convert_to_frontend_format(self, products: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Convert backend product format to frontend format"""
         frontend_products = []
-        
+
         for product in products:
             frontend_product = {
                 "id": product["id"],
@@ -92,13 +92,13 @@ class CBDGoldIntegration:
                 "emoji": product["emoji"]
             }
             frontend_products.append(frontend_product)
-        
+
         return {
             "products": frontend_products,
             "lastUpdated": "new Date().toISOString()",
             "source": "python_backend"
         }
-    
+
     def _write_frontend_constants(self, file_path: Path, data: Dict[str, Any]):
         """Write data to frontend constants file"""
         try:
@@ -106,7 +106,7 @@ class CBDGoldIntegration:
             existing_content = ""
             if file_path.exists():
                 existing_content = file_path.read_text()
-            
+
             # Generate new product constants
             products_ts = "export const CBD_VAPES = [\n"
             for product in data["products"]:
@@ -123,11 +123,11 @@ class CBDGoldIntegration:
                         products_ts += f'    {key}: {value},\n'
                 products_ts += "  },\n"
             products_ts += "];\n\n"
-            
+
             # Add metadata
             products_ts += f"// Generated from Python backend at {data['lastUpdated']}\n"
             products_ts += f"// Source: {data['source']}\n\n"
-            
+
             # If file exists, try to preserve other constants
             if existing_content:
                 # This is a simplified approach - in production you'd want more sophisticated merging
@@ -136,7 +136,7 @@ class CBDGoldIntegration:
                     lines = existing_content.split('\n')
                     new_lines = []
                     skip_until_bracket = False
-                    
+
                     for line in lines:
                         if "export const CBD_VAPES" in line:
                             skip_until_bracket = True
@@ -146,7 +146,7 @@ class CBDGoldIntegration:
                                 skip_until_bracket = False
                             continue
                         new_lines.append(line)
-                    
+
                     # Write the new file
                     with open(file_path, 'w') as f:
                         f.write(products_ts)
@@ -158,14 +158,14 @@ class CBDGoldIntegration:
             else:
                 # Create new file
                 file_path.write_text(products_ts)
-                
+
         except Exception as e:
             print(f"❌ Error writing frontend constants: {e}")
-    
+
     def generate_api_client(self):
         """Generate TypeScript API client for frontend"""
         print("🔄 Generating TypeScript API client...")
-        
+
         api_client_content = '''// Generated TypeScript API Client for CBD Gold ShopFi Backend
 // This file is auto-generated - do not edit manually
 
@@ -357,7 +357,7 @@ export const cbdGoldAPI = new CBDGoldAPI(
   process.env.VITE_API_URL || 'http://localhost:8000'
 );
 '''
-        
+
         # Write API client to frontend
         api_client_file = self.frontend_dir / "services" / "cbdGoldAPI.ts"
         if api_client_file.parent.exists():
@@ -365,21 +365,21 @@ export const cbdGoldAPI = new CBDGoldAPI(
             print("✅ TypeScript API client generated")
         else:
             print("⚠️  Frontend services directory not found")
-    
+
     def run_integration(self):
         """Run full integration process"""
         print("🚀 Starting CBD Gold Integration Process...")
         print(f"📂 Backend dir: {self.backend_dir}")
         print(f"📂 Frontend dir: {self.frontend_dir}")
-        
+
         # Create directories if they don't exist
         os.makedirs(self.frontend_dir / "data", exist_ok=True)
         os.makedirs(self.frontend_dir / "services", exist_ok=True)
-        
+
         # Run integration steps
         self.sync_product_data()
         self.generate_api_client()
-        
+
         print("\n✅ Integration completed successfully!")
         print("\n📋 Next steps:")
         print("1. Start the Python backend: python quickstart.py")

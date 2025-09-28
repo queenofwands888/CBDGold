@@ -15,7 +15,7 @@
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "Node",
+  "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -26,9 +26,9 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "vite.config.js",
-    "src/utils/",
-    "src/utils/",
-    "src/main.tsx",
+    "src/utils/**/*",
+    "src/types/**/*",
+    "src/main.tsx"
   ],
   "references": [
     {
