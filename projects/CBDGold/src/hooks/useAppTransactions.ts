@@ -15,7 +15,7 @@ const mockSigner: SignerFn = async (txns) => {
 // Unified simulated contract interaction layer (placeholder for real Algorand logic)
 export function useAppTransactions() {
   const { dispatch: txDispatch } = useTransactionContext();
-  const { dispatch: appDispatch } = useAppContext();
+  const { dispatch: appDispatch, state: appState } = useAppContext();
   const { notify } = useNotify();
 
   const beginTx = (type: string, note?: string) => {
@@ -79,8 +79,10 @@ export function useAppTransactions() {
       if (chainConfig.mode === 'onchain') {
         // On-chain path
         // TODO: replace mock account and signer retrieval with real wallet integration
-        const activeAccount = 'WALLET_ADDRESS_PLACEHOLDER';
-        await stakeHempOnChain(activeAccount, mockSigner, amount);
+  const activeAccount = appState.walletAddress;
+  if (!activeAccount) throw new Error('Wallet not connected');
+  // NOTE: signer integration pending; currently will throw until a proper wallet signer is provided
+  await stakeHempOnChain(activeAccount, mockSigner, amount);
         appDispatch({ type: 'STAKE_HEMP', payload: { amount } });
         finalize(id, true);
         notify('On-chain stake confirmed', 'success');
