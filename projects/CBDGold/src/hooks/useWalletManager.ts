@@ -71,7 +71,17 @@ export function useWalletManager() {
   return {
     connect,
     disconnect,
-  refreshAssets: () => refreshAssets(),
+    refreshAssets: () => refreshAssets(),
+    async signTransactions(txns: algosdk.Transaction[]) {
+      if (peraRef.current && state.walletConnected) {
+        // Build SignerTransaction objects expected by Pera wallet
+        // Minimal structure: { txn: Transaction }
+        const toSign: any[] = txns.map(txn => ({ txn }));
+        const signedBlobs: Uint8Array[] = await peraRef.current.signTransaction([toSign]);
+        return signedBlobs;
+      }
+      throw new Error('No wallet signer available');
+    },
     connected: state.walletConnected,
     address: state.walletAddress,
     assets: state.accountAssets,

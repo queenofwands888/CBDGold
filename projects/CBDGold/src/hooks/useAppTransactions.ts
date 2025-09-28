@@ -2,7 +2,8 @@ import { useCallback } from 'react';
 import { useTransactionContext, useAppContext } from '../contexts';
 import { useNotify } from './useNotify';
 import { chainConfig } from '../onchain/env';
-import { stakeHempOnChain } from '../onchain/staking';
+import { stakeHempOnChain, unstakeHempOnChain, claimStakingRewardsOnChain } from '../onchain/staking';
+import { useWalletManager } from './useWalletManager';
 
 // Placeholder wallet signer integration point; to be replaced when wallet hook is wired
 type SignerFn = (txns: any[]) => Promise<Uint8Array[]>;
@@ -16,6 +17,7 @@ const mockSigner: SignerFn = async (txns) => {
 export function useAppTransactions() {
   const { dispatch: txDispatch } = useTransactionContext();
   const { dispatch: appDispatch, state: appState } = useAppContext();
+  const wallet = useWalletManager();
   const { notify } = useNotify();
 
   const beginTx = (type: string, note?: string) => {
@@ -78,11 +80,10 @@ export function useAppTransactions() {
     try {
       if (chainConfig.mode === 'onchain') {
         // On-chain path
-        // TODO: replace mock account and signer retrieval with real wallet integration
-  const activeAccount = appState.walletAddress;
-  if (!activeAccount) throw new Error('Wallet not connected');
-  // NOTE: signer integration pending; currently will throw until a proper wallet signer is provided
-  await stakeHempOnChain(activeAccount, mockSigner, amount);
+        const activeAccount = appState.walletAddress;
+        if (!activeAccount) throw new Error('Wallet not connected');
+        const signer = async (txns: any[]) => wallet.signTransactions(txns as any);
+        await stakeHempOnChain(activeAccount, signer, amount);
         appDispatch({ type: 'STAKE_HEMP', payload: { amount } });
         finalize(id, true);
         notify('On-chain stake confirmed', 'success');
@@ -97,7 +98,53 @@ export function useAppTransactions() {
       finalize(id, false, e.message || 'Stake failed');
       notify('Stake failed: ' + (e.message || 'error'), 'error');
     }
-  }, [appDispatch]);
+  }, [appDispatch, appState.walletAddress, wallet]);
+
+  const unstakeHemp = useCallback(async (amount: number) => {
+    const id = beginTx('unstake_hemp', `Unstake ${amount} HEMP`);
+    try {
+      if (chainConfig.mode === 'onchain') {
+        const activeAccount = appState.walletAddress;
+        if (!activeAccount) throw new Error('Wallet not connected');
+        const signer = async (txns: any[]) => wallet.signTransactions(txns as any);
+        await unstakeHempOnChain(activeAccount, signer, amount);
+        appDispatch({ type: 'UNSTAKE_HEMP', payload: { amount } });
+        finalize(id, true);
+        notify('On-chain unstake confirmed', 'success');
+      } else {
+        await simulateDelay();
+        appDispatch({ type: 'UNSTAKE_HEMP', payload: { amount } });
+        finalize(id, true);
+        notify('Unstake confirmed (simulation)', 'success');
+      }
+    } catch (e: any) {
+      finalize(id, false, e.message || 'Unstake failed');
+      notify('Unstake failed: ' + (e.message || 'error'), 'error');
+    }
+  }, [appDispatch, appState.walletAddress, wallet]);
+
+  const claimStakingRewards = useCallback(async (rewardAmount: number) => {
+    const id = beginTx('claim_rewards', `Claim ~${rewardAmount} HEMP`);
+    try {
+      if (chainConfig.mode === 'onchain') {
+        const activeAccount = appState.walletAddress;
+        if (!activeAccount) throw new Error('Wallet not connected');
+        const signer = async (txns: any[]) => wallet.signTransactions(txns as any);
+        await claimStakingRewardsOnChain(activeAccount, signer);
+        appDispatch({ type: 'CLAIM_STAKING_REWARDS', payload: { reward: rewardAmount } });
+        finalize(id, true);
+        notify('On-chain rewards claimed', 'success');
+      } else {
+        await simulateDelay();
+        appDispatch({ type: 'CLAIM_STAKING_REWARDS', payload: { reward: rewardAmount } });
+        finalize(id, true);
+        notify('Rewards claimed (simulation)', 'success');
+      }
+    } catch (e: any) {
+      finalize(id, false, e.message || 'Claim failed');
+      notify('Claim failed: ' + (e.message || 'error'), 'error');
+    }
+  }, [appDispatch, appState.walletAddress, wallet]);
 
   const voteProposal = useCallback(async (idNum: number, weedSpent: number, title?: string) => {
     const id = beginTx('vote', `Vote ${idNum}`);
@@ -110,5 +157,5 @@ export function useAppTransactions() {
     } else finalize(id, false, 'Vote failed');
   }, [appDispatch]);
 
-  return { purchaseAlgo, purchaseUsdc, claimWithHemp, creditSpinHemp, stakeHemp, voteProposal, mode: chainConfig.mode };
+  return { purchaseAlgo, purchaseUsdc, claimWithHemp, creditSpinHemp, stakeHemp, unstakeHemp, claimStakingRewards, voteProposal, mode: chainConfig.mode };
 }

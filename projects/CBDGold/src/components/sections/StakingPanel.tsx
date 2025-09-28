@@ -9,7 +9,7 @@ const StakingPanel: React.FC = () => {
   const { state, dispatch } = useAppContext();
   const { notify } = useNotify();
   const { accountAssets, stakedAmount } = state;
-  const { stakeHemp } = useAppTransactions();
+  const { stakeHemp, unstakeHemp, claimStakingRewards } = useAppTransactions();
   const [amounts, setAmounts] = useState<Record<number, string>>({});
 
   const stake = (poolId: number): void => {
@@ -55,12 +55,32 @@ const StakingPanel: React.FC = () => {
                   onChange={e => setAmounts(a => ({ ...a, [pool.id]: e.target.value }))}
                   className="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 text-sm"
                 />
-                <button
-                  onClick={() => stake(pool.id)}
-                  className={`w-full py-3 px-4 rounded-lg font-semibold transition-all bg-gradient-to-r ${pool.color} text-black hover:opacity-90`}
-                >
-                  Stake HEMP Tokens
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => stake(pool.id)}
+                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all bg-gradient-to-r ${pool.color} text-black hover:opacity-90`}
+                  >
+                    Stake HEMP Tokens
+                  </button>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <button
+                      onClick={() => {
+                        const raw = parseFloat(amounts[pool.id] || '0');
+                        if (!raw || raw <= 0) { notify('Enter unstake amount', 'warning'); return; }
+                        unstakeHemp(Math.floor(raw));
+                      }}
+                      className="bg-black/30 hover:bg-black/40 rounded-lg py-2 font-semibold text-yellow-300"
+                    >Unstake</button>
+                    <button
+                      onClick={() => {
+                        // Simple heuristic: claim 2% of staked pool amount if unspecified
+                        const est = Math.floor(stakedAmount * 0.02) || 1000;
+                        claimStakingRewards(est);
+                      }}
+                      className="bg-black/30 hover:bg-black/40 rounded-lg py-2 font-semibold text-green-300"
+                    >Claim</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -40,6 +40,8 @@ type AppAction =
   | { type: 'SET_SPIN_BONUS'; payload: { discount: number; result: string } }
   | { type: 'CLEAR_SPIN_BONUS' }
   | { type: 'STAKE_HEMP'; payload: { amount: number } }
+  | { type: 'UNSTAKE_HEMP'; payload: { amount: number } }
+  | { type: 'CLAIM_STAKING_REWARDS'; payload: { reward: number } }
   | { type: 'VOTE_PROPOSAL'; payload: { id: number; weedSpent: number } }
   | { type: 'PURCHASE_WITH_ALGO'; payload: { amountAlgo: number } }
   | { type: 'PURCHASE_WITH_USDC'; payload: { amountUsdc: number } }
@@ -105,6 +107,14 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'STAKE_HEMP': {
       const amt = action.payload.amount;
       return { ...state, accountAssets: { ...state.accountAssets, hemp: Math.max(0, state.accountAssets.hemp - amt) }, stakedAmount: state.stakedAmount + amt };
+    }
+    case 'UNSTAKE_HEMP': {
+      const amt = action.payload.amount;
+      return { ...state, stakedAmount: Math.max(0, state.stakedAmount - amt), accountAssets: { ...state.accountAssets, hemp: state.accountAssets.hemp + amt } };
+    }
+    case 'CLAIM_STAKING_REWARDS': {
+      const r = action.payload.reward;
+      return { ...state, accountAssets: { ...state.accountAssets, hemp: state.accountAssets.hemp + r } };
     }
     case 'VOTE_PROPOSAL': {
       return {
