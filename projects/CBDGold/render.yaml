@@ -54,3 +54,5 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://cbdgold-backend.onrender.com
+      - key: SKIP_CLIENT_GEN
+        value: "1"

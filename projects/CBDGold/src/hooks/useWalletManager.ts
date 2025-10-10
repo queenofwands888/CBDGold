@@ -1,34 +1,18 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { useAppContext } from '../contexts';
-import { PeraWalletConnect } from '@perawallet/connect';
 import algosdk from 'algosdk';
 import { chainConfig } from '../onchain/env';
 import { fetchAsaBalances } from '../onchain/assets';
 
-// Very lightweight simulated wallet manager until real integration (Pera, AlgoSigner, etc.) is wired.
-// Provides connect/disconnect and fake asset refresh.
+// Lightweight simulated wallet manager until a production wallet integration (Pera, AlgoSigner, etc.) is wired.
 export function useWalletManager() {
   const { state, dispatch } = useAppContext();
-  const peraRef = useRef<PeraWalletConnect | null>(null);
-
-  // Lazy init Pera instance
-  if (!peraRef.current && typeof window !== 'undefined') {
-    peraRef.current = new PeraWalletConnect({ chainId: chainConfig.network === 'testnet' ? 416001 : undefined });
-  }
 
   const connect = useCallback(async () => {
     if (state.walletConnected || state.isConnecting) return;
     dispatch({ type: 'SET_CONNECTING', payload: true });
     try {
-      // Prefer Pera wallet if available
-      if (peraRef.current) {
-        const accounts = await peraRef.current.connect();
-        const addr = accounts[0];
-        dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address: addr } });
-        refreshAssets(addr);
-        return;
-      }
-      // Fallback simulation
+      // Simulated wallet flow until production integration is enabled
       await new Promise(r => setTimeout(r, 600));
       const fakeAddress = 'FAKE' + Math.random().toString(36).slice(2, 10).toUpperCase();
       dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address: fakeAddress } });
@@ -40,13 +24,12 @@ export function useWalletManager() {
   }, [state.walletConnected, state.isConnecting, dispatch]);
 
   const disconnect = useCallback(() => {
-    try { peraRef.current?.disconnect(); } catch { /* ignore */ }
     dispatch({ type: 'RESET_WALLET' });
   }, [dispatch]);
 
   const refreshAssets = useCallback(async (addr?: string) => {
-    if (!state.walletConnected) return;
     const address = addr || state.walletAddress;
+    if (!address) return;
     try {
       if (chainConfig.mode === 'onchain') {
         const balances = await fetchAsaBalances(address);
@@ -72,15 +55,8 @@ export function useWalletManager() {
     connect,
     disconnect,
     refreshAssets: () => refreshAssets(),
-    async signTransactions(txns: algosdk.Transaction[]) {
-      if (peraRef.current && state.walletConnected) {
-        // Build SignerTransaction objects expected by Pera wallet
-        // Minimal structure: { txn: Transaction }
-        const toSign: any[] = txns.map(txn => ({ txn }));
-        const signedBlobs: Uint8Array[] = await peraRef.current.signTransaction([toSign]);
-        return signedBlobs;
-      }
-      throw new Error('No wallet signer available');
+    async signTransactions(_: algosdk.Transaction[]) {
+      throw new Error('No wallet signer available: interactive wallet integration is disabled.');
     },
     connected: state.walletConnected,
     address: state.walletAddress,

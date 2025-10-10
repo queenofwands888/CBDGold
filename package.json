@@ -1,19 +1,13 @@
 {
-  "dependencies": {
-    "@perawallet/connect": "^1.4.2",
-    "@vitejs/plugin-react": "^4.2.0",
-    "algosdk": "^3.5.2",
-    "autoprefixer": "^10.4.21",
-    "notistack": "^3.0.2",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.13",
-    "vite": "^4.5.0"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "jsdom": "^22.1.0",
-    "vitest": "^0.34.6"
+  "name": "cbdgold-monorepo",
+  "private": true,
+  "workspaces": [
+    "projects/CBDGold",
+    "CBD.Gold/cbd-gold-shopfi"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "test": "npm run test --workspace projects/CBDGold",
+    "dev": "npm run dev --workspace projects/CBDGold"
   }
 }

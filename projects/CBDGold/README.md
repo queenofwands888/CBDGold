@@ -72,7 +72,9 @@ Add this to a `.env.local` file for local development if desired.
 4. Use the following build settings:
    - **Build Command:** `npm install && npm run build`
    - **Publish Directory:** `dist`
-5. Add environment variables as needed; at minimum set `VITE_API_URL` to the deployed backend URL (for example, `https://cbdgold-backend.onrender.com`).
+5. Add environment variables as needed:
+   - `VITE_API_URL` pointing to the deployed backend URL (for example, `https://cbdgold-backend.onrender.com`).
+   - `SKIP_CLIENT_GEN=1` so the build skips Algokit client generation on Render (the script falls back automatically if the CLI is missing).
 6. Click **Create Static Site**. Render will build and deploy automatically on future pushes.
 
 ### 2. Backend (Node Web Service)

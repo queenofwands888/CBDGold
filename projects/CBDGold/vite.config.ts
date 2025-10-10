@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
           manualChunks: {
             react: ['react', 'react-dom'],
             algosdk: ['algosdk'],
-            wallet: ['@perawallet/connect', '@txnlab/use-wallet', '@txnlab/use-wallet-react'],
+            wallet: ['@txnlab/use-wallet', '@txnlab/use-wallet-react'],
             ui: ['notistack', 'lucide-react', 'feather-icons']
           }
         }
