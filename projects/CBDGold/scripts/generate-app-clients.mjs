@@ -21,6 +21,12 @@ if (result.error) {
   process.exit(1);
 }
 
+if (result.status === 127) {
+  console.warn('[generate:app-clients] Algokit CLI executable not found (exit 127); skipping client generation.');
+  console.warn('Set SKIP_CLIENT_GEN=1 to silence this warning in environments without Algokit.');
+  process.exit(0);
+}
+
 if (result.status !== 0) {
   console.error('[generate:app-clients] Algokit CLI exited with status', result.status);
   process.exit(result.status ?? 1);
