@@ -1,0 +1,30 @@
+# CBDGold Backend CI Pipeline
+
+name: Backend Audit & Stress Test
+
+on:
+  push:
+    paths:
+      - 'projects/CBDGold/backend/**'
+  pull_request:
+    paths:
+      - 'projects/CBDGold/backend/**'
+
+jobs:
+  audit-and-stress-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: |
+          cd projects/CBDGold/backend
+          npm install
+      - name: Run stress test
+        run: |
+          cd projects/CBDGold/backend
+          node stress_test.js

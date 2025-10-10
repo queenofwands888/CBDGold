@@ -14,6 +14,7 @@ describe('productService enrichment', () => {
     vi.spyOn(oracleMod, 'getOraclePrices').mockResolvedValue({
       algoUsd: 0.5,
       hempUsd: 0.0002,
+      weedUsd: 0.00008,
       usdcUsd: 1,
       source: { backend: true, fallback: false },
       lastUpdated: Date.now()
@@ -35,6 +36,7 @@ describe('productService enrichment', () => {
     vi.spyOn(oracleMod, 'getOraclePrices').mockResolvedValue({
       algoUsd: 0.4,
       hempUsd: 0.0001,
+      weedUsd: 0.00008,
       usdcUsd: 1,
       source: { backend: true, fallback: false },
       lastUpdated: Date.now()

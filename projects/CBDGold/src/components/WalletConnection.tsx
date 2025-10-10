@@ -25,6 +25,19 @@ const WalletConnection: React.FC = () => {
     }
   };
 
+  const walletAddress = walletInfo?.address ?? '';
+  const assets = {
+    algo: walletInfo?.algoBalance ?? 0,
+    hemp: walletInfo?.hempBalance ?? 0,
+    weed: walletInfo?.weedBalance ?? 0,
+    usdc: walletInfo?.usdcBalance ?? 0,
+  };
+
+  const handleDisconnect = () => {
+    disconnect();
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       <button
@@ -48,6 +61,9 @@ const WalletConnection: React.FC = () => {
       <WalletModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onDisconnect={handleDisconnect}
+        walletAddress={walletAddress}
+        accountAssets={assets}
       />
     </>
   );

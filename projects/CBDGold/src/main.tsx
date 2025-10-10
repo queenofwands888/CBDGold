@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './styles/hf-style.css'
-import ErrorBoundary from './components/ErrorBoundary'
+import { AppProviders } from './providers'
 
 if (import.meta.env.PROD && window.location.protocol === 'http:') {
   window.location.href = window.location.href.replace('http:', 'https:');
@@ -10,8 +10,8 @@ if (import.meta.env.PROD && window.location.protocol === 'http:') {
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ErrorBoundary>
+    <AppProviders>
       <App />
-    </ErrorBoundary>
+    </AppProviders>
   </React.StrictMode>,
 )

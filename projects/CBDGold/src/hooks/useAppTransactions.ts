@@ -157,5 +157,25 @@ export function useAppTransactions() {
     } else finalize(id, false, 'Vote failed');
   }, [appDispatch]);
 
-  return { purchaseAlgo, purchaseUsdc, claimWithHemp, creditSpinHemp, stakeHemp, unstakeHemp, claimStakingRewards, voteProposal, mode: chainConfig.mode };
+  const claimPrize = useCallback(async () => {
+    const id = beginTx('claim_prize', 'Claim spin prize');
+    try {
+      if (!appState.hasPrizeToClaim) {
+        throw new Error('No prize is currently available to claim');
+      }
+
+      await simulateDelay();
+      const hempReward = 250_000;
+      appDispatch({ type: 'CREDIT_SPIN_HEMP', payload: { hempWon: hempReward } });
+      appDispatch({ type: 'SET_PRIZE_CLAIM_STATUS', payload: false });
+      finalize(id, true);
+      notify(`Prize claim confirmed! Credited ${hempReward.toLocaleString()} HEMP`, 'success');
+    } catch (e: any) {
+      finalize(id, false, e.message || 'Prize claim failed');
+      notify('Prize claim failed: ' + (e.message || 'error'), 'error');
+      throw e;
+    }
+  }, [appDispatch, appState.hasPrizeToClaim]);
+
+  return { purchaseAlgo, purchaseUsdc, claimWithHemp, creditSpinHemp, stakeHemp, unstakeHemp, claimStakingRewards, voteProposal, claimPrize, mode: chainConfig.mode };
 }

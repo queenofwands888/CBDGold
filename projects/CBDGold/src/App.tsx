@@ -1,10 +1,6 @@
 // Clean minimal root App component (fully purged of previous duplicated inline component code)
-import React from 'react';
-import { SnackbarProvider } from 'notistack';
-import { AppProvider, TransactionProvider } from './contexts';
+import React, { useMemo } from 'react';
 import MainLayout from './components/Layout/MainLayout';
-import ErrorBoundary from './components/ErrorBoundary';
-import './styles/hf-style.css';
 import TransactionOverlay from './components/common/TransactionOverlay';
 import { useTransactionContext, useAppContext } from './contexts';
 import { useSimulatedTransaction } from './hooks/useSimulatedTransaction';
@@ -16,7 +12,6 @@ import StakingPanel from './components/sections/StakingPanel';
 import GovernancePanel from './components/sections/GovernancePanel';
 import Hero from './components/Hero/Hero';
 import VapesSection from './components/sections/VapesSection';
-import { useMemo } from 'react';
 import { CBD_VAPES } from './data/constants';
 import { usePersistentState } from './hooks/usePersistentState';
 import TransactionHistoryPanel from './components/sections/TransactionHistoryPanel';
@@ -24,8 +19,7 @@ import SpinGamePanel from './components/sections/SpinGamePanel';
 import ContractStatePanel from './components/sections/ContractStatePanel';
 import PrizeLegend from './components/common/PrizeLegend';
 
-// Internal component to bridge overlay & dev trigger while routing not yet wired
-const AppShell: React.FC = () => {
+const App: React.FC = () => {
   const { state: txState, dispatch } = useTransactionContext();
   const { state: appState } = useAppContext();
   usePersistentState();
@@ -119,21 +113,5 @@ const AppShell: React.FC = () => {
     </>
   );
 };
-
-const App: React.FC = () => (
-  <SnackbarProvider
-    maxSnack={3}
-    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-    autoHideDuration={5000}
-  >
-    <ErrorBoundary>
-      <AppProvider>
-        <TransactionProvider>
-          <AppShell />
-        </TransactionProvider>
-      </AppProvider>
-    </ErrorBoundary>
-  </SnackbarProvider>
-);
 
 export default App;
