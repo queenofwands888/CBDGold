@@ -61,6 +61,35 @@ VITE_TX_SIM_FAIL_RATE=0.1 # 10% failure (default)
 ```
 
 Add this to a `.env.local` file for local development if desired.
+
+## Deployment to Render
+
+### 1. Frontend (Static Site)
+
+1. Commit and push the latest code so Render can pull from GitHub.
+2. In the Render dashboard, choose **New + → Static Site** and select this repository.
+3. Set the **Root Directory** to `projects/CBDGold`.
+4. Use the following build settings:
+   - **Build Command:** `npm install && npm run build`
+   - **Publish Directory:** `dist`
+5. Add environment variables as needed; at minimum set `VITE_API_URL` to the deployed backend URL (for example, `https://cbdgold-backend.onrender.com`).
+6. Click **Create Static Site**. Render will build and deploy automatically on future pushes.
+
+### 2. Backend (Node Web Service)
+
+1. From the Render dashboard, choose **New + → Web Service**.
+2. Select the same repository, and set the **Root Directory** to `projects/CBDGold/backend`.
+3. Configure the service with:
+   - **Environment:** Node
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm run start`
+4. Populate the required environment variables from `backend/.env.template` (API tokens, email credentials, Algorand indexer details, rate limits, etc.).
+5. Set `FRONTEND_URL` to the static site URL Render gives you.
+6. Create the service. Render will provision HTTPS automatically and redeploy on new commits.
+
+### 3. Infrastructure as Code (Optional)
+
+A starter `render.yaml` at `projects/CBDGold/render.yaml` defines both services so you can enable **Blueprint Deploys** in Render. Toggle the "Use Blueprint" option during service creation, and Render will keep the infrastructure in sync with the file.
 # CBDGold
 
 This starter React project has been generated using AlgoKit. See below for default getting started instructions.
