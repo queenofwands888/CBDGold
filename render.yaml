@@ -3,7 +3,7 @@ services:
     name: cbdgold-backend
     runtime: node
     rootDir: projects/CBDGold/backend
-  buildCommand: npm install --omit=optional --force
+    buildCommand: npm install --force
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
@@ -44,11 +44,9 @@ services:
     name: cbdgold-frontend
     runtime: static
     rootDir: projects/CBDGold
-  buildCommand: npm install --omit=optional --force && npm run build
+    buildCommand: npm install --force && npm run build
     staticPublishPath: dist
     envVars:
-      - key: ROLLUP_SKIP_NODEJS_NATIVE
-        value: "1"
       - key: VITE_API_URL
         value: https://cbdgold-backend.onrender.com
       - key: SKIP_CLIENT_GEN
