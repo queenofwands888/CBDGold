@@ -2,7 +2,6 @@ services:
   - type: web
     name: cbdgold-backend
     runtime: node
-    plan: free
     rootDir: projects/CBDGold/backend
     buildCommand: npm install
     startCommand: npm run start
@@ -44,7 +43,6 @@ services:
   - type: web
     name: cbdgold-frontend
     runtime: static
-    plan: free
     rootDir: projects/CBDGold
     buildCommand: npm install && npm run build
     staticPublishPath: dist
