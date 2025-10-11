@@ -2,7 +2,7 @@ services:
   - type: web
     name: cbdgold-backend
     runtime: node
-    plan: starter
+    plan: free
     rootDir: projects/CBDGold/backend
     buildCommand: npm install
     startCommand: npm run start
