@@ -130,9 +130,11 @@ Add this to a `.env.local` file for local development if desired.
 5. Set `FRONTEND_URL` to the static site URL Render gives you.
 6. Create the service. Render will provision HTTPS automatically and redeploy on new commits.
 
-### 3. Infrastructure as Code (Optional)
+### 3. Infrastructure as Code (Recommended)
 
-A starter `render.yaml` at `projects/CBDGold/render.yaml` defines both services so you can enable **Blueprint Deploys** in Render. Toggle the "Use Blueprint" option during service creation, and Render will keep the infrastructure in sync with the file.
+A root-level `render.yaml` (located at the repository root) now defines both services. Enable **Blueprint Deploys** in Render and point the blueprint at `main` so Render uses the same build commands you run locally.
+
+If you previously created Render services that expect a Dockerfile, delete or disable them after the blueprint deploy finishes—otherwise those Docker-based services will continue to fail builds. The blueprint-configured services run with the Node/Static buildpacks and automatically redeploy on new pushes.
 # CBDGold
 
 This starter React project has been generated using AlgoKit. See below for default getting started instructions.
