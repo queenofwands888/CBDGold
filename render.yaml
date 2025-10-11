@@ -44,7 +44,7 @@ services:
   - type: web
     name: cbdgold-frontend
     runtime: static
-    plan: starter
+    plan: free
     rootDir: projects/CBDGold
     buildCommand: npm install && npm run build
     staticPublishPath: dist
