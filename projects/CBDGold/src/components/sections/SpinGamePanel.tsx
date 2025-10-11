@@ -76,10 +76,11 @@ const SpinGamePanel: React.FC = () => {
         creditSpinHemp(result.amount);
         notify(`Credited ${result.amount.toLocaleString()} HEMP!`, 'success');
       } else if (result.type === 'prize') {
+        dispatch({ type: 'SET_PRIZE_CLAIM_STATUS', payload: true });
         if (typeof result.discountPct === 'number') {
           // Treat coupon prizes as immediate spin bonus (stacking within cap) for now
-            dispatch({ type: 'SET_SPIN_BONUS', payload: { discount: result.discountPct, result: result.label } });
-            notify(`${result.label}: ${result.discountPct}% discount coupon applied (temp bonus)`, 'info');
+          dispatch({ type: 'SET_SPIN_BONUS', payload: { discount: result.discountPct, result: result.label } });
+          notify(`${result.label}: ${result.discountPct}% discount coupon applied (temp bonus)`, 'info');
         } else {
           // Placeholder: would trigger NFT mint / claim flow
           notify(`${result.label} won! (NFT claim placeholder)`, 'success');

@@ -30,8 +30,8 @@ const ClaimPrizeButton: React.FC = () => {
     <button
       onClick={handleClaim}
       disabled={!canClaim || loading}
-      className={`ml-4 px-5 py-2 rounded-full font-bold text-sm bg-gradient-to-r from-yellow-400 to-amber-500 text-yellow-900 shadow-lg border-2 border-yellow-200/60 transition-all ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
-      title="Claim your prize!"
+      className={`px-5 py-2 rounded-full font-bold text-sm bg-gradient-to-r from-yellow-400 to-amber-500 text-yellow-900 shadow-lg border-2 border-yellow-200/60 transition-all ${loading || !canClaim ? 'opacity-60 cursor-not-allowed' : 'hover:from-yellow-300 hover:to-amber-400'}`}
+      title={canClaim ? 'Claim your prize!' : 'Connect wallet to claim'}
     >
       {loading ? 'Claiming...' : 'Claim Prize'}
     </button>

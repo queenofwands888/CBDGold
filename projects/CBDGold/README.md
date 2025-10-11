@@ -135,6 +135,10 @@ Add this to a `.env.local` file for local development if desired.
 A root-level `render.yaml` (located at the repository root) now defines both services. Enable **Blueprint Deploys** in Render and point the blueprint at `main` so Render uses the same build commands you run locally.
 
 If you previously created Render services that expect a Dockerfile, delete or disable them after the blueprint deploy finishes—otherwise those Docker-based services will continue to fail builds. The blueprint-configured services run with the Node/Static buildpacks and automatically redeploy on new pushes.
+
+## Milestones
+
+- [2025-02-14 · Render Deploy Stability](./docs/milestones/2025-02-14-render-deploy-stability.md)
 # CBDGold
 
 This starter React project has been generated using AlgoKit. See below for default getting started instructions.
