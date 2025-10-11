@@ -46,12 +46,13 @@
     "tslib": "^2.6.2"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.52.4"
+    "@rollup/rollup-linux-x64-gnu": "4.52.4",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.1.13"
   },
   "scripts": {
     "generate:app-clients": "node ./scripts/generate-app-clients.mjs",
-  "dev": "npm run generate:app-clients && vite",
-  "build": "npm run generate:app-clients && tsc && cross-env ROLLUP_SKIP_NODEJS_NATIVE=1 vite build",
+    "dev": "npm run generate:app-clients && vite",
+    "build": "npm run generate:app-clients && tsc && cross-env ROLLUP_SKIP_NODEJS_NATIVE=1 vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
