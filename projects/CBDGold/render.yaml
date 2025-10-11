@@ -3,7 +3,7 @@ services:
     name: cbdgold-backend
     env: node
     plan: starter
-    rootDir: backend
+  rootDir: projects/CBDGold/backend
     buildCommand: npm install
     startCommand: npm run start
     envVars:
@@ -44,7 +44,7 @@ services:
   - type: static_site
     name: cbdgold-frontend
     plan: starter
-    rootDir: .
+  rootDir: projects/CBDGold
     buildCommand: npm install && npm run build
     publishPath: dist
     envVars:
