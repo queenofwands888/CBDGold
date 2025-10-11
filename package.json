@@ -2,8 +2,7 @@
   "name": "cbdgold-monorepo",
   "private": true,
   "workspaces": [
-    "projects/CBDGold",
-    "CBD.Gold/cbd-gold-shopfi"
+    "projects/CBDGold"
   ],
   "scripts": {
     "install:all": "npm install --workspaces",
