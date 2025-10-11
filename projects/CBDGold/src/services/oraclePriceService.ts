@@ -1,6 +1,6 @@
 // Oracle Price Service: Aggregates pricing from backend and fallback sources.
 // Future extension: Integrate AMM/DEX spot (Tinyman, Pact) or external oracle (Pyth, etc.)
-import { secureLogger } from '../utils/security';
+import { logger } from '../utils/logger';
 
 export interface OraclePrices {
   algoUsd: number;
@@ -36,7 +36,7 @@ export async function getOraclePrices(baseUrl?: string): Promise<OraclePrices> {
     const weedUsd = numberOr(p.WEED, p.weed, p.weedUsd);
     const usdcUsd = numberOr(p.USDC, p.usdc, p.usdcUsd, 1);
     if (!isFinite(algoUsd) || algoUsd <= 0 || !isFinite(hempUsd) || hempUsd <= 0 || !isFinite(weedUsd) || weedUsd <= 0) {
-      secureLogger.warn('Invalid oracle values, using fallback');
+  logger.warn('Invalid oracle values, using fallback');
       cache = { ...FALLBACK, lastUpdated: Date.now() };
       return cache;
     }
@@ -50,7 +50,7 @@ export async function getOraclePrices(baseUrl?: string): Promise<OraclePrices> {
     };
     return cache;
   } catch (err) {
-    secureLogger.error('Oracle fetch failed, using fallback', err);
+  logger.error('Oracle fetch failed, using fallback', err);
     cache = { ...FALLBACK, lastUpdated: Date.now() };
     return cache;
   }

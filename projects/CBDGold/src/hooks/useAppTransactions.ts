@@ -1,17 +1,12 @@
 import { useCallback } from 'react';
+import type { TransactionSigner } from 'algosdk';
 import { useTransactionContext, useAppContext } from '../contexts';
 import { useNotify } from './useNotify';
 import { chainConfig } from '../onchain/env';
-import { stakeHempOnChain, unstakeHempOnChain, claimStakingRewardsOnChain } from '../onchain/staking';
+import { stakeHempOnChain, unstakeHempOnChain, claimStakingRewardsOnChain } from '../onchain/stakingTransactions';
+import { voteOnChain } from '../onchain/governanceTransactions';
+import { claimPrizeOnChain } from '../onchain/prizeTransactions';
 import { useWalletManager } from './useWalletManager';
-
-// Placeholder wallet signer integration point; to be replaced when wallet hook is wired
-type SignerFn = (txns: any[]) => Promise<Uint8Array[]>;
-const mockSigner: SignerFn = async (txns) => {
-  // In real integration, use wallet-provided signer returning signed blobs
-  // For now, just throw to indicate missing signer if actually invoked
-  throw new Error('Wallet signer not integrated yet');
-};
 
 // Unified simulated contract interaction layer (placeholder for real Algorand logic)
 export function useAppTransactions() {
@@ -79,14 +74,13 @@ export function useAppTransactions() {
     const id = beginTx('stake_hemp', `Stake ${amount} HEMP`);
     try {
       if (chainConfig.mode === 'onchain') {
-        // On-chain path
         const activeAccount = appState.walletAddress;
         if (!activeAccount) throw new Error('Wallet not connected');
-        const signer = async (txns: any[]) => wallet.signTransactions(txns as any);
-        await stakeHempOnChain(activeAccount, signer, amount);
+        const signer: TransactionSigner = async (txns) => wallet.signTransactions(txns);
+        const { txId } = await stakeHempOnChain(activeAccount, signer, amount);
         appDispatch({ type: 'STAKE_HEMP', payload: { amount } });
         finalize(id, true);
-        notify('On-chain stake confirmed', 'success');
+        notify(`On-chain stake confirmed (tx ${txId.slice(0, 8)}…)`, 'success');
       } else {
         // Simulation path
         await simulateDelay();
@@ -98,7 +92,7 @@ export function useAppTransactions() {
       finalize(id, false, e.message || 'Stake failed');
       notify('Stake failed: ' + (e.message || 'error'), 'error');
     }
-  }, [appDispatch, appState.walletAddress, wallet]);
+  }, [appDispatch, appState.walletAddress, wallet, notify]);
 
   const unstakeHemp = useCallback(async (amount: number) => {
     const id = beginTx('unstake_hemp', `Unstake ${amount} HEMP`);
@@ -106,11 +100,11 @@ export function useAppTransactions() {
       if (chainConfig.mode === 'onchain') {
         const activeAccount = appState.walletAddress;
         if (!activeAccount) throw new Error('Wallet not connected');
-        const signer = async (txns: any[]) => wallet.signTransactions(txns as any);
-        await unstakeHempOnChain(activeAccount, signer, amount);
+        const signer: TransactionSigner = async (txns) => wallet.signTransactions(txns);
+        const { txId } = await unstakeHempOnChain(activeAccount, signer, amount);
         appDispatch({ type: 'UNSTAKE_HEMP', payload: { amount } });
         finalize(id, true);
-        notify('On-chain unstake confirmed', 'success');
+        notify(`On-chain unstake confirmed (tx ${txId.slice(0, 8)}…)`, 'success');
       } else {
         await simulateDelay();
         appDispatch({ type: 'UNSTAKE_HEMP', payload: { amount } });
@@ -121,7 +115,7 @@ export function useAppTransactions() {
       finalize(id, false, e.message || 'Unstake failed');
       notify('Unstake failed: ' + (e.message || 'error'), 'error');
     }
-  }, [appDispatch, appState.walletAddress, wallet]);
+  }, [appDispatch, appState.walletAddress, wallet, notify]);
 
   const claimStakingRewards = useCallback(async (rewardAmount: number) => {
     const id = beginTx('claim_rewards', `Claim ~${rewardAmount} HEMP`);
@@ -129,11 +123,11 @@ export function useAppTransactions() {
       if (chainConfig.mode === 'onchain') {
         const activeAccount = appState.walletAddress;
         if (!activeAccount) throw new Error('Wallet not connected');
-        const signer = async (txns: any[]) => wallet.signTransactions(txns as any);
-        await claimStakingRewardsOnChain(activeAccount, signer);
+        const signer: TransactionSigner = async (txns) => wallet.signTransactions(txns);
+        const { txId } = await claimStakingRewardsOnChain(activeAccount, signer);
         appDispatch({ type: 'CLAIM_STAKING_REWARDS', payload: { reward: rewardAmount } });
         finalize(id, true);
-        notify('On-chain rewards claimed', 'success');
+        notify(`On-chain rewards claimed (tx ${txId.slice(0, 8)}…)`, 'success');
       } else {
         await simulateDelay();
         appDispatch({ type: 'CLAIM_STAKING_REWARDS', payload: { reward: rewardAmount } });
@@ -144,18 +138,30 @@ export function useAppTransactions() {
       finalize(id, false, e.message || 'Claim failed');
       notify('Claim failed: ' + (e.message || 'error'), 'error');
     }
-  }, [appDispatch, appState.walletAddress, wallet]);
+  }, [appDispatch, appState.walletAddress, wallet, notify]);
 
   const voteProposal = useCallback(async (idNum: number, weedSpent: number, title?: string) => {
     const id = beginTx('vote', `Vote ${idNum}`);
-    await simulateDelay();
-    const success = Math.random() > 0.02;
-    if (success) {
-      appDispatch({ type: 'VOTE_PROPOSAL', payload: { id: idNum, weedSpent } });
-      finalize(id, true);
-      notify(`Vote recorded${title ? ': ' + title : ''}`, 'success');
-    } else finalize(id, false, 'Vote failed');
-  }, [appDispatch]);
+    try {
+      if (chainConfig.mode === 'onchain') {
+        const activeAccount = appState.walletAddress;
+        if (!activeAccount) throw new Error('Wallet not connected');
+        const signer: TransactionSigner = async (txns) => wallet.signTransactions(txns);
+        const { txId } = await voteOnChain(activeAccount, signer, idNum, true);
+        appDispatch({ type: 'VOTE_PROPOSAL', payload: { id: idNum, weedSpent } });
+        finalize(id, true);
+        notify(`Vote submitted${title ? ': ' + title : ''} (tx ${txId.slice(0, 8)}…)`, 'success');
+      } else {
+        await simulateDelay();
+        appDispatch({ type: 'VOTE_PROPOSAL', payload: { id: idNum, weedSpent } });
+        finalize(id, true);
+        notify(`Vote recorded${title ? ': ' + title : ''}`, 'success');
+      }
+    } catch (e: any) {
+      finalize(id, false, e.message || 'Vote failed');
+      notify('Vote failed: ' + (e.message || 'error'), 'error');
+    }
+  }, [appDispatch, appState.walletAddress, wallet, notify]);
 
   const claimPrize = useCallback(async () => {
     const id = beginTx('claim_prize', 'Claim spin prize');
@@ -164,18 +170,30 @@ export function useAppTransactions() {
         throw new Error('No prize is currently available to claim');
       }
 
-      await simulateDelay();
-      const hempReward = 250_000;
-      appDispatch({ type: 'CREDIT_SPIN_HEMP', payload: { hempWon: hempReward } });
-      appDispatch({ type: 'SET_PRIZE_CLAIM_STATUS', payload: false });
-      finalize(id, true);
-      notify(`Prize claim confirmed! Credited ${hempReward.toLocaleString()} HEMP`, 'success');
+      if (chainConfig.mode === 'onchain') {
+        const activeAccount = appState.walletAddress;
+        if (!activeAccount) throw new Error('Wallet not connected');
+        const signer: TransactionSigner = async (txns) => wallet.signTransactions(txns);
+        const prizeAmount = 250_000; // placeholder reward amount until contract returns value
+        const { txId } = await claimPrizeOnChain(activeAccount, signer, prizeAmount);
+        appDispatch({ type: 'CREDIT_SPIN_HEMP', payload: { hempWon: prizeAmount } });
+        appDispatch({ type: 'SET_PRIZE_CLAIM_STATUS', payload: false });
+        finalize(id, true);
+        notify(`Prize claimed on-chain (tx ${txId.slice(0, 8)}…)`, 'success');
+      } else {
+        await simulateDelay();
+        const hempReward = 250_000;
+        appDispatch({ type: 'CREDIT_SPIN_HEMP', payload: { hempWon: hempReward } });
+        appDispatch({ type: 'SET_PRIZE_CLAIM_STATUS', payload: false });
+        finalize(id, true);
+        notify(`Prize claim confirmed! Credited ${hempReward.toLocaleString()} HEMP`, 'success');
+      }
     } catch (e: any) {
       finalize(id, false, e.message || 'Prize claim failed');
       notify('Prize claim failed: ' + (e.message || 'error'), 'error');
       throw e;
     }
-  }, [appDispatch, appState.hasPrizeToClaim]);
+  }, [appDispatch, appState.hasPrizeToClaim, appState.walletAddress, wallet, notify]);
 
   return { purchaseAlgo, purchaseUsdc, claimWithHemp, creditSpinHemp, stakeHemp, unstakeHemp, claimStakingRewards, voteProposal, claimPrize, mode: chainConfig.mode };
 }

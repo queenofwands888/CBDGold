@@ -1,5 +1,6 @@
 import algosdk from 'algosdk';
 import { chainConfig } from './env';
+import { logger } from '../utils/logger';
 
 export interface AsaBalances {
   algo: number;
@@ -28,7 +29,7 @@ export async function fetchAsaBalances(address: string): Promise<AsaBalances> {
       if (id === chainConfig.usdcAsaId) usdc = bal / 1_000_000; // assuming 6 decimals
     }
   } catch (e) {
-    console.warn('ASA balance fetch failed; using zeros', e);
+    logger.warn('ASA balance fetch failed; using zeros', e);
   }
   return { algo, hemp, weed, usdc };
 }

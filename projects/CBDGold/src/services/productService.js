@@ -1,5 +1,5 @@
 // API service for fetching products and prices from backend
-import { secureLogger } from '../utils/security';
+import { logger } from '../utils/logger';
 import { getOraclePrices } from './oraclePriceService';
 
 class ProductService {
@@ -26,7 +26,7 @@ class ProductService {
       }
 
       const data = await response.json();
-      secureLogger.log(`Products fetched: ${data.products?.length || 0} items`);
+  logger.info('Products fetched', { count: data.products?.length || 0 });
 
       // Enrich with oracle-derived prices BEFORE caching so cache has enriched structure
       const oracle = await getOraclePrices(this.baseUrl);
@@ -37,14 +37,14 @@ class ProductService {
       });
       return { ...enriched, oracle };
     } catch (error) {
-      secureLogger.error('Failed to fetch products', error);
+  logger.error('Failed to fetch products', error);
       // Return cached data if available, even if stale
       if (cached) {
-        secureLogger.warn('Using stale cached data due to fetch error');
+  logger.warn('Using stale cached product data');
         return cached.data;
       }
       // Fallback to local data if no cache available
-      secureLogger.log('Using fallback products data');
+  logger.info('Using fallback products data');
       const fallback = this.getFallbackProducts();
       const oracle = await getOraclePrices(this.baseUrl);
       return { ...this._enrichProducts(fallback, oracle), oracle };
@@ -60,7 +60,7 @@ class ProductService {
 
       return await response.json();
     } catch (error) {
-      secureLogger.error(`Failed to fetch product ${id}`, error);
+  logger.error(`Failed to fetch product ${id}`, error);
       return null;
     }
   }
@@ -89,7 +89,7 @@ class ProductService {
 
       return data;
     } catch (error) {
-      secureLogger.error('Failed to fetch prices', error);
+  logger.error('Failed to fetch prices', error);
       // Return fallback prices
       return {
         success: true,

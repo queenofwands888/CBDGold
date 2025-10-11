@@ -1,0 +1,93 @@
+{
+  "hints": {},
+  "contract": {
+    "name": "CBDGoldPrize",
+    "methods": [
+      {
+        "name": "claim_prize",
+        "desc": "Claim a prize payout if the caller meets staking requirements and cooldown.",
+        "args": [
+          { "name": "amount", "type": "uint64", "desc": "Requested prize amount" }
+        ],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "fund_pool",
+        "desc": "Admin funds the prize pool via grouped ASA transfer into the contract.",
+        "args": [],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "get_prize_info",
+        "desc": "Emit prize statistics for the caller (claims, cooldown) via logs.",
+        "args": [],
+        "returns": { "type": "void" },
+        "readonly": true
+      },
+      {
+        "name": "admin_toggle",
+        "desc": "Toggle prize claim availability (admin only).",
+        "args": [],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "set_staking_app",
+        "desc": "Admin sets the staking application ID used to validate eligibility.",
+        "args": [
+          { "name": "staking_app_id", "type": "uint64", "desc": "Application ID of staking contract" }
+        ],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "set_min_stake",
+        "desc": "Admin sets minimum stake required for prize eligibility.",
+        "args": [
+          { "name": "min_stake", "type": "uint64", "desc": "Minimum HEMP stake required" }
+        ],
+        "returns": { "type": "void" }
+      }
+    ],
+    "networks": {}
+  },
+  "schema": {
+    "global": {
+      "declared": {
+        "total_prizes_claimed": { "type": "uint64", "key": "total_prizes_claimed", "descr": "Number of claims processed" },
+        "prize_pool_balance": { "type": "uint64", "key": "prize_pool_balance", "descr": "Total ASA held for prizes" },
+        "admin_address": { "type": "bytes", "key": "admin_address", "descr": "Administrator address", "static": true },
+        "claims_enabled": { "type": "uint64", "key": "claims_enabled", "descr": "Claims enabled toggle" },
+        "staking_app_id": { "type": "uint64", "key": "staking_app_id", "descr": "Staking app used for eligibility" },
+        "min_stake_req": { "type": "uint64", "key": "min_stake_req", "descr": "Minimum stake requirement" },
+        "daily_max": { "type": "uint64", "key": "daily_max", "descr": "Reserved for daily cap" }
+      }
+    },
+    "local": {
+      "declared": {
+        "total_claims": { "type": "uint64", "key": "total_claims", "descr": "Total claims made by user" },
+        "last_claim": { "type": "uint64", "key": "last_claim", "descr": "Timestamp of last claim" }
+      }
+    }
+  },
+  "source": {
+    "approval": "",
+    "clear": ""
+  },
+  "state": {
+    "global": {
+      "num_uints": 6,
+      "num_byte_slices": 1
+    },
+    "local": {
+      "num_uints": 2,
+      "num_byte_slices": 0
+    }
+  }
+  ,
+  "bare_call_config": {
+    "no_op": "CALL",
+    "opt_in": "CALL",
+    "close_out": "CALL",
+    "delete_application": "CALL",
+    "update_application": "CALL"
+  }
+}

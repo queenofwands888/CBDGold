@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { chainConfig } from '../../onchain/env';
-import { fetchStakingGlobalState, fetchStakingLocalState } from '../../onchain/staking';
+import { fetchStakingGlobalState, fetchStakingLocalState } from '../../onchain/stakingTransactions';
 import { useAppContext } from '../../contexts';
 
 const ContractStatePanel: React.FC = () => {

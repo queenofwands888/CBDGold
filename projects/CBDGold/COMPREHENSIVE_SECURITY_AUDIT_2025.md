@@ -49,18 +49,19 @@ npm install esbuild@latest vite@latest
 **Files**: `.env`, `backend/.env`
 **Issues Found**:
 ```env
-# Frontend .env (token redacted in repo; rotate immediately if this value was ever real)
-VITE_HF_TOKEN=<replace_with_your_huggingface_token>
+# Frontend .env (tokens redacted in repo; rotate immediately if any production value was ever committed)
 VITE_ALGOD_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+VITE_API_URL=https://cbdgold-backend.example
 
 # Backend .env - Insecure defaults (example placeholders only)
-HF_TOKEN=<replace_with_backend_token>
+ADMIN_API_KEY=<replace_with_backend_admin_key>
+EMAIL_PASS=<replace_with_smtp_password>
 ```
 
 **Impact**: API tokens may be exposed to version control or unauthorized access
 **Fix Required**:
 ```bash
-# 1. Immediately revoke exposed HuggingFace token
+# 1. Revoke any third-party API tokens committed in git history (legacy external integrations now removed)
 # 2. Use proper .env management
 echo ".env" >> .gitignore
 echo "backend/.env" >> .gitignore
@@ -189,7 +190,7 @@ npm install esbuild@latest vite@latest
 
 2. **Secure Environment Variables**
 ```bash
-# Revoke exposed HuggingFace token immediately
+# Rotate any historical third-party tokens immediately (legacy external credentials already purged)
 # Update .gitignore
 echo ".env*" >> .gitignore
 echo "!.env.template" >> .gitignore

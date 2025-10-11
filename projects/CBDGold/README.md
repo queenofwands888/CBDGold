@@ -1,8 +1,52 @@
 ## Development
 
- Run dev server:
+- Install dependencies:
+
+```bash
+npm install
+npm run backend:install
+```
+
+- Regenerate Algorand contract clients when you update on-chain code:
+
+```bash
+npm run generate:app-clients
+```
+
+- Start the frontend (runs the generator automatically and launches Vite):
+
+```bash
+npm run dev
+```
+
+- Start the backend API for local testing:
+
+```bash
+npm run backend:dev
+```
+
+To run both services together use the convenience script:
+
+```bash
+npm run dev:full
+```
+
+The client generator now includes an automatic post-processing step (see `scripts/generate-app-clients.mjs`) that patches the generated files so bare-call transaction types only include supported `onComplete` values. This keeps TypeScript builds green even after regenerating clients from scratch.
 
 ### Testing
+
+Vitest drives the unit/integration suite for both the frontend and lightweight backend utilities.
+
+```bash
+npm test
+```
+
+For watch mode during local development:
+
+```bash
+npm run test:watch
+```
+
 ### Environment & Security Configuration
 
 Backend `.env` keys:
@@ -13,16 +57,27 @@ ENABLE_SECURITY_HEADERS=true
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 ADMIN_API_KEY=change_me_to_strong_random
-HF_TOKEN=your_hf_token
-HF_MODEL=your_model_name
-HF_RATE_LIMIT_MAX=15
-HF_TIMEOUT_MS=15000
+```
 ```
 
 Frontend `.env.local` keys:
 ```
 VITE_API_URL=http://localhost:3001
 VITE_TX_SIM_FAIL_RATE=0.1
+
+# Algorand connectivity (set to match LocalNet/TestNet/MainNet)
+VITE_ALGOD_SERVER=https://testnet-api.algonode.cloud
+VITE_ALGOD_PORT=
+VITE_ALGOD_TOKEN=
+VITE_ALGOD_NETWORK=testnet
+
+# Contract + ASA identifiers (all required for on-chain mode)
+VITE_STAKING_APP_ID=
+VITE_GOV_APP_ID=
+VITE_PRIZE_APP_ID=
+VITE_HEMP_ASA_ID=
+VITE_WEED_ASA_ID=
+VITE_USDC_ASA_ID=
 ```
 
 Oracle / Pricing System:
@@ -35,21 +90,6 @@ Oracle / Pricing System:
 Admin Security:
 - All `/admin/*` endpoints now require header `x-admin-key: $ADMIN_API_KEY`.
 - Replace the temporary API-key gate with wallet challenge/JWT before production.
-
-
-Vitest is configured for unit testing.
-
-Run the full test suite:
-
-```bash
-npm test
-```
-
-Watch mode during development:
-
-```bash
-npm run test:watch
-```
 
 ### Transaction Simulation
 
@@ -74,7 +114,8 @@ Add this to a `.env.local` file for local development if desired.
    - **Publish Directory:** `dist`
 5. Add environment variables as needed:
    - `VITE_API_URL` pointing to the deployed backend URL (for example, `https://cbdgold-backend.onrender.com`).
-   - `SKIP_CLIENT_GEN=1` so the build skips Algokit client generation on Render (the script falls back automatically if the CLI is missing).
+   - `VITE_ALGOD_SERVER`, `VITE_ALGOD_NETWORK`, and the `VITE_*_APP_ID` / ASA variables for the network you plan to target.
+   - `SKIP_CLIENT_GEN=1` if the build image does not provide the AlgoKit CLI (the generator will reuse the existing clients and still run the post-processing patch).
 6. Click **Create Static Site**. Render will build and deploy automatically on future pushes.
 
 ### 2. Backend (Node Web Service)
@@ -155,6 +196,16 @@ The template comes with [`use-wallet`](https://github.com/txnlab/use-wallet) int
 - - [Daffi Wallet](https://www.daffi.me).
 
 Refer to official [`use-wallet`](https://github.com/txnlab/use-wallet) documentation for detailed guidelines on how to integrate with other wallet providers (such as WalletConnect v2). Too see implementation details on the use wallet hook and initialization of extra wallet providers refer to [`App.tsx`](./src/App.tsx).
+
+## Wallet testing checklist
+
+1. **Populate Algod + contract env vars** – set `VITE_ALGOD_*`, `VITE_STAKING_APP_ID`, `VITE_GOV_APP_ID`, `VITE_PRIZE_APP_ID`, `VITE_HEMP_ASA_ID`, `VITE_WEED_ASA_ID`, and `VITE_USDC_ASA_ID` in `.env.local` (or deployment env). When all IDs are present the dApp switches to on-chain mode automatically.
+2. **Start a network endpoint** – for LocalNet run `algokit localnet start` (or the "Start AlgoKit LocalNet" VS Code task); for TestNet/MainNet ensure the public endpoint you configured is reachable.
+3. **Regenerate clients** – `npm run generate:app-clients` to pull the latest ARC-56 specs and auto-patch bare call typing.
+4. **Launch services** – `npm run dev:full` starts both frontend and backend; open `http://localhost:5173`.
+5. **Connect an Algorand wallet** – the UI checks `window.algorand`/`window.myAlgoConnect`. Use Pera/Defly browser extensions on TestNet/MainNet or the AlgoKit LocalNet wallet in development.
+6. **Fund the address** – be sure the wallet holds the configured ASA IDs and enough ALGOs to cover transaction fees before staking, voting, or claiming prizes.
+7. **Inspect transaction toasts** – every on-chain action surfaces the tx id (first 8 chars). Use the Explorer for your target network to verify groups and state changes.
 
 # Tools
 

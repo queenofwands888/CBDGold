@@ -4,6 +4,7 @@ import FeatherIcon from '../FeatherIcon';
 import { useAppContext } from '../../contexts';
 import { useNotify } from '../../hooks/useNotify';
 import { useAppTransactions } from '../../hooks/useAppTransactions';
+import { normalizeTokenInput, parsePositiveNumber } from '../../utils/validation';
 
 const StakingPanel: React.FC = () => {
   const { state, dispatch } = useAppContext();
@@ -12,14 +13,29 @@ const StakingPanel: React.FC = () => {
   const { stakeHemp, unstakeHemp, claimStakingRewards } = useAppTransactions();
   const [amounts, setAmounts] = useState<Record<number, string>>({});
 
+  const handleAmountChange = (poolId: number, raw: string) => {
+    const normalized = normalizeTokenInput(raw, { allowDecimals: false, maxLength: 12 });
+    setAmounts(prev => ({ ...prev, [poolId]: normalized }));
+  };
+
   const stake = (poolId: number): void => {
-    const pool = STAKING_POOLS.find(p => p.id === poolId)!;
-    const raw = parseFloat(amounts[poolId] || '');
-  if (!raw || raw <= 0) { notify('Enter amount in HEMP', 'warning'); return; }
-    const atomic = Math.floor(raw); // currently treat raw as atomic tokens
-  if (atomic < pool.minStake) { notify(`Minimum ${pool.minStake.toLocaleString()} HEMP for ${pool.name}`, 'error'); return; }
-  if (atomic > accountAssets.hemp) { notify('Insufficient HEMP balance', 'error'); return; }
-  stakeHemp(atomic);
+    const pool = STAKING_POOLS.find(p => p.id === poolId);
+    if (!pool) return;
+    const parsed = parsePositiveNumber(amounts[poolId] ?? '');
+    if (parsed === null) {
+      notify('Enter a valid amount in HEMP', 'warning');
+      return;
+    }
+    const atomic = Math.floor(parsed);
+    if (atomic < pool.minStake) {
+      notify(`Minimum ${pool.minStake.toLocaleString()} HEMP for ${pool.name}`, 'error');
+      return;
+    }
+    if (atomic > accountAssets.hemp) {
+      notify('Insufficient HEMP balance', 'error');
+      return;
+    }
+    stakeHemp(atomic);
     notify(`Submitting stake of ${atomic.toLocaleString()} HEMP into ${pool.name}...`, 'info');
   };
 
@@ -52,7 +68,7 @@ const StakingPanel: React.FC = () => {
                   type="number"
                   placeholder={`Min ${pool.minStake.toLocaleString()} HEMP`}
                   value={amounts[pool.id] || ''}
-                  onChange={e => setAmounts(a => ({ ...a, [pool.id]: e.target.value }))}
+                  onChange={e => handleAmountChange(pool.id, e.target.value)}
                   className="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 text-sm"
                 />
                 <div className="flex flex-col gap-2">
@@ -65,9 +81,12 @@ const StakingPanel: React.FC = () => {
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <button
                       onClick={() => {
-                        const raw = parseFloat(amounts[pool.id] || '0');
-                        if (!raw || raw <= 0) { notify('Enter unstake amount', 'warning'); return; }
-                        unstakeHemp(Math.floor(raw));
+                        const parsed = parsePositiveNumber(amounts[pool.id] || '');
+                        if (parsed === null) {
+                          notify('Enter unstake amount', 'warning');
+                          return;
+                        }
+                        unstakeHemp(Math.floor(parsed));
                       }}
                       className="bg-black/30 hover:bg-black/40 rounded-lg py-2 font-semibold text-yellow-300"
                     >Unstake</button>

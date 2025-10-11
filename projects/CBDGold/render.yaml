@@ -13,10 +13,6 @@ services:
         value: 10000
       - key: FRONTEND_URL
         value: https://cbdgold-frontend.onrender.com
-      - key: HF_TOKEN
-        sync: false
-      - key: HF_MODEL
-        sync: false
       - key: EMAIL_HOST
         sync: false
       - key: EMAIL_PORT

@@ -1,0 +1,99 @@
+{
+  "hints": {},
+  "contract": {
+    "name": "CBDGoldGovernance",
+    "methods": [
+      {
+        "name": "create_proposal",
+        "desc": "Admin creates a new governance proposal with supplied title.",
+        "args": [
+          { "name": "title", "type": "string", "desc": "UTF-8 proposal title" }
+        ],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "vote",
+        "desc": "Eligible voter casts a vote for (1) or against (0) a proposal.",
+        "args": [
+          { "name": "proposal_id", "type": "uint64", "desc": "Target proposal id" },
+          { "name": "vote_for", "type": "uint64", "desc": "1 for yes, 0 for no" }
+        ],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "finalize_proposal",
+        "desc": "Finalize proposal outcome once voting window closes.",
+        "args": [
+          { "name": "proposal_id", "type": "uint64", "desc": "Target proposal id" }
+        ],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "get_proposal",
+        "desc": "Emit proposal aggregates (votes, status) via logs for off-chain reads.",
+        "args": [
+          { "name": "proposal_id", "type": "uint64", "desc": "Target proposal id" }
+        ],
+        "returns": { "type": "void" },
+        "readonly": true
+      },
+      {
+        "name": "update_voting_power",
+        "desc": "Update caller voting power based on current WEED holdings.",
+        "args": [
+          { "name": "voting_power", "type": "uint64", "desc": "Voting power weight" }
+        ],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "set_quorum",
+        "desc": "Admin sets the minimum vote weight required for quorum.",
+        "args": [
+          { "name": "quorum_min", "type": "uint64", "desc": "Minimum aggregate voting weight" }
+        ],
+        "returns": { "type": "void" }
+      }
+    ],
+    "networks": {}
+  },
+  "schema": {
+    "global": {
+      "declared": {
+        "total_proposals": { "type": "uint64", "key": "total_proposals", "descr": "Total proposals ever created" },
+        "active_proposals": { "type": "uint64", "key": "active_proposals", "descr": "Current active proposals" },
+        "admin_address": { "type": "bytes", "key": "admin_address", "descr": "Administrator address", "static": true },
+        "voting_enabled": { "type": "uint64", "key": "voting_enabled", "descr": "Voting toggle" },
+        "min_weed_required": { "type": "uint64", "key": "min_weed_required", "descr": "Minimum WEED requirement to vote" },
+        "quorum_min": { "type": "uint64", "key": "quorum_min", "descr": "Minimum votes to reach quorum" }
+      }
+    },
+    "local": {
+      "declared": {
+        "voting_power": { "type": "uint64", "key": "voting_power", "descr": "Individual voting power" },
+        "total_votes": { "type": "uint64", "key": "total_votes", "descr": "Total votes cast by user" }
+      }
+    }
+  },
+  "source": {
+    "approval": "",
+    "clear": ""
+  },
+  "state": {
+    "global": {
+      "num_uints": 5,
+      "num_byte_slices": 1
+    },
+    "local": {
+      "num_uints": 2,
+      "num_byte_slices": 0
+    }
+  }
+  ,
+  "bare_call_config": {
+    "no_op": "CALL",
+    "opt_in": "CALL",
+    "close_out": "NEVER",
+    "delete_application": "CALL",
+    "update_application": "CALL"
+  }
+}

@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { chainConfig } from '../onchain/env';
-import { fetchStakingGlobalState, fetchStakingLocalState } from '../onchain/staking';
+import { fetchStakingGlobalState, fetchStakingLocalState } from '../onchain/stakingTransactions';
 import { useAppContext } from '../contexts';
-import { fetchAsaBalances } from '../onchain/assets';
+import { fetchAsaBalances } from '../onchain/assetBalances';
 
 // Polling sync for on-chain mode; lightweight (no websocket)
 export function useOnChainSync(intervalMs = 20000) {

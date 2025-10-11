@@ -1,0 +1,95 @@
+{
+  "hints": {},
+  "contract": {
+    "name": "CBDGoldStaking",
+    "methods": [
+      {
+        "name": "set_params",
+        "desc": "Configure staking asset and emission rate (admin only).",
+        "args": [
+          { "name": "asset_id", "type": "uint64", "desc": "ASA id to stake" },
+          { "name": "reward_rate", "type": "uint64", "desc": "Emission rate measured per second" }
+        ],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "stake",
+        "desc": "Stake HEMP tokens; must be grouped with an asset transfer to the app account.",
+        "args": [],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "unstake",
+        "desc": "Unstake previously deposited HEMP tokens back to the caller.",
+        "args": [
+          { "name": "amount", "type": "uint64", "desc": "Amount of HEMP to withdraw" }
+        ],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "claim",
+        "desc": "Claim accumulated staking rewards in HEMP.",
+        "args": [],
+        "returns": { "type": "void" }
+      },
+      {
+        "name": "get_info",
+        "desc": "Emit staking stats (staked balance, tier, pending rewards) via logs.",
+        "args": [],
+        "returns": { "type": "void" },
+        "readonly": true
+      },
+      {
+        "name": "admin_toggle",
+        "desc": "Toggle staking availability on or off (admin only).",
+        "args": [],
+        "returns": { "type": "void" }
+      }
+    ],
+    "networks": {}
+  },
+  "schema": {
+    "global": {
+      "declared": {
+        "total_staked": { "type": "uint64", "key": "total_staked", "descr": "Total staked HEMP" },
+        "staking_enabled": { "type": "uint64", "key": "staking_enabled", "descr": "Staking toggle" },
+        "admin_address": { "type": "bytes", "key": "admin_address", "descr": "Administrator address", "static": true },
+        "asset_id": { "type": "uint64", "key": "asset_id", "descr": "ASA id being staked" },
+        "reward_rate": { "type": "uint64", "key": "reward_rate", "descr": "Reward emission per second" },
+        "last_reward_time": { "type": "uint64", "key": "last_reward_time", "descr": "Last reward accumulator update timestamp" },
+        "acc_rpt": { "type": "uint64", "key": "acc_rpt", "descr": "Scaled reward-per-token accumulator" }
+      }
+    },
+    "local": {
+      "declared": {
+        "staked_amount": { "type": "uint64", "key": "staked_amount", "descr": "User staked HEMP" },
+        "reward_debt": { "type": "uint64", "key": "reward_debt", "descr": "Reward debt to avoid double counting" },
+        "pending": { "type": "uint64", "key": "pending", "descr": "Pending rewards awaiting claim" },
+        "stake_timestamp": { "type": "uint64", "key": "stake_timestamp", "descr": "Last stake timestamp" },
+        "tier": { "type": "uint64", "key": "tier", "descr": "User tier derived from balance" }
+      }
+    }
+  },
+  "source": {
+    "approval": "",
+    "clear": ""
+  },
+  "state": {
+    "global": {
+      "num_uints": 6,
+      "num_byte_slices": 1
+    },
+    "local": {
+      "num_uints": 5,
+      "num_byte_slices": 0
+    }
+  }
+  ,
+  "bare_call_config": {
+    "no_op": "CALL",
+    "opt_in": "CALL",
+    "close_out": "CALL",
+    "delete_application": "CALL",
+    "update_application": "CALL"
+  }
+}

@@ -18,6 +18,9 @@ import TransactionHistoryPanel from './components/sections/TransactionHistoryPan
 import SpinGamePanel from './components/sections/SpinGamePanel';
 import ContractStatePanel from './components/sections/ContractStatePanel';
 import PrizeLegend from './components/common/PrizeLegend';
+import PriceBar from './components/PriceBar';
+import { useOracleTicker } from './hooks/useOracleTicker';
+import { logger } from './utils/logger';
 
 const App: React.FC = () => {
   const { state: txState, dispatch } = useTransactionContext();
@@ -25,8 +28,22 @@ const App: React.FC = () => {
   usePersistentState();
   const { simulate, resetCurrent } = useSimulatedTransaction();
   const { currentTx } = txState;
-  const tokenPrices = useMemo(() => ({ HEMP: 0.00025 }), []);
-  const oracleMeta = useMemo(() => ({ source: { backend: false, fallback: true }, lastUpdated: Date.now() - 15000 }), []);
+  const {
+    oracle,
+    lastLiveOracle,
+    history: oracleHistory,
+    priceDelta,
+    paused: oraclePaused,
+    loading: oracleLoading,
+    refresh: refreshOracle,
+    togglePaused: toggleOraclePaused,
+  } = useOracleTicker();
+  const tokenPrices = useMemo(() => ({
+    HEMP: oracle?.hempUsd ?? 0.0001,
+    WEED: oracle?.weedUsd ?? 0.00008,
+    ALGO: oracle?.algoUsd ?? 0.25,
+    USDC: oracle?.usdcUsd ?? 1,
+  }), [oracle]);
 
   const showOverlay = currentTx.status !== 'idle';
 
@@ -34,6 +51,16 @@ const App: React.FC = () => {
     <>
       <MainLayout>
         <Hero />
+        <PriceBar
+          oracleMeta={oracle}
+          lastLiveOracle={lastLiveOracle}
+          priceDelta={priceDelta}
+          history={oracleHistory}
+          paused={oraclePaused}
+          onTogglePaused={toggleOraclePaused}
+          onRefresh={refreshOracle}
+          loading={oracleLoading}
+        />
         <div className="flex items-center justify-between mb-6" data-nav-tabs>
           <NavigationTabs />
           <ChainModeBadge />
@@ -64,10 +91,10 @@ const App: React.FC = () => {
                   hempEarned: v.hempEarned
                 }))}
                 tokenPrices={tokenPrices}
-                oracleMeta={oracleMeta as any}
+                oracleMeta={oracle as any}
                 onPurchase={(vape, method, price) => {
                   // Placeholder: additional side-effects (analytics, post-purchase modal) could be inserted here
-                  console.log('[purchase-event]', { id: vape.id, method, price });
+                  logger.info('purchase-event', { id: vape.id, method, price });
                 }}
               />
             )}

@@ -16,14 +16,14 @@ output_path = "src/contracts/clients"
 [[project.contracts]]
 type = "python"
 name = "CBDGoldStaking"
-path = "./contracts/CBDGoldStaking"
+path = "../CBDGoldStaking"
 
 [[project.contracts]]
 type = "python"
 name = "CBDGoldPrize"
-path = "./contracts/CBDGoldPrize"
+path = "../CBDGoldPrize"
 
 [[project.contracts]]
 type = "python"
 name = "CBDGoldGovernance"
-path = "./contracts/CBDGoldGovernance"
+path = "../CBDGoldGovernance"

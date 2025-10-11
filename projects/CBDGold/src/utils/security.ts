@@ -1,6 +1,9 @@
 // Security utilities for input validation and sanitization
 // 🔒 CBDGold Security Module
 
+import { secureStorage } from './storage';
+import { logger } from './logger';
+
 /**
  * Validates Algorand wallet addresses
  * @param address - The wallet address to validate
@@ -136,60 +139,64 @@ export const validateEmail = (email: string): { isValid: boolean; error?: string
  * @param window - Time window in milliseconds
  * @returns boolean - True if call is allowed
  */
-export const isRateLimited = (key: string, limit: number = 10, window: number = 60000): boolean => {
-  const now = Date.now();
-  const storageKey = `rate_limit_${key}`;
-
-  try {
-    const stored = localStorage.getItem(storageKey);
-    const calls = stored ? JSON.parse(stored) : [];
-
-    // Remove old calls outside the window
-    const recentCalls = calls.filter((timestamp: number) => now - timestamp < window);
-
-    // Check if limit exceeded
-    if (recentCalls.length >= limit) {
-      return true; // Rate limited
-    }
-
-    // Add current call and save
-    recentCalls.push(now);
-    localStorage.setItem(storageKey, JSON.stringify(recentCalls));
-
-    return false; // Not rate limited
-  } catch (error) {
-    // If localStorage fails, allow the call
-    console.warn('Rate limiting storage failed:', error);
+export const isRateLimited = (key: string, limit: number = 10, windowMs: number = 60000): boolean => {
+  if (!key || typeof key !== 'string') {
     return false;
   }
+
+  if (limit <= 0) {
+    return true;
+  }
+
+  const now = Date.now();
+  const sanitizedKey = key.replace(/[^a-zA-Z0-9:_-]/g, '').toLowerCase() || 'default';
+  const bucketLimit = Math.max(limit, 1);
+  const sanitizedWindow = Math.max(windowMs, 0);
+  const legacyStorageKey = `rate_limit_${sanitizedKey}`;
+
+  const allBuckets = secureStorage.getJSON<Record<string, number[]>>('rate_limits') ?? {};
+  const rawTimestamps = Array.isArray(allBuckets[sanitizedKey]) ? allBuckets[sanitizedKey] : [];
+  let timestamps = rawTimestamps.filter(ts => typeof ts === 'number');
+
+  if (typeof window !== 'undefined') {
+    try {
+      const legacyPayload = window.localStorage?.getItem(legacyStorageKey);
+      if (legacyPayload) {
+        const legacy = JSON.parse(legacyPayload);
+        if (Array.isArray(legacy)) {
+          timestamps = timestamps.concat(legacy.filter((ts: unknown) => typeof ts === 'number'));
+        }
+        window.localStorage?.removeItem(legacyStorageKey);
+      }
+    } catch (error) {
+      logger.warn('Failed to migrate legacy rate limit state', { key: sanitizedKey, error });
+    }
+  }
+
+  const recentCalls = sanitizedWindow === 0
+    ? []
+    : timestamps.filter(timestamp => now - timestamp < sanitizedWindow);
+
+  if (recentCalls.length >= bucketLimit) {
+    allBuckets[sanitizedKey] = recentCalls.slice(0, bucketLimit);
+    if (!secureStorage.setJSON('rate_limits', allBuckets, { maxBytes: 12_288 })) {
+      logger.warn('Failed to persist rate limit bucket after cap', { key: sanitizedKey });
+    }
+    return true;
+  }
+
+  recentCalls.push(now);
+  allBuckets[sanitizedKey] = recentCalls.slice(-bucketLimit);
+  if (!secureStorage.setJSON('rate_limits', allBuckets, { maxBytes: 12_288 })) {
+    logger.warn('Failed to persist updated rate limit bucket', { key: sanitizedKey });
+  }
+
+  return false;
 };
 
 /**
  * Secure logger that doesn't expose sensitive data in production
  */
-export const secureLogger = {
-  log: (message: string, data?: any) => {
-    if (import.meta.env.DEV) {
-      console.log(`[CBDGold] ${message}`, data);
-    }
-  },
-
-  error: (message: string, error?: any) => {
-    if (import.meta.env.DEV) {
-      console.error(`[CBDGold ERROR] ${message}`, error);
-    } else {
-      // In production, only log non-sensitive error info
-      console.error(`[CBDGold] Error occurred: ${message}`);
-    }
-  },
-
-  warn: (message: string, data?: any) => {
-    if (import.meta.env.DEV) {
-      console.warn(`[CBDGold WARN] ${message}`, data);
-    }
-  }
-};
-
 /**
  * Security headers validation for API responses
  * @param response - Fetch API response object
@@ -205,7 +212,7 @@ export const validateApiResponse = (response: Response): boolean => {
   );
 
   if (!isDomainAllowed) {
-    secureLogger.error('API response from unauthorized domain:', url.hostname);
+    logger.error('API response from unauthorized domain', url.hostname);
     return false;
   }
 

@@ -6,6 +6,9 @@
     },
     {
       "path": "projects/CBDGold"
+    },
+    {
+      "path": "projects/sample-contract"
     }
   ],
   "settings": {

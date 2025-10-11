@@ -2,8 +2,9 @@ import { MutableRefObject, useCallback, useMemo, useRef } from 'react';
 import algosdk from 'algosdk';
 import { useAppContext } from '../contexts';
 import { chainConfig } from '../onchain/env';
-import { fetchAsaBalances } from '../onchain/assets';
+import { fetchAsaBalances } from '../onchain/assetBalances';
 import { AccountAssets } from '../types';
+import { logger } from '../utils/logger';
 
 type WalletConnection = {
   address: string;
@@ -84,7 +85,7 @@ function createOnChainAdapter(simulationAdapter: WalletAdapter, hasWarnedNoProvi
       const provider = getWindowProvider();
       if (!provider) {
         if (!hasWarnedNoProvider.current) {
-          console.warn('Algorand wallet provider not detected; falling back to simulation mode');
+          logger.warn('Algorand wallet provider not detected; falling back to simulation mode');
           hasWarnedNoProvider.current = true;
         }
         return simulationAdapter.connect();
@@ -103,8 +104,9 @@ function createOnChainAdapter(simulationAdapter: WalletAdapter, hasWarnedNoProvi
         const balances = await fetchAsaBalances(address);
         return { address, assets: balances };
       } catch (error) {
-        console.warn('Unable to fetch on-chain balances, falling back to simulation values', error);
-  return { address, assets: await simulationAdapter.refreshAssets(address) };
+        logger.warn('Unable to fetch on-chain balances, falling back to simulation values', error);
+        const fallbackAssets = await simulationAdapter.refreshAssets(address);
+        return { address, assets: fallbackAssets };
       }
     },
     async disconnect() {
@@ -117,8 +119,8 @@ function createOnChainAdapter(simulationAdapter: WalletAdapter, hasWarnedNoProvi
       try {
         return await fetchAsaBalances(address);
       } catch (error) {
-        console.warn('Failed to fetch ASA balances, returning simulated values', error);
-  return simulationAdapter.refreshAssets(address);
+        logger.warn('Failed to fetch ASA balances, returning simulated values', error);
+        return simulationAdapter.refreshAssets(address);
       }
     },
     async signTransactions(txns: algosdk.Transaction[]) {
@@ -152,7 +154,7 @@ export function useWalletManager() {
       dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address } });
       dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: assets });
     } catch (error) {
-      console.error(`[wallet:${adapter.name}] connect failed`, error);
+      logger.error(`[wallet:${adapter.name}] connect failed`, error);
       dispatch({ type: 'SET_CONNECTING', payload: false });
       throw error;
     }
@@ -161,7 +163,7 @@ export function useWalletManager() {
   const disconnect = useCallback(() => {
     dispatch({ type: 'RESET_WALLET' });
     adapter.disconnect().catch((error) => {
-      console.warn(`[wallet:${adapter.name}] disconnect failed`, error);
+      logger.warn(`[wallet:${adapter.name}] disconnect failed`, error);
     });
   }, [adapter, dispatch]);
 
@@ -172,7 +174,7 @@ export function useWalletManager() {
       const balances = await adapter.refreshAssets(address);
       dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: balances });
     } catch (error) {
-      console.warn(`[wallet:${adapter.name}] asset refresh failed`, error);
+      logger.warn(`[wallet:${adapter.name}] asset refresh failed`, error);
     }
   }, [adapter, dispatch, state.walletAddress]);
 

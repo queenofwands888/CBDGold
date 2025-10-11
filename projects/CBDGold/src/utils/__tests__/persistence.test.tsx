@@ -6,6 +6,7 @@ import { render, screen, act } from '@testing-library/react';
 globalThis.__TESTING__ = true;
 import App from '../../App';
 import { AppProviders } from '../../providers';
+import { secureStorage } from '../../utils/storage';
 
 // Provide mocks to prevent network & animation libs from causing side effects
 vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ products: [], tokenPrices: {} }) })));
@@ -27,6 +28,7 @@ describe('Persistence (localStorage)', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     localStorage.clear();
+    secureStorage.clearNamespace();
   });
   afterEach(() => {
     vi.clearAllTimers();
@@ -37,7 +39,7 @@ describe('Persistence (localStorage)', () => {
     const seedHistory = [
       { id: 'a', type: 'other', status: 'confirmed' as const, createdAt: Date.now() - 1000, note: 'Old Tx', amount: 0, txId: 'SIMULATED_TX_abc1234567' }
     ];
-    localStorage.setItem('cbdgold_tx_history', JSON.stringify(seedHistory));
+  localStorage.setItem('cbdgold_tx_history', JSON.stringify(seedHistory));
     localStorage.setItem('cbdgold_app_state', JSON.stringify({
       walletConnected: true,
       walletAddress: 'TEST_ADDR',
@@ -71,7 +73,7 @@ describe('Persistence (localStorage)', () => {
     await flushMicrotasks();
 
     const many = Array.from({ length: 40 }, (_, i) => ({ id: 'tx' + i, type: 'other' as const, status: 'confirmed' as const, createdAt: Date.now() - i * 1000, note: 'Tx ' + i, amount: 0 }));
-    localStorage.setItem('cbdgold_tx_history', JSON.stringify(many));
+  localStorage.setItem('cbdgold_tx_history', JSON.stringify(many));
 
     render(
       <AppProviders>
@@ -80,7 +82,7 @@ describe('Persistence (localStorage)', () => {
     ); // re-mount to reload and persist trimmed history
     await flushMicrotasks();
 
-    const stored = JSON.parse(localStorage.getItem('txHistory') || '[]');
+    const stored = secureStorage.getJSON<any[]>('tx_history') ?? [];
     expect(stored.length).toBeLessThanOrEqual(25);
   });
 });

@@ -2,6 +2,8 @@
 // SECURITY: API calls now go through secure backend proxy
 // No more direct API token exposure in frontend!
 
+import { logger } from '../utils/logger';
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 export default async function queryModel(text: string) {
@@ -30,7 +32,7 @@ export default async function queryModel(text: string) {
 
     return res.json();
   } catch (error) {
-    console.error('HuggingFace API error:', error);
+    logger.error('HuggingFace API error', error);
     throw error;
   }
 }
