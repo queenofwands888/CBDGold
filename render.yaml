@@ -41,7 +41,7 @@ services:
         value: "600000"
       - key: CLAIM_RATE_LIMIT_MAX_REQUESTS
         value: "3"
-  - type: static_site
+  - type: static
     name: cbdgold-frontend
     plan: starter
     rootDir: projects/CBDGold
