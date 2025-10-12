@@ -16,17 +16,10 @@ const WalletProviders: React.FC<Props> = ({ children }) => {
 			wallets.push({ id: WalletId.WALLETCONNECT, options: { projectId: wcProjectId } });
 		}
 
-		return new WalletManager({
-			wallets,
-			defaultNetwork: network,
-			networks: {
-				[network]: {
-					algod: { baseServer, port, token },
-					isTestnet: String(network).toLowerCase().includes('test')
-				}
-			},
-			options: { debug: false, resetNetwork: false }
-		});
+			return new WalletManager({
+				wallets,
+				defaultNetwork: network,
+			});
 	}, []);
 
 	return <WalletProvider manager={manager}>{children}</WalletProvider>;
