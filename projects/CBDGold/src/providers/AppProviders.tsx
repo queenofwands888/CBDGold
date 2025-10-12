@@ -2,6 +2,7 @@ import React from 'react';
 import { SnackbarProvider } from 'notistack';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { AppProvider, TransactionProvider } from '../contexts';
+import WalletProviders from './WalletProviders';
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -14,9 +15,11 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => (
     autoHideDuration={5000}
   >
     <ErrorBoundary>
-      <AppProvider>
-        <TransactionProvider>{children}</TransactionProvider>
-      </AppProvider>
+      <WalletProviders>
+        <AppProvider>
+          <TransactionProvider>{children}</TransactionProvider>
+        </AppProvider>
+      </WalletProviders>
     </ErrorBoundary>
   </SnackbarProvider>
 );
