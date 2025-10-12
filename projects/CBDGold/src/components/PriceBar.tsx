@@ -39,35 +39,61 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
     }).join(' ');
   }
   return (
-    <div className="w-full mb-6 mt-8 md:mt-10 flex justify-center px-3">
-      <div className="w-full max-w-3xl glass-card rounded-xl px-4 py-2 flex flex-wrap items-center gap-6 text-sm">
-        <div className="flex items-center gap-2">
-          <span className={`px-2 py-1 rounded-md font-semibold ${badgeColor}`}>{live ? 'Live' : 'Fallback'} · {ageSec}s</span>
+    <div className="w-full mb-8 mt-6 md:mt-8 flex justify-center px-3 animate-slideUp">
+      <div className="w-full max-w-4xl glass-card rounded-2xl px-5 py-3 flex flex-wrap items-center gap-4 md:gap-6 text-sm backdrop-blur-xl">
+        <div className="flex items-center gap-2.5">
+          <span className={`badge ${badgeColor} flex items-center gap-1.5`}>
+            <span className={`w-2 h-2 rounded-full ${live ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`} />
+            {live ? 'Live' : 'Fallback'} · {ageSec}s
+          </span>
           {onTogglePaused && (
             <button
               onClick={onTogglePaused}
-              className={`text-xs px-2 py-1 rounded-md border border-white/10 ${paused ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30' : 'hover:bg-white/10'}`}
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all ${
+                paused 
+                  ? 'bg-red-500/15 text-red-300 border-red-500/30 hover:bg-red-500/25' 
+                  : 'border-white/10 hover:bg-white/5 hover:border-white/20'
+              }`}
               title="Pause/resume auto-refresh (Alt+P)"
             >
-              {paused ? 'Resume' : 'Pause'}
+              {paused ? '▶ Resume' : '⏸ Pause'}
             </button>
           )}
           {onRefresh && (
             <button
               onClick={onRefresh}
               disabled={loading}
-              className={`text-xs px-2 py-1 rounded-md border border-white/10 ${loading ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/10'}`}
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium border border-white/10 transition-all ${
+                loading 
+                  ? 'opacity-40 cursor-not-allowed' 
+                  : 'hover:bg-white/5 hover:border-brand-emerald/30'
+              }`}
               title="Refresh prices (Alt+R)"
             >
-              {loading ? '…' : 'Refresh'}
+              {loading ? '⟳ Loading...' : '↻ Refresh'}
             </button>
           )}
         </div>
-        <div className="flex items-center gap-6 flex-wrap">
-          <div className="flex items-center gap-2"><span className="text-gray-400">ALGO</span><span className="text-blue-300">${oracleMeta.algoUsd?.toFixed(3) ?? '0.000'}</span><Delta value={priceDelta?.algoPct} /></div>
-          <div className="flex items-center gap-2"><span className="text-gray-400">HEMP</span><span className="text-green-300">${oracleMeta.hempUsd?.toFixed(6) ?? '0.000000'}</span><Delta value={priceDelta?.hempPct} /></div>
-          <div className="flex items-center gap-2"><span className="text-gray-400">WEED</span><span className="text-pink-300">${oracleMeta.weedUsd?.toFixed(6) ?? '0.000000'}</span><Delta value={priceDelta?.weedPct} /></div>
-          <div className="flex items-center gap-2"><span className="text-gray-400">USDC</span><span className="text-yellow-300">${oracleMeta.usdcUsd?.toFixed(2) ?? '1.00'}</span></div>
+        <div className="flex items-center gap-4 md:gap-6 flex-wrap">
+          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
+            <span className="text-gray-400 text-xs font-medium">ALGO</span>
+            <span className="text-blue-400 font-bold">${oracleMeta.algoUsd?.toFixed(3) ?? '0.000'}</span>
+            <Delta value={priceDelta?.algoPct} />
+          </div>
+          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
+            <span className="text-gray-400 text-xs font-medium">HEMP</span>
+            <span className="text-brand-emerald font-bold">${oracleMeta.hempUsd?.toFixed(6) ?? '0.000000'}</span>
+            <Delta value={priceDelta?.hempPct} />
+          </div>
+          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
+            <span className="text-gray-400 text-xs font-medium">WEED</span>
+            <span className="text-pink-400 font-bold">${oracleMeta.weedUsd?.toFixed(6) ?? '0.000000'}</span>
+            <Delta value={priceDelta?.weedPct} />
+          </div>
+          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
+            <span className="text-gray-400 text-xs font-medium">USDC</span>
+            <span className="text-yellow-400 font-bold">${oracleMeta.usdcUsd?.toFixed(2) ?? '1.00'}</span>
+          </div>
           {lastLiveOracle && !live && (
             <div className="text-xs text-orange-300">Reverted to fallback · last live {Math.round((Date.now() - lastLiveOracle.lastUpdated) / 1000)}s ago</div>
           )}

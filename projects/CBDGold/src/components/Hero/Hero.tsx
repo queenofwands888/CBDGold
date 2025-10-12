@@ -14,29 +14,61 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative flex flex-col items-center justify-center min-h-[70vh] w-full text-center bg-gradient-to-br from-[#181824] via-[#23243a] to-[#1a1a2e] pb-12 overflow-hidden rounded-xl mb-10">
-      <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 via-blue-500/10 to-purple-600/10 animate-pulse-slow blur-2xl opacity-70 pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light pointer-events-none" />
-      <div className="relative z-10 flex flex-col items-center justify-center px-6">
-        <img
-          src="https://huggingface.co/spaces/CBDGold/cbdgold/resolve/main/images/CBD%20Logo%20-%20PNG%20File%20-%20Black%20Background%20-%2072dpi%20-%20Web%20Use.png"
-          alt="CBD Gold Logo"
-          className="w-32 h-32 rounded-full shadow-2xl mb-6 border-4 border-white/10 bg-black/60 object-cover"
-          style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}
-        />
-        <h1 className="text-4xl md:text-5xl font-black text-white drop-shadow-2xl mb-5 tracking-tight leading-tight">
-          CBD Gold ShopFi
+    <section className="relative flex flex-col items-center justify-center min-h-[75vh] w-full text-center overflow-hidden rounded-2xl mb-12 animate-fadeIn">
+      {/* Animated background layers */}
+      <div className="absolute inset-0 bg-gradient-to-br from-surface via-brand-midnight to-surface-elevated" />
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-green/10 via-brand-emerald/5 to-brand-purple/10 animate-pulse-slow blur-3xl" />
+      <div className="absolute inset-0 bg-noise-soft opacity-[0.15] mix-blend-soft-light pointer-events-none" />
+      
+      {/* Accent orbs */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-emerald/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-brand-purple/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      
+      <div className="relative z-10 flex flex-col items-center justify-center px-6 py-16 max-w-5xl mx-auto">
+        {/* Logo with glow effect */}
+        <div className="relative mb-8 animate-slideUp">
+          <div className="absolute inset-0 bg-brand-emerald/30 rounded-full blur-2xl animate-glow" />
+          <img
+            src="https://huggingface.co/spaces/CBDGold/cbdgold/resolve/main/images/CBD%20Logo%20-%20PNG%20File%20-%20Black%20Background%20-%2072dpi%20-%20Web%20Use.png"
+            alt="CBD Gold Logo"
+            className="relative w-36 h-36 rounded-full shadow-card border-2 border-white/10 bg-gradient-to-br from-surface to-surface-elevated object-cover backdrop-blur-sm"
+          />
+        </div>
+        
+        {/* Heading with gradient text */}
+        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tight leading-tight animate-slideUp" style={{ animationDelay: '0.1s' }}>
+          <span className="bg-gradient-to-r from-white via-brand-emerald to-white bg-clip-text text-transparent">
+            CBD Gold ShopFi
+          </span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto mb-8 font-medium drop-shadow">
-          Premium CBD 510 ceramic vapes, ShopFi staking, and WEED governance.<br className="hidden md:block" />
-          <span className="text-green-300 font-semibold">Powered by Algorand.</span>
+        
+        {/* Subtitle */}
+        <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 font-medium leading-relaxed animate-slideUp" style={{ animationDelay: '0.2s' }}>
+          Premium CBD 510 ceramic vapes, ShopFi staking, and WEED governance.
+          <br className="hidden md:block" />
+          <span className="inline-flex items-center gap-2 mt-2 text-brand-emerald font-semibold">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            Powered by Algorand
+          </span>
         </p>
-        <button
-          className="px-10 py-3 rounded-full bg-gradient-to-r from-green-400 to-green-600 text-black font-extrabold text-lg shadow-xl hover:from-green-500 hover:to-green-700 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-400/50 border-2 border-white/10 backdrop-blur-lg"
-          onClick={goShopFi}
-        >
-          Explore ShopFi
-        </button>
+        
+        {/* CTA Button */}
+        <div className="flex flex-col sm:flex-row gap-4 animate-slideUp" style={{ animationDelay: '0.3s' }}>
+          <button
+            className="group relative px-8 py-4 rounded-xl bg-gradient-to-r from-brand-green to-brand-emerald text-black font-bold text-lg shadow-glow-green hover:shadow-glow-green hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand-emerald/50 overflow-hidden"
+            onClick={goShopFi}
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              Explore ShopFi
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        </div>
       </div>
     </section>
   );

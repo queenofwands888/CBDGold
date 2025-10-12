@@ -61,11 +61,11 @@ const App: React.FC = () => {
           onRefresh={refreshOracle}
           loading={oracleLoading}
         />
-        <div className="flex items-center justify-between mb-6" data-nav-tabs>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4" data-nav-tabs>
           <NavigationTabs />
           <ChainModeBadge />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 items-start">
           <div className="lg:col-span-3 space-y-6">
             {appState.activeTab === 'dashboard' && <DashboardPanel />}
             {appState.activeTab === 'shopfi' && <StakingPanel />}
