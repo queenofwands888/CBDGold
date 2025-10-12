@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback, useMemo, useRef } from 'react';
+import { MutableRefObject, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useWallet } from '@txnlab/use-wallet-react';
 import algosdk from 'algosdk';
 import { useAppContext } from '../contexts';
@@ -208,6 +208,19 @@ export function useWalletManager() {
     }
     return adapter.signTransactions(txns);
   }, [adapter, uw]);
+
+  // Sync uw activeAddress to state and refresh assets
+  useEffect(() => {
+    if (uw?.activeAddress && !state.walletConnected) {
+      dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address: uw.activeAddress } });
+      // Refresh assets for the new address
+      adapter.refreshAssets(uw.activeAddress).then((assets) => {
+        dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: assets });
+      }).catch((error) => {
+        logger.warn('[wallet] asset refresh failed on connect', error);
+      });
+    }
+  }, [uw?.activeAddress, adapter, dispatch, state.walletConnected]);
 
   return {
     connect,
