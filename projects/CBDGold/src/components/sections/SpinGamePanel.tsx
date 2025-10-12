@@ -64,8 +64,14 @@ const SpinGamePanel: React.FC = () => {
 
   const spin = () => {
     if (isSpinning) return;
+    if (!state.accountAssets.algo || state.accountAssets.algo < 1) {
+      notify('Not enough ALGO! Need at least 1 ALGO to spin.', 'error');
+      return;
+    }
     setIsSpinning(true);
     setLocalResult(null);
+    // Deduct 1 ALGO from balance (simulated)
+    dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: { ...state.accountAssets, algo: state.accountAssets.algo - 1 } });
     setTimeout(() => {
       const result: any = outcomes[Math.floor(Math.random() * outcomes.length)];
       setLocalResult(result.label);
@@ -113,15 +119,16 @@ const SpinGamePanel: React.FC = () => {
         <div className="flex justify-between"><span className="text-gray-400">Spin Bonus:</span><span className="text-pink-400 font-semibold">{spinBonusDiscount}%</span></div>
         <div className="flex justify-between"><span className="text-gray-400">Effective Discount:</span><span className="text-yellow-400 font-semibold">{totalPotentialDiscount}%</span></div>
         <div className="flex justify-between"><span className="text-gray-400">Cap:</span><span className="text-gray-300">{ECON_CONFIG.MAX_TOTAL_DISCOUNT}%</span></div>
+        <div className="flex justify-between"><span className="text-gray-400">Spin Cost:</span><span className="text-red-400 font-semibold">1 ALGO</span></div>
       </div>
 
       <button
-        disabled={isSpinning}
+        disabled={isSpinning || !state.accountAssets.algo || state.accountAssets.algo < 1}
         onClick={spin}
-        className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-purple-500 to-pink-600 shadow-lg hover:from-purple-600 hover:to-pink-700 ${isSpinning ? 'opacity-60 cursor-not-allowed' : ''}`}
+        className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-purple-500 to-pink-600 shadow-lg hover:from-purple-600 hover:to-pink-700 ${isSpinning || !state.accountAssets.algo || state.accountAssets.algo < 1 ? 'opacity-60 cursor-not-allowed' : ''}`}
       >
         <FeatherIcon icon="refresh-cw" className={isSpinning ? 'animate-spin-slow' : ''} />
-        {isSpinning ? 'SPINNING...' : 'SPIN NOW'}
+        {isSpinning ? 'SPINNING...' : 'SPIN FOR 1 ALGO'}
       </button>
 
       {(localResult || lastSpinResult) && (
