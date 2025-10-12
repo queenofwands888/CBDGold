@@ -40,19 +40,16 @@ const Hero: React.FC = () => {
             {/* Heading with gradient text */}
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tight leading-tight animate-slideUp" style={{ animationDelay: '0.1s' }}>
               <span className="bg-gradient-to-r from-white via-brand-emerald to-white bg-clip-text text-transparent">
-                CBD Gold ShopFi
+                Welcome to ShopFi
               </span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 font-medium leading-relaxed animate-slideUp" style={{ animationDelay: '0.2s' }}>
-              Premium CBD 510 ceramic vapes, ShopFi staking, and WEED governance.
+              eShopping is the concept, CBD Gold is the Brand!
               <br className="hidden md:block" />
-              <span className="inline-flex items-center gap-2 mt-2 text-brand-emerald font-semibold">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Powered by Algorand
+              <span className="inline-flex items-center gap-2 mt-2 text-red-400 font-bold text-xl">
+                TEST IS ON TEST NET - Do not send real funds!!!
               </span>
             </p>
 

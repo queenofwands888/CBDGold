@@ -6,7 +6,7 @@ import FeatherIcon from '../FeatherIcon';
 // Internal keys: dashboard, vapes (CBD Gold products), shopfi (staking), governance
 const tabs: { key: string; label: string; icon: string }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'home' },
-  { key: 'vapes', label: 'CBD Gold', icon: 'shopping-bag' },
+  { key: 'vapes', label: 'eShop', icon: 'shopping-bag' },
   { key: 'shopfi', label: 'ShopFi', icon: 'lock' },
   { key: 'governance', label: 'Governance', icon: 'users' }
 ];
