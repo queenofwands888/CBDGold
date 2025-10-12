@@ -11,6 +11,7 @@ import adminProducts from './admin/products.js';
 import adminAudit from './admin/audit.js';
 import adminGovernance from './admin/governance.js';
 import adminAnalytics from './admin/analytics.js';
+import walletsRouter from './routes/wallets.js';
 
 
 // Admin API routes (after app is initialized)
@@ -92,6 +93,7 @@ app.use('/admin/analytics', requireAdmin, adminAnalytics);
 app.use('/', claimPrizeRouter);
 app.use('/', productsRouter);
 app.use(purchaseRouter);
+app.use('/', walletsRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
