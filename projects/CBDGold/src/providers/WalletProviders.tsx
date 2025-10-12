@@ -6,23 +6,15 @@ type Props = { children: React.ReactNode };
 const WalletProviders: React.FC<Props> = ({ children }) => {
 	const manager = useMemo(() => {
 		const network = (import.meta.env.VITE_ALGOD_NETWORK as string)?.toLowerCase() || NetworkId.TESTNET;
-		const baseServer = (import.meta.env.VITE_ALGOD_SERVER as string) || 'https://testnet-api.algonode.cloud';
-		const port = (import.meta.env.VITE_ALGOD_PORT as string) || '443';
-		const token = (import.meta.env.VITE_ALGOD_TOKEN as string) || '';
 		const wcProjectId = (import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string) || '';
 
 			const wallets: any[] = [WalletId.PERA];
 			if (wcProjectId) {
 				wallets.push({ id: WalletId.WALLETCONNECT, options: { projectId: wcProjectId, chainId: network === 'testnet' ? 'algorand:testnet' : 'algorand:mainnet' } });
-			}			return new WalletManager({
+			}
+			return new WalletManager({
 				wallets,
-				defaultNetwork: network,
-				networks: {
-					[network]: {
-						algod: { baseServer, port, token },
-						isTestnet: network === 'testnet'
-					}
-				}
+				defaultNetwork: network
 			});
 	}, []);
 
