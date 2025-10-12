@@ -5,7 +5,7 @@ import { WalletProvider, WalletManager, WalletId, NetworkId } from '@txnlab/use-
 type Props = { children: React.ReactNode };
 const WalletProviders: React.FC<Props> = ({ children }) => {
 	const manager = useMemo(() => {
-		const network = (import.meta.env.VITE_ALGOD_NETWORK as string) || NetworkId.TESTNET;
+		const network = (import.meta.env.VITE_ALGOD_NETWORK as string)?.toLowerCase() || NetworkId.TESTNET;
 		const baseServer = (import.meta.env.VITE_ALGOD_SERVER as string) || 'https://testnet-api.algonode.cloud';
 		const port = (import.meta.env.VITE_ALGOD_PORT as string) || '443';
 		const token = (import.meta.env.VITE_ALGOD_TOKEN as string) || '';
