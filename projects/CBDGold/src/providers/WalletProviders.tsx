@@ -10,7 +10,7 @@ const WalletProviders: React.FC<Props> = ({ children }) => {
 
 			const wallets: any[] = [WalletId.PERA];
 			if (wcProjectId) {
-				wallets.push({ id: WalletId.WALLETCONNECT, options: { projectId: wcProjectId, chainId: network === 'testnet' ? 416001 : 416002 } });
+				wallets.push({ id: WalletId.WALLETCONNECT, options: { projectId: wcProjectId, chainId: network === 'testnet' ? 'algorand:testnet' : 'algorand:mainnet' } });
 			}
 			return new WalletManager({
 				wallets,
