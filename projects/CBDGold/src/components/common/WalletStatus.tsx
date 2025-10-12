@@ -14,10 +14,7 @@ const WalletStatus: React.FC = () => {
         <h3 className="font-bold text-lg text-brand-emerald">Wallet</h3>
         {!connected ? (
           <button
-            onClick={async () => {
-              await connect();
-              setIsModalOpen(true);
-            }}
+            onClick={() => setIsModalOpen(true)}
             disabled={connecting}
             className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 disabled:opacity-50 text-black text-sm font-bold transition-all shadow-lg"
           >
