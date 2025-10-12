@@ -49,7 +49,7 @@ const Hero: React.FC = () => {
               eShopping is the concept, CBD Gold is the Brand!
               <br className="hidden md:block" />
               <span className="inline-flex items-center gap-2 mt-2 text-red-400 font-bold text-xl">
-                TEST IS ON TEST NET - Do not send real funds!!!
+                THIS IS ON TEST NET - Do not send real funds!!!
               </span>
             </p>
 
