@@ -47,10 +47,10 @@ const ClaimPrize: React.FC<ClaimPrizeProps> = ({ userAddress, prizeId, onClaimed
     setQrCode(null);
     if (typeof onTxStatus === 'function') onTxStatus('pending');
     try {
-    // Call contract client for prize claim
-    const tx: PrizeTxResult = await claimPrizeContract(userAddress, Number(prizeId));
-    if (typeof onTxStatus === 'function') onTxStatus('confirmed', tx.txId);
-    // Continue with backend for shipping QR code
+      // Call contract client for prize claim
+      const tx: PrizeTxResult = await claimPrizeContract(userAddress, Number(prizeId));
+      if (typeof onTxStatus === 'function') onTxStatus('confirmed', tx.txId);
+      // Continue with backend for shipping QR code
       const message = `I claim my prize ${prizeId} for shipping to: ${sanitizedAddress}`;
       let signedMsg: string | null = null;
 

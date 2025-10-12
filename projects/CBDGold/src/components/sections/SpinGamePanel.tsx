@@ -71,7 +71,7 @@ const SpinGamePanel: React.FC = () => {
       setLocalResult(result.label);
       if (result.type === 'discount') {
         dispatch({ type: 'SET_SPIN_BONUS', payload: { discount: result.amount, result: result.label } });
-        notify(`+${result.amount}% bonus discount applied (next purchase or ${ECON_CONFIG.SPIN_BONUS_DURATION_MS/60000}m)`, 'info');
+        notify(`+${result.amount}% bonus discount applied (next purchase or ${ECON_CONFIG.SPIN_BONUS_DURATION_MS / 60000}m)`, 'info');
       } else if (result.type === 'hemp') {
         creditSpinHemp(result.amount);
         notify(`Credited ${result.amount.toLocaleString()} HEMP!`, 'success');
@@ -142,7 +142,7 @@ const SpinGamePanel: React.FC = () => {
             </div>
           ))}
         </div>
-        <p className="text-[9px] text-gray-500 mt-3 leading-relaxed">Prize Tiers: JACKPOT (Full Range NFT), RARE (Single Vape NFT), LEGENDARY (25% Off NFT), GOLDEN (7% Off Coupon). Discount bonuses apply to next qualifying purchase or expire after {ECON_CONFIG.SPIN_BONUS_DURATION_MS/60000} minutes. HEMP prizes credit immediately. NFT & coupon claims currently simulated.</p>
+        <p className="text-[9px] text-gray-500 mt-3 leading-relaxed">Prize Tiers: JACKPOT (Full Range NFT), RARE (Single Vape NFT), LEGENDARY (25% Off NFT), GOLDEN (7% Off Coupon). Discount bonuses apply to next qualifying purchase or expire after {ECON_CONFIG.SPIN_BONUS_DURATION_MS / 60000} minutes. HEMP prizes credit immediately. NFT & coupon claims currently simulated.</p>
       </div>
     </div>
   );

@@ -140,7 +140,7 @@ export const secureStorage = {
       Object.keys(storage)
         .filter(key => key.startsWith(`${NAMESPACE}:`))
         .forEach(key => {
-          try { storage.removeItem(key); } catch {}
+          try { storage.removeItem(key); } catch { }
         });
     }
     memoryFallback.clear();

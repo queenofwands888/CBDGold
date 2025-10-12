@@ -27,7 +27,7 @@ export function useAppTransactions() {
     txDispatch({ type: 'SET_CURRENT_TX', payload: success ? { status: 'confirmed', id } : { status: 'failed', id, error } });
   };
 
-  const simulateDelay = () => new Promise(r => setTimeout(r, 900 + Math.random()*600));
+  const simulateDelay = () => new Promise(r => setTimeout(r, 900 + Math.random() * 600));
 
   const purchaseAlgo = useCallback(async (amountAlgo: number) => {
     const id = beginTx('purchase_algo', `Spend ${amountAlgo} ALGO`);

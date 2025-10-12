@@ -55,7 +55,7 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
       // Call backend purchase API in background (customer view)
       const stakeTierName = currentStakingTier.name.toLowerCase();
       const buyerAddress = state.walletAddress || 'SIMULATION_ADDRESS';
-      
+
       const purchaseResult = await purchaseService.createPurchase(
         vape.id,
         buyerAddress,
@@ -70,7 +70,7 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
       // Display amount charged from backend (customer-friendly)
       const displayPrice = `$${purchaseResult.amountCharged?.toFixed(2) || discounted.toFixed(2)}`;
       onPurchase(vape, currency, displayPrice);
-      
+
       notify(`Purchase completed: ${displayPrice}`, 'success');
       if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
     } catch (error) {
@@ -101,7 +101,7 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
       // Call backend purchase API for HEMP claim (customer view)
       const stakeTierName = currentStakingTier.name.toLowerCase();
       const buyerAddress = state.walletAddress || 'SIMULATION_ADDRESS';
-      
+
       const purchaseResult = await purchaseService.createPurchase(
         vape.id,
         buyerAddress,
@@ -110,15 +110,15 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
       );
 
       await claimWithHemp(hempRequired);
-      
+
       // Display backend amount or fallback message
-      const displayValue = purchaseResult.amountCharged ? 
+      const displayValue = purchaseResult.amountCharged ?
         `Value: $${purchaseResult.amountCharged.toFixed(2)}` :
         `Value: $${usdcEquivalent.toFixed(2)} USDC`;
-      
+
       const message = `Product: ${vape.name}\nHEMP Used: ${hempRequired.toLocaleString()} tokens\n${displayValue}`;
       onPurchase(vape, 'HEMP_CLAIM', message);
-      
+
       if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
     } catch (error) {
       // Fallback to local calculation if backend fails

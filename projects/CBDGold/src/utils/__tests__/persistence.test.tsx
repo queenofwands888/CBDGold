@@ -39,7 +39,7 @@ describe('Persistence (localStorage)', () => {
     const seedHistory = [
       { id: 'a', type: 'other', status: 'confirmed' as const, createdAt: Date.now() - 1000, note: 'Old Tx', amount: 0, txId: 'SIMULATED_TX_abc1234567' }
     ];
-  localStorage.setItem('cbdgold_tx_history', JSON.stringify(seedHistory));
+    localStorage.setItem('cbdgold_tx_history', JSON.stringify(seedHistory));
     localStorage.setItem('cbdgold_app_state', JSON.stringify({
       walletConnected: true,
       walletAddress: 'TEST_ADDR',
@@ -57,8 +57,8 @@ describe('Persistence (localStorage)', () => {
 
     // Presence of history label
     expect(screen.getByText(/Old Tx/)).toBeTruthy();
-  // Presence of note text rendered in history list
-  expect(screen.getByText('Old Tx')).toBeTruthy();
+    // Presence of note text rendered in history list
+    expect(screen.getByText('Old Tx')).toBeTruthy();
     // Staked HEMP value displayed (locale aware)
     const stakeDisplay = Number(12345).toLocaleString();
     expect(screen.getAllByText(stakeDisplay).length).toBeGreaterThan(0);
@@ -73,7 +73,7 @@ describe('Persistence (localStorage)', () => {
     await flushMicrotasks();
 
     const many = Array.from({ length: 40 }, (_, i) => ({ id: 'tx' + i, type: 'other' as const, status: 'confirmed' as const, createdAt: Date.now() - i * 1000, note: 'Tx ' + i, amount: 0 }));
-  localStorage.setItem('cbdgold_tx_history', JSON.stringify(many));
+    localStorage.setItem('cbdgold_tx_history', JSON.stringify(many));
 
     render(
       <AppProviders>

@@ -49,11 +49,10 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
           {onTogglePaused && (
             <button
               onClick={onTogglePaused}
-              className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all ${
-                paused 
-                  ? 'bg-red-500/15 text-red-300 border-red-500/30 hover:bg-red-500/25' 
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all ${paused
+                  ? 'bg-red-500/15 text-red-300 border-red-500/30 hover:bg-red-500/25'
                   : 'border-white/10 hover:bg-white/5 hover:border-white/20'
-              }`}
+                }`}
               title="Pause/resume auto-refresh (Alt+P)"
             >
               {paused ? '▶ Resume' : '⏸ Pause'}
@@ -63,11 +62,10 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
             <button
               onClick={onRefresh}
               disabled={loading}
-              className={`text-xs px-3 py-1.5 rounded-lg font-medium border border-white/10 transition-all ${
-                loading 
-                  ? 'opacity-40 cursor-not-allowed' 
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium border border-white/10 transition-all ${loading
+                  ? 'opacity-40 cursor-not-allowed'
                   : 'hover:bg-white/5 hover:border-brand-emerald/30'
-              }`}
+                }`}
               title="Refresh prices (Alt+R)"
             >
               {loading ? '⟳ Loading...' : '↻ Refresh'}

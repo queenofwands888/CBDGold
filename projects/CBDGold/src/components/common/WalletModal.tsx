@@ -40,7 +40,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
           <button
             className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-bold transition-all"
             onClick={async () => {
-              await activeWallet.disconnect().catch(() => {});
+              await activeWallet.disconnect().catch(() => { });
               onClose();
             }}
           >

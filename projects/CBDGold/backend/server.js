@@ -52,7 +52,7 @@ if (process.env.ENABLE_SECURITY_HEADERS === 'true') {
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:", "https:"],
-  connectSrc: ["'self'"],
+        connectSrc: ["'self'"],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],

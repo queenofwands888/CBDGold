@@ -21,11 +21,10 @@ const NavigationTabs: React.FC = () => {
           <button
             key={t.key}
             onClick={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: t.key })}
-            className={`tab-btn flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-sm ${
-              active
+            className={`tab-btn flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-sm ${active
                 ? 'bg-gradient-to-r from-brand-green to-brand-emerald text-black shadow-glow-green scale-105 border-brand-emerald/50'
                 : 'text-gray-300 hover:text-white hover:scale-105'
-            }`}
+              }`}
           >
             <FeatherIcon icon={t.icon} className="w-4 h-4" />
             <span>{t.label}</span>

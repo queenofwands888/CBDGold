@@ -67,8 +67,8 @@ const TestnetTools: React.FC = () => {
         signedBlob = decodeSignedBlob(res[0]);
       }
 
-  const sendRes: any = await algod.sendRawTransaction(signedBlob!).do();
-  const txId: string = (sendRes && (sendRes.txId || sendRes.txid || sendRes['txId'] || sendRes['txid'])) as string;
+      const sendRes: any = await algod.sendRawTransaction(signedBlob!).do();
+      const txId: string = (sendRes && (sendRes.txId || sendRes.txid || sendRes['txId'] || sendRes['txid'])) as string;
       await algosdk.waitForConfirmation(algod, txId, 4);
       enqueueSnackbar(`Self-payment confirmed: ${txId.slice(0, 10)}…`, { variant: 'success' });
     } catch (e: any) {

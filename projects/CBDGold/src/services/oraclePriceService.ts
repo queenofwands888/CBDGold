@@ -36,7 +36,7 @@ export async function getOraclePrices(baseUrl?: string): Promise<OraclePrices> {
     const weedUsd = numberOr(p.WEED, p.weed, p.weedUsd);
     const usdcUsd = numberOr(p.USDC, p.usdc, p.usdcUsd, 1);
     if (!isFinite(algoUsd) || algoUsd <= 0 || !isFinite(hempUsd) || hempUsd <= 0 || !isFinite(weedUsd) || weedUsd <= 0) {
-  logger.warn('Invalid oracle values, using fallback');
+      logger.warn('Invalid oracle values, using fallback');
       cache = { ...FALLBACK, lastUpdated: Date.now() };
       return cache;
     }
@@ -50,7 +50,7 @@ export async function getOraclePrices(baseUrl?: string): Promise<OraclePrices> {
     };
     return cache;
   } catch (err) {
-  logger.error('Oracle fetch failed, using fallback', err);
+    logger.error('Oracle fetch failed, using fallback', err);
     cache = { ...FALLBACK, lastUpdated: Date.now() };
     return cache;
   }

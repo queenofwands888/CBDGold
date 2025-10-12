@@ -26,7 +26,7 @@ class ProductService {
       }
 
       const data = await response.json();
-  logger.info('Products fetched', { count: data.products?.length || 0 });
+      logger.info('Products fetched', { count: data.products?.length || 0 });
 
       // Enrich with oracle-derived prices BEFORE caching so cache has enriched structure
       const oracle = await getOraclePrices(this.baseUrl);
@@ -37,14 +37,14 @@ class ProductService {
       });
       return { ...enriched, oracle };
     } catch (error) {
-  logger.error('Failed to fetch products', error);
+      logger.error('Failed to fetch products', error);
       // Return cached data if available, even if stale
       if (cached) {
-  logger.warn('Using stale cached product data');
+        logger.warn('Using stale cached product data');
         return cached.data;
       }
       // Fallback to local data if no cache available
-  logger.info('Using fallback products data');
+      logger.info('Using fallback products data');
       const fallback = this.getFallbackProducts();
       const oracle = await getOraclePrices(this.baseUrl);
       return { ...this._enrichProducts(fallback, oracle), oracle };
@@ -60,7 +60,7 @@ class ProductService {
 
       return await response.json();
     } catch (error) {
-  logger.error(`Failed to fetch product ${id}`, error);
+      logger.error(`Failed to fetch product ${id}`, error);
       return null;
     }
   }
@@ -89,7 +89,7 @@ class ProductService {
 
       return data;
     } catch (error) {
-  logger.error('Failed to fetch prices', error);
+      logger.error('Failed to fetch prices', error);
       // Return fallback prices
       return {
         success: true,

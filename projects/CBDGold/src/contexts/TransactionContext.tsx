@@ -39,7 +39,7 @@ function transactionReducer(state: TransactionState, action: TransactionAction):
       return {
         ...state,
         txHistory: state.txHistory.map(tx =>
-          tx.id === action.payload.id 
+          tx.id === action.payload.id
             ? { ...tx, ...action.payload.updates }
             : tx
         ),
@@ -105,7 +105,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
       logger.warn('Failed to persist tx_history payload; consider trimming history');
     }
   }, [state.txHistory]);
-  
+
   return (
     <TransactionContext.Provider value={{ state, dispatch }}>
       {children}

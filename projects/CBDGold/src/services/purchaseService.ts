@@ -16,16 +16,16 @@ class PurchaseService {
    * @param isAdmin - Whether to get admin breakdown (defaults to false for customer view)
    */
   async createPurchase(
-    productId: number, 
-    buyerAddress: string, 
-    stakeTier: string = 'none', 
+    productId: number,
+    buyerAddress: string,
+    stakeTier: string = 'none',
     isAdmin: boolean = false
   ) {
     try {
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
       };
-      
+
       // Add admin header if requested
       if (isAdmin) {
         headers['x-admin-view'] = 'true';
@@ -46,18 +46,18 @@ class PurchaseService {
       }
 
       const data = await response.json();
-      
+
       if (isAdmin) {
-        logger.info('Admin purchase breakdown received', { 
-          product: data.product, 
-          hotShare: data.hotShare, 
-          treasuryShare: data.treasuryShare, 
-          operationalShare: data.operationalShare 
+        logger.info('Admin purchase breakdown received', {
+          product: data.product,
+          hotShare: data.hotShare,
+          treasuryShare: data.treasuryShare,
+          operationalShare: data.operationalShare
         });
       } else {
-        logger.info('Customer purchase completed', { 
-          product: data.product, 
-          amountCharged: data.amountCharged 
+        logger.info('Customer purchase completed', {
+          product: data.product,
+          amountCharged: data.amountCharged
         });
       }
 

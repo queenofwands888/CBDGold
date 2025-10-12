@@ -26,14 +26,16 @@ describe('WalletStatus', () => {
     const connectButton = screen.getByRole('button', { name: 'Connect' });
     fireEvent.click(connectButton);
 
-    expect(screen.getByRole('button', { name: 'Connecting...' })).toBeDisabled();
+    // Now it opens modal, click Pera
+    const peraButton = screen.getByRole('button', { name: /Pera/ });
+    fireEvent.click(peraButton);
 
     await act(async () => {
       vi.advanceTimersByTime(600);
       await Promise.resolve();
     });
 
-    expect(screen.getByRole('button', { name: 'Disconnect' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Wallet' })).toBeInTheDocument();
     expect(screen.getByText(/FAKE/i)).toBeInTheDocument();
     expect(screen.getByText('Refresh Assets')).toBeInTheDocument();
     expect(screen.getByText('5.5')).toBeInTheDocument(); // ALGO balance derived from mocked random value
@@ -44,11 +46,14 @@ describe('WalletStatus', () => {
     renderWithProviders(<WalletStatus />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Connect' }));
+    const peraButton = screen.getByRole('button', { name: /Pera/ });
+    fireEvent.click(peraButton);
     await act(async () => {
       vi.advanceTimersByTime(600);
       await Promise.resolve();
     });
 
+    fireEvent.click(screen.getByRole('button', { name: 'Wallet' }));
     fireEvent.click(screen.getByRole('button', { name: 'Disconnect' }));
 
     expect(screen.getByRole('button', { name: 'Connect' })).toBeInTheDocument();
