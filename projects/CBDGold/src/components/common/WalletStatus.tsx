@@ -5,47 +5,47 @@ const WalletStatus: React.FC = () => {
   const { connect, disconnect, connected, connecting, address, assets, refreshAssets } = useWalletManager();
 
   return (
-    <div className="p-4 rounded-lg border border-gray-700 bg-gray-900/60 space-y-3">
+    <div className="glass-card rounded-xl p-5 space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-yellow-400">Wallet</h3>
+        <h3 className="font-bold text-lg text-brand-emerald">Wallet</h3>
         {!connected ? (
           <button
             onClick={connect}
             disabled={connecting}
-            className="px-3 py-1.5 rounded bg-green-600 hover:bg-green-500 disabled:opacity-50 text-sm font-medium"
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 disabled:opacity-50 text-black text-sm font-bold transition-all shadow-lg"
           >
             {connecting ? 'Connecting...' : 'Connect'}
           </button>
         ) : (
           <button
             onClick={disconnect}
-            className="px-3 py-1.5 rounded bg-red-600 hover:bg-red-500 text-sm font-medium"
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-bold transition-all shadow-lg"
           >
             Disconnect
           </button>
         )}
       </div>
-      <div className="text-xs font-mono break-all text-gray-400 min-h-[28px]">
+      <div className="text-xs font-mono break-all text-gray-300 bg-black/20 rounded-lg p-3 min-h-[44px]">
         {connected ? address : 'Not connected'}
       </div>
       {connected && (
         <>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="bg-gray-800 rounded p-2 text-center">
-              <p className="text-gray-400 text-xs">ALGO</p>
-              <p className="text-blue-400 font-semibold">{assets.algo}</p>
+            <div className="bg-black/30 border border-blue-500/20 rounded-lg p-3 text-center hover:border-blue-400/40 transition-all">
+              <p className="text-gray-400 text-xs mb-1">ALGO</p>
+              <p className="text-blue-400 font-bold text-lg">{assets.algo}</p>
             </div>
-            <div className="bg-gray-800 rounded p-2 text-center">
-              <p className="text-gray-400 text-xs">HEMP</p>
-              <p className="text-green-400 font-semibold">{assets.hemp}</p>
+            <div className="bg-black/30 border border-green-500/20 rounded-lg p-3 text-center hover:border-green-400/40 transition-all">
+              <p className="text-gray-400 text-xs mb-1">HEMP</p>
+              <p className="text-green-400 font-bold text-lg">{assets.hemp}</p>
             </div>
-            <div className="bg-gray-800 rounded p-2 text-center">
-              <p className="text-gray-400 text-xs">WEED</p>
-              <p className="text-purple-400 font-semibold">{assets.weed}</p>
+            <div className="bg-black/30 border border-purple-500/20 rounded-lg p-3 text-center hover:border-purple-400/40 transition-all">
+              <p className="text-gray-400 text-xs mb-1">WEED</p>
+              <p className="text-purple-400 font-bold text-lg">{assets.weed}</p>
             </div>
-            <div className="bg-gray-800 rounded p-2 text-center">
-              <p className="text-gray-400 text-xs">USDC</p>
-              <p className="text-yellow-400 font-semibold">{assets.usdc}</p>
+            <div className="bg-black/30 border border-yellow-500/20 rounded-lg p-3 text-center hover:border-yellow-400/40 transition-all">
+              <p className="text-gray-400 text-xs mb-1">USDC</p>
+              <p className="text-yellow-400 font-bold text-lg">{assets.usdc}</p>
             </div>
           </div>
           <div className="flex gap-2">
