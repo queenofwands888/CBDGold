@@ -61,11 +61,11 @@ const App: React.FC = () => {
           onRefresh={refreshOracle}
           loading={oracleLoading}
         />
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4" data-nav-tabs>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8" data-nav-tabs>
           <NavigationTabs />
           <ChainModeBadge />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
           <div className="lg:col-span-3 space-y-6">
             {appState.activeTab === 'dashboard' && <DashboardPanel />}
             {appState.activeTab === 'shopfi' && <StakingPanel />}
@@ -98,12 +98,12 @@ const App: React.FC = () => {
                 }}
               />
             )}
-            <div className="p-4 rounded-lg border border-gray-700 bg-gray-900/60">
-              <h2 className="font-semibold mb-2 text-yellow-400">Development Controls</h2>
-              <div className="flex gap-3 flex-wrap">
+            <div className="glass-card p-6 rounded-2xl border border-yellow-500/20">
+              <h2 className="font-semibold mb-4 text-yellow-400 text-center">Development Controls</h2>
+              <div className="flex gap-3 flex-wrap justify-center">
                 <button
                   onClick={() => simulate('demo')}
-                  className="px-4 py-2 rounded bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-medium"
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-300 text-black text-sm font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   disabled={currentTx.status === 'pending'}
                 >
                   {currentTx.status === 'pending' ? 'Processing...' : 'Simulate Transaction'}
@@ -111,13 +111,13 @@ const App: React.FC = () => {
                 {currentTx.status !== 'idle' && currentTx.status !== 'pending' && (
                   <button
                     onClick={resetCurrent}
-                    className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    className="px-6 py-3 rounded-xl bg-gray-700 hover:bg-gray-600 border border-gray-600 hover:border-gray-500 text-sm font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
                   >
                     Reset Overlay
                   </button>
                 )}
               </div>
-              <p className="text-xs mt-2 text-gray-400">Temporary panel for testing state & overlay.</p>
+              <p className="text-xs mt-4 text-gray-400 text-center">Temporary panel for testing state & overlay.</p>
             </div>
           </div>
           <div className="space-y-6">

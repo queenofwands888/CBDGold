@@ -14,17 +14,19 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative flex flex-col items-center justify-center min-h-[75vh] w-full text-center overflow-hidden rounded-2xl mb-12 animate-fadeIn">
-      {/* Animated background layers */}
-      <div className="absolute inset-0 bg-gradient-to-br from-surface via-brand-midnight to-surface-elevated" />
-      <div className="absolute inset-0 bg-gradient-to-br from-brand-green/10 via-brand-emerald/5 to-brand-purple/10 animate-pulse-slow blur-3xl" />
-      <div className="absolute inset-0 bg-noise-soft opacity-[0.15] mix-blend-soft-light pointer-events-none" />
-      
-      {/* Accent orbs */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-emerald/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-brand-purple/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-      
-      <div className="relative z-10 flex flex-col items-center justify-center px-6 py-16 max-w-5xl mx-auto">
+    <section className="relative w-full mb-8 animate-fadeIn">
+      {/* Glass card frame with border */}
+      <div className="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+        <div className="relative flex flex-col items-center justify-center min-h-[70vh] w-full text-center">
+          {/* Animated background layers */}
+          <div className="absolute inset-0 bg-gradient-to-br from-surface via-brand-midnight to-surface-elevated" />
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-green/10 via-brand-emerald/5 to-brand-purple/10 animate-pulse-slow blur-3xl" />
+          
+          {/* Accent orbs */}
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-emerald/20 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-brand-purple/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          
+          <div className="relative z-10 flex flex-col items-center justify-center px-6 py-16 md:py-20 max-w-5xl mx-auto w-full">
         {/* Logo with glow effect */}
         <div className="relative mb-8 animate-slideUp">
           <div className="absolute inset-0 bg-brand-emerald/30 rounded-full blur-2xl animate-glow" />
@@ -55,19 +57,21 @@ const Hero: React.FC = () => {
         </p>
         
         {/* CTA Button */}
-        <div className="flex flex-col sm:flex-row gap-4 animate-slideUp" style={{ animationDelay: '0.3s' }}>
-          <button
-            className="group relative px-8 py-4 rounded-xl bg-gradient-to-r from-brand-green to-brand-emerald text-black font-bold text-lg shadow-glow-green hover:shadow-glow-green hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand-emerald/50 overflow-hidden"
-            onClick={goShopFi}
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              Explore ShopFi
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
+            <div className="flex flex-col sm:flex-row gap-4 animate-slideUp" style={{ animationDelay: '0.3s' }}>
+              <button
+                className="group relative px-8 py-4 rounded-xl bg-gradient-to-r from-brand-green to-brand-emerald text-black font-bold text-lg shadow-glow-green hover:shadow-glow-green hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand-emerald/50 overflow-hidden"
+                onClick={goShopFi}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Explore ShopFi
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -39,8 +39,8 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
     }).join(' ');
   }
   return (
-    <div className="w-full mb-8 mt-6 md:mt-8 flex justify-center px-3 animate-slideUp">
-      <div className="w-full max-w-4xl glass-card rounded-2xl px-5 py-3 flex flex-wrap items-center gap-4 md:gap-6 text-sm backdrop-blur-xl">
+    <div className="w-full flex justify-center animate-slideUp">
+      <div className="w-full max-w-6xl glass-card rounded-2xl px-6 py-4 flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm backdrop-blur-xl border border-white/10">
         <div className="flex items-center gap-2.5">
           <span className={`badge ${badgeColor} flex items-center gap-1.5`}>
             <span className={`w-2 h-2 rounded-full ${live ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`} />
