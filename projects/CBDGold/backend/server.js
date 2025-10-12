@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import claimPrizeRouter from './routes/claimPrize.js';
 import productsRouter from './routes/products.js';
+import purchaseRouter from './routes/purchase.js';
 import adminClaims from './admin/claims.js';
 import adminProducts from './admin/products.js';
 import adminAudit from './admin/audit.js';
@@ -91,6 +91,7 @@ app.use('/admin/analytics', requireAdmin, adminAnalytics);
 // Routes
 app.use('/', claimPrizeRouter);
 app.use('/', productsRouter);
+app.use(purchaseRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

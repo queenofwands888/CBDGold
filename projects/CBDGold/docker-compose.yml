@@ -1,0 +1,25 @@
+version: '3.9'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOT_WALLET=${HOT_WALLET:-GFLK62N2S7EERTGITVJAEQZRRYOMVXBRCKA7H72PRYXNIIRV3NL53I7BBU}
+      - TREASURY_WALLET=${TREASURY_WALLET:-43IB5RMLM2NFOHOPA6NPHNDL53S2AVZ4KUSRDUQP6WEOLTKFYIPK4VXA6A}
+      - OPERATIONAL_WALLET=${OPERATIONAL_WALLET:-6YFLAC2EFOKZ7UPL2QV7WUT74IVBJH4AVLM5O76C6A2IKRPQHEEQ7QJO4E}
+    ports:
+      - "3001:3001"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3001}
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend

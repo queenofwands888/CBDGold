@@ -1,5 +1,4 @@
 import React from 'react';
-import QRCode from 'qrcode.react';
 
 const hotWalletAddress = import.meta.env.VITE_HOT_WALLET_ADDRESS || 'GFLK62N2S7EERTGITVJAEQZRRYOMVXBRCKA7H72PRYXNIIRV3NL53I7BBU';
 
@@ -12,7 +11,7 @@ const HotWallet: React.FC = () => (
         className="btn-secondary text-xs"
         onClick={() => navigator.clipboard.writeText(hotWalletAddress)}
       >Copy Address</button>
-      <QRCode value={hotWalletAddress} size={96} bgColor="#00000000" fgColor="#FF3333" />
+      {/* QR code temporarily disabled for production build stability; re-enable with compatible types */}
     </div>
   </div>
 );

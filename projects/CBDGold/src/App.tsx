@@ -22,6 +22,7 @@ import PrizeLegend from './components/common/PrizeLegend';
 import PriceBar from './components/PriceBar';
 import { useOracleTicker } from './hooks/useOracleTicker';
 import { logger } from './utils/logger';
+import './utils/adminUtils'; // Load admin utilities for development
 
 const App: React.FC = () => {
   const { state: txState, dispatch } = useTransactionContext();

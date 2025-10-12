@@ -1,0 +1,20 @@
+# Backend Dockerfile
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+# Install dependencies
+COPY backend/package*.json ./backend/
+RUN cd backend && npm ci --omit=dev
+
+# Copy source
+COPY backend ./backend
+
+# Expose port
+EXPOSE 3001
+
+# Environment
+ENV NODE_ENV=production
+
+# Start the server
+CMD ["sh", "-c", "cd backend && node server.js"]

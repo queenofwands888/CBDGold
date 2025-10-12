@@ -5,6 +5,7 @@ import { useAppContext } from '../../contexts';
 import { useNotify } from '../../hooks/useNotify';
 import { useAppTransactions } from '../../hooks/useAppTransactions';
 import { ECON_CONFIG } from '../../data/constants';
+import purchaseService from '../../services/purchaseService';
 
 interface VapesSectionProps {
   walletConnected: boolean;
@@ -49,10 +50,37 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
     const discounted = (vape.prices?.[priceField] || 0) * (1 - currentStakingTier.discount / 100);
     const balanceOk = currency === 'ALGO' ? algoBalance >= discounted : usdcBalance >= discounted;
     if (!balanceOk) { notify(`Insufficient ${currency}`, 'error'); return; }
-    if (currency === 'ALGO') await purchaseAlgo(discounted);
-    else await purchaseUsdc(discounted);
-    onPurchase(vape, currency, currency === 'ALGO' ? `${discounted.toFixed(2)} ALGO` : `$${discounted.toFixed(2)} USDC`);
-    if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
+
+    try {
+      // Call backend purchase API in background (customer view)
+      const stakeTierName = currentStakingTier.name.toLowerCase();
+      const buyerAddress = state.walletAddress || 'SIMULATION_ADDRESS';
+      
+      const purchaseResult = await purchaseService.createPurchase(
+        vape.id,
+        buyerAddress,
+        stakeTierName,
+        false // Customer view - no admin breakdown
+      );
+
+      // Continue with existing blockchain simulation
+      if (currency === 'ALGO') await purchaseAlgo(discounted);
+      else await purchaseUsdc(discounted);
+
+      // Display amount charged from backend (customer-friendly)
+      const displayPrice = `$${purchaseResult.amountCharged?.toFixed(2) || discounted.toFixed(2)}`;
+      onPurchase(vape, currency, displayPrice);
+      
+      notify(`Purchase completed: ${displayPrice}`, 'success');
+      if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
+    } catch (error) {
+      // Fallback to local calculation if backend fails
+      console.warn('Backend purchase failed, using local calculation:', error);
+      if (currency === 'ALGO') await purchaseAlgo(discounted);
+      else await purchaseUsdc(discounted);
+      onPurchase(vape, currency, currency === 'ALGO' ? `${discounted.toFixed(2)} ALGO` : `$${discounted.toFixed(2)} USDC`);
+      if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
+    }
   };
 
   // Use enriched hemp price directly, applying staking discount proportionally
@@ -68,10 +96,38 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
     const hempPrice = tokenPrices?.HEMP || 0.0001;
     const hempRequired = Math.floor(usdcEquivalent / hempPrice);
     if (hempBalance < hempRequired) { notify(`Need ${hempRequired.toLocaleString()} HEMP`, 'error'); return; }
-    await claimWithHemp(hempRequired);
-    const message = `Product: ${vape.name}\nHEMP Used: ${hempRequired.toLocaleString()} tokens\nValue: $${usdcEquivalent.toFixed(2)} USDC`;
-    onPurchase(vape, 'HEMP_CLAIM', message);
-    if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
+
+    try {
+      // Call backend purchase API for HEMP claim (customer view)
+      const stakeTierName = currentStakingTier.name.toLowerCase();
+      const buyerAddress = state.walletAddress || 'SIMULATION_ADDRESS';
+      
+      const purchaseResult = await purchaseService.createPurchase(
+        vape.id,
+        buyerAddress,
+        stakeTierName,
+        false // Customer view
+      );
+
+      await claimWithHemp(hempRequired);
+      
+      // Display backend amount or fallback message
+      const displayValue = purchaseResult.amountCharged ? 
+        `Value: $${purchaseResult.amountCharged.toFixed(2)}` :
+        `Value: $${usdcEquivalent.toFixed(2)} USDC`;
+      
+      const message = `Product: ${vape.name}\nHEMP Used: ${hempRequired.toLocaleString()} tokens\n${displayValue}`;
+      onPurchase(vape, 'HEMP_CLAIM', message);
+      
+      if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
+    } catch (error) {
+      // Fallback to local calculation if backend fails
+      console.warn('Backend HEMP claim failed, using local calculation:', error);
+      await claimWithHemp(hempRequired);
+      const message = `Product: ${vape.name}\nHEMP Used: ${hempRequired.toLocaleString()} tokens\nValue: $${usdcEquivalent.toFixed(2)} USDC`;
+      onPurchase(vape, 'HEMP_CLAIM', message);
+      if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
+    }
   };
 
   const spinForGold = () => {

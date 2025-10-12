@@ -1,5 +1,4 @@
 import React from 'react';
-import QRCode from 'qrcode.react';
 
 const treasuryAddress = import.meta.env.VITE_TREASURY_ADDRESS || '43IB5RMLM2NFOHOPA6NPHNDL53S2AVZ4KUSRDUQP6WEOLTKFYIPK4VXA6A';
 
@@ -12,7 +11,7 @@ const TreasuryWallet: React.FC = () => (
         className="btn-secondary text-xs"
         onClick={() => navigator.clipboard.writeText(treasuryAddress)}
       >Copy Address</button>
-      <QRCode value={treasuryAddress} size={96} bgColor="#00000000" fgColor="#FFD700" />
+      {/* QR code temporarily disabled for production build stability; re-enable with compatible types */}
     </div>
   </div>
 );
