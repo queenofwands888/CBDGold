@@ -11,14 +11,18 @@ const WalletProviders: React.FC<Props> = ({ children }) => {
 		const token = (import.meta.env.VITE_ALGOD_TOKEN as string) || '';
 		const wcProjectId = (import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string) || '';
 
-		const wallets: any[] = [WalletId.PERA];
-		if (wcProjectId) {
-			wallets.push({ id: WalletId.WALLETCONNECT, options: { projectId: wcProjectId } });
-		}
-
-			return new WalletManager({
+			const wallets: any[] = [WalletId.PERA];
+			if (wcProjectId) {
+				wallets.push({ id: WalletId.WALLETCONNECT, options: { projectId: wcProjectId, chainId: network === 'testnet' ? 'algorand:testnet' : 'algorand:mainnet' } });
+			}			return new WalletManager({
 				wallets,
 				defaultNetwork: network,
+				networks: {
+					[network]: {
+						algod: { baseServer, port, token },
+						isTestnet: network === 'testnet'
+					}
+				}
 			});
 	}, []);
 
