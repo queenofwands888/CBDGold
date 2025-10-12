@@ -1,4 +1,5 @@
 import { MutableRefObject, useCallback, useMemo, useRef } from 'react';
+import { useWallet } from '@txnlab/use-wallet-react';
 import algosdk from 'algosdk';
 import { useAppContext } from '../contexts';
 import { chainConfig } from '../onchain/env';
@@ -140,6 +141,7 @@ function createOnChainAdapter(simulationAdapter: WalletAdapter, hasWarnedNoProvi
 export function useWalletManager() {
   const { state, dispatch } = useAppContext();
   const hasWarnedNoProvider = useRef(false);
+  const uw = useWallet();
 
   const simulationAdapter = useMemo(() => createSimulationAdapter(), []);
   const onChainAdapter = useMemo(() => createOnChainAdapter(simulationAdapter, hasWarnedNoProvider), [simulationAdapter]);
@@ -150,6 +152,21 @@ export function useWalletManager() {
     dispatch({ type: 'SET_CONNECTING', payload: true });
 
     try {
+      // Prefer official use-wallet provider if initialized
+      if (uw && uw.wallets && uw.wallets.length > 0) {
+        // ensure providers init complete
+        // attempt to connect the first available wallet (Pera)
+        const pera = uw.wallets.find(w => (w as any).id === 'pera' || (w as any).metadata?.name?.toLowerCase?.() === 'pera');
+        const target = pera ?? uw.wallets[0];
+        await target.connect();
+        const active = uw.activeAddress || (target as any).activeAccount?.address;
+        if (!active) throw new Error('Failed to obtain active address from wallet');
+        const assets = await adapter.refreshAssets(active);
+        dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address: active } });
+        dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: assets });
+        return;
+      }
+
       const { address, assets } = await adapter.connect();
       dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address } });
       dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: assets });
@@ -162,6 +179,9 @@ export function useWalletManager() {
 
   const disconnect = useCallback(() => {
     dispatch({ type: 'RESET_WALLET' });
+    if (uw && uw.activeWallet) {
+      uw.activeWallet.disconnect().catch((e: any) => logger.warn('[use-wallet] disconnect failed', e));
+    }
     adapter.disconnect().catch((error) => {
       logger.warn(`[wallet:${adapter.name}] disconnect failed`, error);
     });
@@ -179,16 +199,23 @@ export function useWalletManager() {
   }, [adapter, dispatch, state.walletAddress]);
 
   const signTransactions = useCallback(async (txns: algosdk.Transaction[]) => {
+    // Prefer library's signer when available
+    if (uw && uw.signTransactions) {
+      const blobs = txns.map((t) => t.toByte());
+      const signed = await uw.signTransactions(blobs as any);
+      // uw.signTransactions may return Uint8Array[] already
+      return signed as unknown as Uint8Array[];
+    }
     return adapter.signTransactions(txns);
-  }, [adapter]);
+  }, [adapter, uw]);
 
   return {
     connect,
     disconnect,
     refreshAssets,
     signTransactions,
-    connected: state.walletConnected,
-    address: state.walletAddress,
+    connected: state.walletConnected || !!uw?.activeAddress,
+    address: state.walletAddress || (uw?.activeAddress ?? undefined),
     assets: state.accountAssets,
     connecting: state.isConnecting,
     mode: chainConfig.mode,

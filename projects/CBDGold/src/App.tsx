@@ -7,6 +7,7 @@ import { useSimulatedTransaction } from './hooks/useSimulatedTransaction';
 import NavigationTabs from './components/common/NavigationTabs';
 import ChainModeBadge from './components/common/ChainModeBadge';
 import WalletStatus from './components/common/WalletStatus';
+import TestnetTools from './components/common/TestnetTools';
 import DashboardPanel from './components/sections/DashboardPanel';
 import StakingPanel from './components/sections/StakingPanel';
 import GovernancePanel from './components/sections/GovernancePanel';
@@ -122,6 +123,7 @@ const App: React.FC = () => {
           </div>
           <div className="space-y-6">
             <WalletStatus />
+            <TestnetTools />
             <ContractStatePanel />
             <TransactionHistoryPanel />
             <SpinGamePanel />
