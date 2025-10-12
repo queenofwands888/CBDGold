@@ -1,4 +1,20 @@
 /* Tailwind CSS v4 */
 @import "tailwindcss";
 
+/* Ensure base styles are applied */
+@layer base {
+  * {
+    border-color: rgba(148, 163, 184, 0.12);
+  }
+  
+  /* Override Tailwind utilities that might cause black text on dark background */
+  .text-black {
+    color: rgb(249, 250, 251) !important;
+  }
+  
+  .text-gray-900 {
+    color: rgb(209, 213, 219) !important;
+  }
+}
+
 /* Custom styles can go below */
