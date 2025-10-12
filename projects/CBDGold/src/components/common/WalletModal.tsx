@@ -32,6 +32,9 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
             <WalletRow key={wallet.id} wallet={wallet as UseWalletType} onClose={onClose} />
           ))}
         </div>
+        <p className="text-[11px] text-gray-400 text-center">
+          Tip: Use WalletConnect to scan a QR from Pera Mobile on TestNet.
+        </p>
 
         {activeWallet && (
           <button

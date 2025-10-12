@@ -23,6 +23,7 @@ Environment (optional):
 - VITE_ALGOD_SERVER=https://testnet-api.algonode.cloud
 - VITE_ALGOD_PORT=443
 - VITE_ALGOD_TOKEN=
+- VITE_WALLETCONNECT_PROJECT_ID=<your_reown_project_id>  # enables QR WalletConnect flow in the modal
 
 Troubleshooting:
 
