@@ -1,8 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useWalletManager } from '../../hooks/useWalletManager';
+import WalletModal from './WalletModal';
 
 const WalletStatus: React.FC = () => {
   const { connect, disconnect, connected, connecting, address, assets, refreshAssets } = useWalletManager();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="glass-card rounded-xl p-5 space-y-4">
@@ -10,7 +12,10 @@ const WalletStatus: React.FC = () => {
         <h3 className="font-bold text-lg text-brand-emerald">Wallet</h3>
         {!connected ? (
           <button
-            onClick={connect}
+            onClick={async () => {
+              await connect();
+              setIsModalOpen(true);
+            }}
             disabled={connecting}
             className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 disabled:opacity-50 text-black text-sm font-bold transition-all shadow-lg"
           >
@@ -18,10 +23,10 @@ const WalletStatus: React.FC = () => {
           </button>
         ) : (
           <button
-            onClick={disconnect}
+            onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-bold transition-all shadow-lg"
           >
-            Disconnect
+            Wallet
           </button>
         )}
       </div>
@@ -60,6 +65,7 @@ const WalletStatus: React.FC = () => {
           <ReceiveTestAlgo address={address} onRefresh={refreshAssets} />
         </>
       )}
+      <WalletModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };
