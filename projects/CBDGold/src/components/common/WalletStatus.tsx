@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useWalletManager } from '../../hooks/useWalletManager';
 import WalletModal from './WalletModal';
 import TreasuryWallet from './TreasuryWallet';
+import HotWallet from './HotWallet';
 
 const WalletStatus: React.FC = () => {
   const { connect, disconnect, connected, connecting, address, assets, refreshAssets } = useWalletManager();
@@ -65,6 +66,7 @@ const WalletStatus: React.FC = () => {
           {/* Receive Test ALGO helper */}
           <ReceiveTestAlgo address={address} onRefresh={refreshAssets} />
           <TreasuryWallet />
+          <HotWallet />
         </>
       )}
       <WalletModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
