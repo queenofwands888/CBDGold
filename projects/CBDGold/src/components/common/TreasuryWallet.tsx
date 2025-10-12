@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import walletsService from '../../services/walletsService';
+import { fetchWallets } from '../../services/walletsService';
 
 // Lazy QR generator
 async function toQrDataUrl(text: string): Promise<string> {
@@ -16,7 +16,7 @@ const TreasuryWallet: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        const data = await walletsService.fetchWallets();
+        const data = await fetchWallets();
         const addr = data.treasury || fallback;
         if (cancelled) return;
         setAddress(addr);
