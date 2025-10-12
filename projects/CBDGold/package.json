@@ -62,7 +62,7 @@
   "scripts": {
     "generate:app-clients": "node ./scripts/generate-app-clients.mjs",
     "dev": "npm run generate:app-clients && vite",
-    "build": "npm run generate:app-clients && tsc && cross-env ROLLUP_SKIP_NODEJS_NATIVE=1 vite build",
+    "build": "SKIP_CLIENT_GEN=1 npm run generate:app-clients && tsc && cross-env ROLLUP_SKIP_NODEJS_NATIVE=1 vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
