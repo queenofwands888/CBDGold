@@ -10,6 +10,9 @@ export default defineConfig(({ mode }) => {
       react(),
       isDev && nodePolyfills({ globals: { Buffer: true } })
     ].filter(Boolean),
+    optimizeDeps: {
+      include: ['@walletconnect/sign-client', '@walletconnect/core']
+    },
     build: {
       rollupOptions: {
         output: {
