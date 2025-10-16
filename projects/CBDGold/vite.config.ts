@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
       isDev && nodePolyfills({ globals: { Buffer: true } })
     ].filter(Boolean),
     optimizeDeps: {
-      include: ['@walletconnect/sign-client', '@walletconnect/core']
+      include: ['@walletconnect/sign-client', '@walletconnect/core', '@walletconnect/modal', '@perawallet/connect']
     },
     build: {
       rollupOptions: {

@@ -42,10 +42,12 @@
   "dependencies": {
     "@algorandfoundation/algokit-utils": "^9.0.0",
     "@blockshake/defly-connect": "^1.2.1",
+    "@perawallet/connect": "^1.4.2",
     "@txnlab/use-wallet": "^4.0.0",
     "@txnlab/use-wallet-react": "^4.0.0",
     "@types/qrcode.react": "^1.0.5",
     "@walletconnect/core": "^2.22.4",
+    "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.22.3",
     "@walletconnect/types": "^2.22.4",
     "@walletconnect/utils": "^2.22.4",
@@ -60,8 +62,8 @@
     "tslib": "^2.6.2"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.52.4",
-    "@tailwindcss/oxide-linux-x64-gnu": "4.1.13"
+    "@rollup/rollup-linux-x64-gnu": "^4.52.4",
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.1.14"
   },
   "scripts": {
     "generate:app-clients": "node ./scripts/generate-app-clients.mjs",
