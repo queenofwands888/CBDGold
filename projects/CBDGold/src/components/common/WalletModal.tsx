@@ -1,5 +1,6 @@
 import React from 'react';
 import { useWallet } from '@txnlab/use-wallet-react';
+import { useWalletManager } from '../../hooks/useWalletManager';
 import type { Wallet as UseWalletType } from '@txnlab/use-wallet-react';
 
 type WalletModalProps = {
@@ -8,7 +9,8 @@ type WalletModalProps = {
 };
 
 const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
-  const { wallets, activeAddress, activeWallet } = useWallet();
+  const { wallets, activeAddress } = useWallet();
+  const { disconnect, connected } = useWalletManager();
 
   if (!isOpen) return null;
 
@@ -36,11 +38,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
           Tip: Use WalletConnect to scan a QR from Pera Mobile on TestNet.
         </p>
 
-        {activeWallet && (
+        {connected && (
           <button
             className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-bold transition-all"
             onClick={async () => {
-              await activeWallet.disconnect().catch(() => { });
+              await disconnect();
               onClose();
             }}
           >
@@ -64,7 +66,7 @@ const WalletRow: React.FC<{ wallet: UseWalletType; onClose: () => void }> = ({ w
             await wallet.connect();
           }
           onClose();
-        } catch (e) {
+        } catch {
           // no-op
         }
       }}
