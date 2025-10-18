@@ -123,4 +123,3 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
 };
 
 export default PriceBar;
-export type { PriceBarProps };

@@ -31,6 +31,21 @@ type PrizeOutcome = {
 
 type SpinOutcome = HempOutcome | DiscountOutcome | PrizeOutcome;
 
+const getOutcomeTag = (outcome: SpinOutcome): { label: string; className: string } => {
+  if (outcome.type === 'discount') {
+    return { label: '%OFF', className: 'text-pink-400' };
+  }
+
+  if (outcome.type === 'prize') {
+    if (typeof outcome.discountPct === 'number') {
+      return { label: '%OFF', className: 'text-pink-400' };
+    }
+    return { label: 'PRIZE', className: 'text-yellow-400' };
+  }
+
+  return { label: 'HEMP', className: 'text-green-400' };
+};
+
 const formatDuration = (ms: number) => {
   if (ms <= 0) return 'expired';
   const m = Math.floor(ms / 60000);
@@ -171,12 +186,15 @@ const SpinGamePanel: React.FC = () => {
         <p className="text-[10px] uppercase tracking-wide text-gray-500 mb-2 font-semibold">Possible Outcomes</p>
         <div className="grid grid-cols-2 gap-2 text-[10px]">
           {/* Show unique set for legend (not every weighted duplicate) */}
-          {[...new Map(outcomes.map(o => [o.label, o])).values()].map(o => (
-            <div key={o.label} className="bg-black/30 rounded-md px-2 py-1 flex items-center justify-between gap-1">
-              <span className="truncate text-gray-300">{o.label}</span>
-              <span className={`text-[9px] font-bold ${o.type === 'discount' || o.discountPct ? 'text-pink-400' : o.type === 'prize' ? 'text-yellow-400' : 'text-green-400'}`}>{o.type === 'discount' || o.discountPct ? '%OFF' : o.type === 'prize' ? 'PRIZE' : 'HEMP'}</span>
-            </div>
-          ))}
+          {[...new Map(outcomes.map(o => [o.label, o])).values()].map(o => {
+            const tag = getOutcomeTag(o);
+            return (
+              <div key={o.label} className="bg-black/30 rounded-md px-2 py-1 flex items-center justify-between gap-1">
+                <span className="truncate text-gray-300">{o.label}</span>
+                <span className={`text-[9px] font-bold ${tag.className}`}>{tag.label}</span>
+              </div>
+            );
+          })}
         </div>
         <p className="text-[9px] text-gray-500 mt-3 leading-relaxed">Prize Tiers: JACKPOT (Full Range NFT), RARE (Single Vape NFT), LEGENDARY (25% Off NFT), GOLDEN (7% Off Coupon). Discount bonuses apply to next qualifying purchase or expire after {ECON_CONFIG.SPIN_BONUS_DURATION_MS / 60000} minutes. HEMP prizes credit immediately. NFT & coupon claims currently simulated.</p>
       </div>

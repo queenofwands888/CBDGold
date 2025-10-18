@@ -61,8 +61,8 @@ const TestnetTools: React.FC = () => {
       const params = await algod.getTransactionParams().do();
       const suggestedParams = params as algosdk.SuggestedParams;
       const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: address!,
-        to: address!,
+        sender: address!,
+        receiver: address!,
         amount: 100_000,
         suggestedParams,
       });
@@ -70,6 +70,9 @@ const TestnetTools: React.FC = () => {
       let signedBlob: Uint8Array | undefined;
       try {
         // Try via our adapter first (on-chain mode)
+        if (!signTransactions) {
+          throw new Error('Wallet transaction signer is unavailable.');
+        }
         const [signed] = await signTransactions([txn]);
         signedBlob = signed;
       } catch {
@@ -78,9 +81,12 @@ const TestnetTools: React.FC = () => {
         const provider = providerWindow?.algorand ?? providerWindow?.myAlgoConnect;
         if (!provider) throw new Error('No wallet provider available to sign');
         const encoded = txn.toByte();
-        const res = provider.signTxns
-          ? await provider.signTxns([encoded])
-          : await provider.signTransactions([encoded]);
+        const signer = provider.signTxns ?? provider.signTransactions;
+        if (!signer) {
+          throw new Error('Wallet provider does not expose a signing method.');
+        }
+        const boundSigner = signer.bind(provider);
+        const res = await boundSigner([encoded]);
         if (!res || res.length === 0) {
           throw new Error('Wallet provider returned no signatures.');
         }
