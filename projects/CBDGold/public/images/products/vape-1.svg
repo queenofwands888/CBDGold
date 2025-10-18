@@ -1,0 +1,21 @@
+<svg width="360" height="480" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-northern" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1f2937" />
+      <stop offset="40%" stop-color="#312e81" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(148, 163, 184, 0.35)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </linearGradient>
+  </defs>
+  <rect width="360" height="480" rx="28" fill="url(#grad-northern)" />
+  <rect width="360" height="480" rx="28" fill="url(#shine)" opacity="0.45" />
+  <circle cx="90" cy="110" r="140" fill="rgba(52, 211, 153, 0.08)" />
+  <circle cx="300" cy="150" r="120" fill="rgba(168, 85, 247, 0.08)" />
+  <text x="40" y="220" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#f9fafb">Northern</text>
+  <text x="40" y="266" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#f9fafb">Lights CBD</text>
+  <text x="40" y="314" font-family="'Inter', sans-serif" font-weight="500" font-size="20" letter-spacing="0.18em" fill="#34d399">PREMIUM VAPE</text>
+  <text x="40" y="354" font-family="'Inter', sans-serif" font-weight="400" font-size="18" fill="#cbd5f5">Sweet Pine • Deep Relaxation</text>
+</svg>

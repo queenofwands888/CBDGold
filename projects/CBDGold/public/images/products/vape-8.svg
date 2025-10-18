@@ -1,0 +1,21 @@
+<svg width="360" height="480" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2e1065" />
+      <stop offset="45%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#c026d3" />
+    </linearGradient>
+    <radialGradient id="glow-purple" cx="35%" cy="25%" r="80%">
+      <stop offset="0%" stop-color="rgba(216, 180, 254, 0.55)" />
+      <stop offset="100%" stop-color="rgba(216, 180, 254, 0)" />
+    </radialGradient>
+  </defs>
+  <rect width="360" height="480" rx="28" fill="url(#grad-purple)" />
+  <rect width="360" height="480" rx="28" fill="url(#glow-purple)" />
+  <circle cx="300" cy="110" r="120" fill="rgba(244, 114, 182, 0.18)" />
+  <circle cx="110" cy="190" r="150" fill="rgba(129, 140, 248, 0.14)" />
+  <text x="36" y="220" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#faf5ff">Purple Haze</text>
+  <text x="36" y="266" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#faf5ff">CBD</text>
+  <text x="36" y="312" font-family="'Inter', sans-serif" font-weight="500" font-size="20" letter-spacing="0.18em" fill="#e9d5ff">Sativa • Berry Bloom</text>
+  <text x="36" y="354" font-family="'Inter', sans-serif" font-weight="400" font-size="18" fill="#f5e8ff">Dreamy Uplift • Night Glow</text>
+</svg>

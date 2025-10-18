@@ -6,6 +6,10 @@ import { useNotify } from '../../hooks/useNotify';
 import { calculateStakingTier } from '../../utils/stakingTier';
 import { ECON_CONFIG, PRIZE_TIERS } from '../../data/constants';
 
+interface SpinGamePanelProps {
+  tokenPrices: Record<'HEMP' | 'WEED' | 'ALGO' | 'USDC', number>;
+}
+
 type HempOutcome = {
   label: string;
   type: 'hemp';
@@ -53,7 +57,10 @@ const formatDuration = (ms: number) => {
   return m > 0 ? `${m}m ${s}s` : `${s}s`;
 };
 
-const SpinGamePanel: React.FC = () => {
+const BASE_SPIN_COST_ALGO = 1;
+const FALLBACK_SPIN_COST_HEMP = Math.ceil((BASE_SPIN_COST_ALGO * 0.25) / 0.0001); // default oracle fallback
+
+const SpinGamePanel: React.FC<SpinGamePanelProps> = ({ tokenPrices }) => {
   const { state, dispatch } = useAppContext();
   const { spinBonusDiscount, lastSpinResult, spinBonusExpiresAt, stakedAmount } = state;
   const { creditSpinHemp } = useAppTransactions();
@@ -72,6 +79,14 @@ const SpinGamePanel: React.FC = () => {
   }, []);
 
   const remainingMs = spinBonusExpiresAt ? spinBonusExpiresAt - currentTime : 0;
+
+  const spinCostHemp = useMemo(() => {
+    const algoUsd = tokenPrices.ALGO || 0.25;
+    const hempUsd = tokenPrices.HEMP || 0.0001;
+    if (!Number.isFinite(hempUsd) || hempUsd <= 0) return FALLBACK_SPIN_COST_HEMP;
+    const cost = Math.ceil((BASE_SPIN_COST_ALGO * (Number.isFinite(algoUsd) && algoUsd > 0 ? algoUsd : 0.25)) / hempUsd);
+    return Number.isFinite(cost) && cost > 0 ? cost : FALLBACK_SPIN_COST_HEMP;
+  }, [tokenPrices]);
   useEffect(() => {
     if (!spinBonusExpiresAt || spinBonusDiscount <= 0) return;
     if (remainingMs > 0) return;
@@ -108,16 +123,16 @@ const SpinGamePanel: React.FC = () => {
 
   const spin = () => {
     if (isSpinning) return;
-    if (!state.accountAssets.algo || state.accountAssets.algo < 1) {
-      notify('Not enough ALGO! Need at least 1 ALGO to spin.', 'error');
+    if (!state.accountAssets.hemp || state.accountAssets.hemp < spinCostHemp) {
+      notify(`Not enough HEMP. Need at least ${spinCostHemp.toLocaleString()} HEMP to spin.`, 'error');
       return;
     }
     setIsSpinning(true);
     setLocalResult(null);
-    // Deduct 1 ALGO from balance (simulated)
-    dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: { ...state.accountAssets, algo: state.accountAssets.algo - 1 } });
+    // Deduct HEMP (simulated client state sync)
+    dispatch({ type: 'CLAIM_WITH_HEMP', payload: { hempSpent: spinCostHemp } });
     setTimeout(() => {
-  const result = outcomes[Math.floor(Math.random() * outcomes.length)];
+      const result = outcomes[Math.floor(Math.random() * outcomes.length)];
       setLocalResult(result.label);
       if (result.type === 'discount') {
         dispatch({ type: 'SET_SPIN_BONUS', payload: { discount: result.amount, result: result.label } });
@@ -142,12 +157,15 @@ const SpinGamePanel: React.FC = () => {
 
   const totalPotentialDiscount = Math.min(ECON_CONFIG.MAX_TOTAL_DISCOUNT, stakingTier.discount + spinBonusDiscount);
 
+  const formattedCost = spinCostHemp.toLocaleString();
+  const canSpin = !isSpinning && state.accountAssets.hemp >= spinCostHemp;
+
   return (
     <div className="glass-card rounded-2xl p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-white flex items-center gap-2">
           <FeatherIcon icon="refresh-cw" className={isSpinning ? 'animate-spin-slow text-purple-400' : 'text-purple-400'} />
-          Spin & Bonus
+          Win CBD Gold
         </h3>
         {spinBonusDiscount > 0 ? (
           <span className="text-[10px] px-2 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold">
@@ -163,16 +181,16 @@ const SpinGamePanel: React.FC = () => {
         <div className="flex justify-between"><span className="text-gray-400">Spin Bonus:</span><span className="text-pink-400 font-semibold">{spinBonusDiscount}%</span></div>
         <div className="flex justify-between"><span className="text-gray-400">Effective Discount:</span><span className="text-yellow-400 font-semibold">{totalPotentialDiscount}%</span></div>
         <div className="flex justify-between"><span className="text-gray-400">Cap:</span><span className="text-gray-300">{ECON_CONFIG.MAX_TOTAL_DISCOUNT}%</span></div>
-        <div className="flex justify-between"><span className="text-gray-400">Spin Cost:</span><span className="text-red-400 font-semibold">1 ALGO</span></div>
+        <div className="flex justify-between"><span className="text-gray-400">Spin Cost:</span><span className="text-red-400 font-semibold">{formattedCost} HEMP</span></div>
       </div>
 
       <button
-        disabled={isSpinning || !state.accountAssets.algo || state.accountAssets.algo < 1}
+        disabled={!canSpin}
         onClick={spin}
-        className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-purple-500 to-pink-600 shadow-lg hover:from-purple-600 hover:to-pink-700 ${isSpinning || !state.accountAssets.algo || state.accountAssets.algo < 1 ? 'opacity-60 cursor-not-allowed' : ''}`}
+        className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-purple-500 to-pink-600 shadow-lg hover:from-purple-600 hover:to-pink-700 ${canSpin ? '' : 'opacity-60 cursor-not-allowed'}`}
       >
         <FeatherIcon icon="refresh-cw" className={isSpinning ? 'animate-spin-slow' : ''} />
-        {isSpinning ? 'SPINNING...' : 'SPIN FOR 1 ALGO'}
+        {isSpinning ? 'SPINNING...' : `SPIN FOR ${formattedCost} HEMP`}
       </button>
 
       {(localResult || lastSpinResult) && (

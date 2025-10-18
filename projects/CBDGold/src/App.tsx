@@ -6,7 +6,6 @@ import { useTransactionContext, useAppContext } from './contexts';
 import NavigationTabs from './components/common/NavigationTabs';
 import ChainModeBadge from './components/common/ChainModeBadge';
 import WalletStatus from './components/common/WalletStatus';
-import TestnetTools from './components/common/TestnetTools';
 import DashboardPanel from './components/sections/DashboardPanel';
 import StakingPanel from './components/sections/StakingPanel';
 import GovernancePanel from './components/sections/GovernancePanel';
@@ -16,11 +15,10 @@ import { CBD_VAPES } from './data/constants';
 import { usePersistentState } from './hooks/usePersistentState';
 import TransactionHistoryPanel from './components/sections/TransactionHistoryPanel';
 import SpinGamePanel from './components/sections/SpinGamePanel';
-import ContractStatePanel from './components/sections/ContractStatePanel';
-import PrizeLegend from './components/common/PrizeLegend';
 import PriceBar from './components/PriceBar';
 import { useOracleTicker } from './hooks/useOracleTicker';
 import { logger } from './utils/logger';
+import BrandWalletDirectory from './components/common/BrandWalletDirectory';
 
 const App: React.FC = () => {
   const { state: txState, dispatch } = useTransactionContext();
@@ -32,10 +30,6 @@ const App: React.FC = () => {
     lastLiveOracle,
     history: oracleHistory,
     priceDelta,
-    paused: oraclePaused,
-    loading: oracleLoading,
-    refresh: refreshOracle,
-    togglePaused: toggleOraclePaused,
   } = useOracleTicker();
   const tokenPrices = useMemo((): { HEMP: number; WEED: number; ALGO: number; USDC: number } => ({
     HEMP: oracle?.hempUsd ?? 0.0001,
@@ -57,10 +51,6 @@ const App: React.FC = () => {
           lastLiveOracle={lastLiveOracle}
           priceDelta={priceDelta}
           history={oracleHistory}
-          paused={oraclePaused}
-          onTogglePaused={toggleOraclePaused}
-          onRefresh={refreshOracle}
-          loading={oracleLoading}
         />
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8" data-nav-tabs>
           <NavigationTabs />
@@ -89,7 +79,8 @@ const App: React.FC = () => {
                   terpenes: v.terpenes,
                   color: v.color,
                   emoji: v.emoji,
-                  hempEarned: v.hempEarned
+                  hempEarned: v.hempEarned,
+                  image: v.image
                 }))}
                 tokenPrices={tokenPrices}
                 onPurchase={(vape, method, price) => {
@@ -101,11 +92,9 @@ const App: React.FC = () => {
           </div>
           <div className="space-y-6">
             <WalletStatus />
-            <TestnetTools />
-            <ContractStatePanel />
+            <BrandWalletDirectory />
             <TransactionHistoryPanel />
-            <SpinGamePanel />
-            <PrizeLegend />
+            <SpinGamePanel tokenPrices={tokenPrices} />
           </div>
         </div>
       </MainLayout>

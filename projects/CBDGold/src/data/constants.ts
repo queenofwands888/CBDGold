@@ -1,20 +1,22 @@
+import { getAppUrl } from '../utils/explorer';
+
 // Centralized static data & config extracted from App.tsx for simplification
 
 export interface VapeProduct {
   id: number; name: string; strain: string; type: string; flavor: string; effects: string;
   priceAlgo: number; priceUsdc: number; hempEarned: number; potency: string; terpenes: string[];
-  color: string; emoji: string;
+  color: string; emoji: string; image?: string;
 }
 
 export const CBD_VAPES: VapeProduct[] = [
-  { id: 1, name: 'Northern Lights CBD', strain: 'Northern Lights', type: 'Indica-dominant', flavor: 'Sweet Pine & Earth', effects: 'Deeply Relaxing', priceAlgo: 135, priceUsdc: 33.00, hempEarned: 135000, potency: '66.6% CBD', terpenes: ['Myrcene', 'Pinene', 'Caryophyllene'], color: 'from-purple-500 to-indigo-600', emoji: '🌌' },
-  { id: 2, name: 'Sour Diesel CBD', strain: 'Sour Diesel', type: 'Sativa-dominant', flavor: 'Citrus Fuel & Herbs', effects: 'Energizing Focus', priceAlgo: 135, priceUsdc: 33.00, hempEarned: 135000, potency: '66.6% CBD', terpenes: ['Limonene', 'Caryophyllene', 'Myrcene'], color: 'from-yellow-500 to-orange-600', emoji: '⚡' },
-  { id: 3, name: 'OG Kush CBD', strain: 'OG Kush', type: 'Hybrid', flavor: 'Earthy Lemon Pine', effects: 'Balanced Euphoria', priceAlgo: 135, priceUsdc: 33.00, hempEarned: 135000, potency: '66.6% CBD', terpenes: ['Myrcene', 'Limonene', 'Caryophyllene'], color: 'from-green-500 to-emerald-600', emoji: '👑' },
-  { id: 4, name: 'Blue Dream CBD', strain: 'Blue Dream', type: 'Sativa-dominant', flavor: 'Blueberry & Vanilla', effects: 'Creative & Uplifting', priceAlgo: 135, priceUsdc: 33.00, hempEarned: 135000, potency: '66.6% CBD', terpenes: ['Myrcene', 'Pinene', 'Caryophyllene'], color: 'from-blue-500 to-indigo-600', emoji: '💙' },
-  { id: 5, name: 'Girl Scout Cookies CBD', strain: 'Girl Scout Cookies', type: 'Hybrid', flavor: 'Sweet Mint & Chocolate', effects: 'Relaxed Focus', priceAlgo: 140, priceUsdc: 34.50, hempEarned: 140000, potency: '68.2% CBD', terpenes: ['Caryophyllene', 'Limonene', 'Humulene'], color: 'from-pink-500 to-rose-600', emoji: '🍪' },
-  { id: 6, name: 'White Widow CBD', strain: 'White Widow', type: 'Hybrid', flavor: 'Woody & Spicy', effects: 'Euphoric Balance', priceAlgo: 138, priceUsdc: 33.75, hempEarned: 138000, potency: '67.3% CBD', terpenes: ['Myrcene', 'Caryophyllene', 'Pinene'], color: 'from-gray-400 to-slate-600', emoji: '🕷️' },
-  { id: 7, name: 'Pineapple Express CBD', strain: 'Pineapple Express', type: 'Sativa-dominant', flavor: 'Tropical Pineapple', effects: 'Happy & Energetic', priceAlgo: 142, priceUsdc: 35.00, hempEarned: 142000, potency: '69.1% CBD', terpenes: ['Limonene', 'Myrcene', 'Pinene'], color: 'from-yellow-400 to-amber-600', emoji: '🍍' },
-  { id: 8, name: 'Purple Haze CBD', strain: 'Purple Haze', type: 'Sativa-dominant', flavor: 'Berry & Floral', effects: 'Dreamy & Uplifting', priceAlgo: 145, priceUsdc: 36.00, hempEarned: 145000, potency: '70.5% CBD', terpenes: ['Terpinolene', 'Myrcene', 'Caryophyllene'], color: 'from-purple-600 to-violet-700', emoji: '💜' }
+  { id: 1, name: 'Northern Lights CBD', strain: 'Northern Lights', type: 'Indica-dominant', flavor: 'Sweet Pine & Earth', effects: 'Deeply Relaxing', priceAlgo: 135, priceUsdc: 33.00, hempEarned: 135000, potency: '66.6% CBD', terpenes: ['Myrcene', 'Pinene', 'Caryophyllene'], color: 'from-purple-500 to-indigo-600', emoji: '🌌', image: '/images/products/vape-1.svg' },
+  { id: 2, name: 'Sour Diesel CBD', strain: 'Sour Diesel', type: 'Sativa-dominant', flavor: 'Citrus Fuel & Herbs', effects: 'Energizing Focus', priceAlgo: 135, priceUsdc: 33.00, hempEarned: 135000, potency: '66.6% CBD', terpenes: ['Limonene', 'Caryophyllene', 'Myrcene'], color: 'from-yellow-500 to-orange-600', emoji: '⚡', image: '/images/products/vape-2.svg' },
+  { id: 3, name: 'OG Kush CBD', strain: 'OG Kush', type: 'Hybrid', flavor: 'Earthy Lemon Pine', effects: 'Balanced Euphoria', priceAlgo: 135, priceUsdc: 33.00, hempEarned: 135000, potency: '66.6% CBD', terpenes: ['Myrcene', 'Limonene', 'Caryophyllene'], color: 'from-green-500 to-emerald-600', emoji: '👑', image: '/images/products/vape-3.svg' },
+  { id: 4, name: 'Blue Dream CBD', strain: 'Blue Dream', type: 'Sativa-dominant', flavor: 'Blueberry & Vanilla', effects: 'Creative & Uplifting', priceAlgo: 135, priceUsdc: 33.00, hempEarned: 135000, potency: '66.6% CBD', terpenes: ['Myrcene', 'Pinene', 'Caryophyllene'], color: 'from-blue-500 to-indigo-600', emoji: '💙', image: '/images/products/vape-4.svg' },
+  { id: 5, name: 'Girl Scout Cookies CBD', strain: 'Girl Scout Cookies', type: 'Hybrid', flavor: 'Sweet Mint & Chocolate', effects: 'Relaxed Focus', priceAlgo: 140, priceUsdc: 34.50, hempEarned: 140000, potency: '68.2% CBD', terpenes: ['Caryophyllene', 'Limonene', 'Humulene'], color: 'from-pink-500 to-rose-600', emoji: '🍪', image: '/images/products/vape-5.svg' },
+  { id: 6, name: 'White Widow CBD', strain: 'White Widow', type: 'Hybrid', flavor: 'Woody & Spicy', effects: 'Euphoric Balance', priceAlgo: 138, priceUsdc: 33.75, hempEarned: 138000, potency: '67.3% CBD', terpenes: ['Myrcene', 'Caryophyllene', 'Pinene'], color: 'from-gray-400 to-slate-600', emoji: '🕷️', image: '/images/products/vape-6.svg' },
+  { id: 7, name: 'Pineapple Express CBD', strain: 'Pineapple Express', type: 'Sativa-dominant', flavor: 'Tropical Pineapple', effects: 'Happy & Energetic', priceAlgo: 142, priceUsdc: 35.00, hempEarned: 142000, potency: '69.1% CBD', terpenes: ['Limonene', 'Myrcene', 'Pinene'], color: 'from-yellow-400 to-amber-600', emoji: '🍍', image: '/images/products/vape-7.svg' },
+  { id: 8, name: 'Purple Haze CBD', strain: 'Purple Haze', type: 'Sativa-dominant', flavor: 'Berry & Floral', effects: 'Dreamy & Uplifting', priceAlgo: 145, priceUsdc: 36.00, hempEarned: 145000, potency: '70.5% CBD', terpenes: ['Terpinolene', 'Myrcene', 'Caryophyllene'], color: 'from-purple-600 to-violet-700', emoji: '💜', image: '/images/products/vape-8.svg' }
 ];
 
 export interface StakingPool { id: number; name: string; minStake: number; discount: number; apy: number; shipping: string; benefits: string[]; color: string; }
@@ -43,12 +45,12 @@ export const CONTRACT_APP_IDS = {
   PRIZE: 746492277
 } as const;
 
-// Contract Explorer Links for TestNet
-export const CONTRACT_EXPLORER_LINKS = {
-  STAKING: 'https://testnet.algoexplorer.io/application/746492270',
-  GOVERNANCE: 'https://testnet.algoexplorer.io/application/746492276',
-  PRIZE: 'https://testnet.algoexplorer.io/application/746492277'
-} as const;
+// Contract Explorer Links resolve dynamically based on configured network
+export const CONTRACT_EXPLORER_LINKS = Object.freeze({
+  STAKING: getAppUrl(CONTRACT_APP_IDS.STAKING),
+  GOVERNANCE: getAppUrl(CONTRACT_APP_IDS.GOVERNANCE),
+  PRIZE: getAppUrl(CONTRACT_APP_IDS.PRIZE)
+});
 
 // Asset IDs for TestNet
 export const ASSET_IDS = {

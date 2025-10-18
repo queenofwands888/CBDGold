@@ -1,0 +1,21 @@
+<svg width="360" height="480" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1d4ed8" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <radialGradient id="glow-blue" cx="35%" cy="20%" r="80%">
+      <stop offset="0%" stop-color="rgba(165, 180, 252, 0.5)" />
+      <stop offset="100%" stop-color="rgba(165, 180, 252, 0)" />
+    </radialGradient>
+  </defs>
+  <rect width="360" height="480" rx="28" fill="url(#grad-blue)" />
+  <rect width="360" height="480" rx="28" fill="url(#glow-blue)" />
+  <circle cx="320" cy="120" r="110" fill="rgba(96, 165, 250, 0.18)" />
+  <circle cx="120" cy="180" r="150" fill="rgba(14, 165, 233, 0.12)" />
+  <text x="40" y="220" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#dbeafe">Blue Dream</text>
+  <text x="40" y="266" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#dbeafe">CBD</text>
+  <text x="40" y="312" font-family="'Inter', sans-serif" font-weight="500" font-size="20" letter-spacing="0.16em" fill="#bfdbfe">Sativa • Blueberry Vanilla</text>
+  <text x="40" y="356" font-family="'Inter', sans-serif" font-weight="400" font-size="18" fill="#c7d2fe">Creative Lift • Members Only</text>
+</svg>

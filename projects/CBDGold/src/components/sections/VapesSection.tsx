@@ -20,6 +20,7 @@ type DisplayVape = {
   color: string;
   emoji: string;
   hempEarned?: number;
+  image?: string;
 };
 
 type TokenPriceMap = Record<'HEMP' | 'WEED' | 'ALGO' | 'USDC', number>;
@@ -154,6 +155,11 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
             <div key={vape.id} className="glass-card rounded-2xl p-6 overflow-hidden relative">
               <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${vape.color} opacity-20 rounded-full -mr-10 -mt-10`}></div>
               <div className="relative">
+                {vape.image && (
+                  <div className="mb-5 overflow-hidden rounded-xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                    <img src={vape.image} alt={vape.name} className="w-full h-44 object-cover" loading="lazy" />
+                  </div>
+                )}
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-black/30 border border-white/10">
                     <span role="img" aria-label={vape.name}>{vape.emoji}</span>

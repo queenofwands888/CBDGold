@@ -1,0 +1,21 @@
+<svg width="360" height="480" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-pineapple" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#422006" />
+      <stop offset="40%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#facc15" />
+    </linearGradient>
+    <radialGradient id="glow-pineapple" cx="70%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="rgba(250, 204, 21, 0.45)" />
+      <stop offset="100%" stop-color="rgba(250, 204, 21, 0)" />
+    </radialGradient>
+  </defs>
+  <rect width="360" height="480" rx="28" fill="url(#grad-pineapple)" />
+  <rect width="360" height="480" rx="28" fill="url(#glow-pineapple)" />
+  <circle cx="310" cy="110" r="110" fill="rgba(253, 230, 138, 0.2)" />
+  <circle cx="90" cy="170" r="140" fill="rgba(74, 222, 128, 0.12)" />
+  <text x="38" y="218" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#fefce8">Pineapple</text>
+  <text x="38" y="264" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#fefce8">Express CBD</text>
+  <text x="38" y="312" font-family="'Inter', sans-serif" font-weight="500" font-size="20" letter-spacing="0.18em" fill="#fde68a">Sativa • Tropical Pine</text>
+  <text x="38" y="354" font-family="'Inter', sans-serif" font-weight="400" font-size="18" fill="#f7fee7">Happy Energy • Daytime</text>
+</svg>

@@ -12,8 +12,15 @@ const Header: React.FC = () => {
   return (
     <>
       <header className="flex justify-between items-center mb-8">
-        <div className="flex items-center">
-          <img src={logo} alt="CBD Gold Logo" className="h-10 w-10" />
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 blur-xl bg-brand-emerald/20" />
+            <img src={logo} alt="CBD Gold Logo" className="relative h-12 w-12" style={{ filter: 'drop-shadow(0 0 14px rgba(52, 211, 153, 0.45))' }} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-2xl font-extrabold gradient-text tracking-tight">CBD Gold ShopFi</span>
+            <span className="text-xs uppercase text-gray-400 tracking-[0.3em]">Hemp • Commerce • Algorand</span>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <ClaimPrizeButton />

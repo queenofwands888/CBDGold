@@ -1,8 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useWalletManager } from '../../hooks/useWalletManager';
 import WalletModal from './WalletModal';
-import TreasuryWallet from './TreasuryWallet';
-import HotWallet from './HotWallet';
 
 const WalletStatus: React.FC = () => {
   const { connected, connecting, address, assets, refreshAssets } = useWalletManager();
@@ -60,27 +58,9 @@ const WalletStatus: React.FC = () => {
               Refresh Assets
             </button>
           </div>
-          {/* Receive Test ALGO helper */}
-          <ReceiveTestAlgo address={address} onRefresh={refreshAssets} />
-          <TreasuryWallet />
-          <HotWallet />
         </>
       )}
       <WalletModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-    </div>
-  );
-};
-
-const ReceiveTestAlgo: React.FC<{ address?: string; onRefresh: () => void }> = ({ address, onRefresh }) => {
-  const faucetUrl = useMemo(() => `https://bank.testnet.algorand.network/`, []);
-  if (!address) return null;
-  return (
-    <div className="mt-2 p-3 rounded-lg border border-green-500/30 bg-green-500/10">
-      <p className="text-xs text-gray-300 mb-2 text-center">Fund your TestNet address with the official faucet</p>
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-        <a className="btn-secondary text-xs" href={faucetUrl} target="_blank" rel="noreferrer">Open TestNet Faucet</a>
-        <button className="btn-primary text-xs" onClick={onRefresh}>Refresh Balance</button>
-      </div>
     </div>
   );
 };

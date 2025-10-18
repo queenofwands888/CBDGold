@@ -1,5 +1,8 @@
 import React from 'react';
 import FeatherIcon from './FeatherIcon';
+import { chainConfig } from '../onchain/env';
+import { getNetworkLabel, isTestNet } from '../onchain/network';
+import { getTxnUrl, explorerName } from '../utils/explorer';
 
 export interface TransactionOverlayProps {
   open: boolean;
@@ -22,6 +25,10 @@ const statusStyles: Record<string, string> = {
 
 const TransactionOverlay: React.FC<TransactionOverlayProps> = ({ open, status, actionLabel = 'Transaction', txId, error, onClose }) => {
   if (!open) return null;
+  const onChain = chainConfig.mode === 'onchain';
+  const networkLabel = getNetworkLabel();
+  const showTestNetWarning = onChain && isTestNet();
+  const explorerLabel = explorerName();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
       <div className="glass-card rounded-2xl p-8 w-full max-w-md relative" data-aos="zoom-in">
@@ -39,14 +46,17 @@ const TransactionOverlay: React.FC<TransactionOverlayProps> = ({ open, status, a
           {status === 'failed' && `${actionLabel} Failed`}
         </h3>
         <p className="text-center text-sm text-gray-300 mb-4">
-          {status === 'pending' && 'Please wait while the transaction is being confirmed on Algorand TestNet.'}
-          {status === 'confirmed' && 'Your transaction was successfully confirmed on-chain.'}
+          {status === 'pending' && (onChain ? `Please wait while the transaction is confirmed on Algorand ${networkLabel}.` : 'Simulating transaction flow…')}
+          {status === 'confirmed' && (onChain ? 'Your transaction was successfully confirmed on-chain.' : 'Simulation marked as confirmed.')}
           {status === 'failed' && (error || 'The transaction did not complete successfully.')}
         </p>
         <div className="space-y-3">
+          {showTestNetWarning && (
+            <p className="text-[10px] uppercase tracking-[0.2em] text-center text-red-300">TestNet only — do not send MainNet funds.</p>
+          )}
           {txId && (
-            <a href={`https://testnet.algoexplorer.io/tx/${txId}`} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-blue-400 hover:text-blue-300 underline">
-              View on AlgoExplorer →
+            <a href={getTxnUrl(txId)} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-blue-400 hover:text-blue-300 underline">
+              View on {explorerLabel} →
             </a>
           )}
           <button onClick={onClose} className={`w-full py-3 rounded-lg font-semibold bg-gradient-to-r ${statusStyles[status]} text-black hover:opacity-90 transition-all`}>

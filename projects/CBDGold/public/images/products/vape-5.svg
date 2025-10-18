@@ -1,0 +1,21 @@
+<svg width="360" height="480" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-cookie" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#27160b" />
+      <stop offset="50%" stop-color="#a16207" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <radialGradient id="glow-cookie" cx="60%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="rgba(251, 191, 36, 0.4)" />
+      <stop offset="100%" stop-color="rgba(251, 191, 36, 0)" />
+    </radialGradient>
+  </defs>
+  <rect width="360" height="480" rx="28" fill="url(#grad-cookie)" />
+  <rect width="360" height="480" rx="28" fill="url(#glow-cookie)" />
+  <circle cx="300" cy="120" r="110" fill="rgba(253, 230, 138, 0.18)" />
+  <circle cx="90" cy="160" r="140" fill="rgba(249, 168, 212, 0.12)" />
+  <text x="38" y="216" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="40" fill="#fef3c7">Girl Scout</text>
+  <text x="38" y="256" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="40" fill="#fef3c7">Cookies CBD</text>
+  <text x="38" y="302" font-family="'Inter', sans-serif" font-weight="500" font-size="19" letter-spacing="0.18em" fill="#fde68a">Hybrid • Mint Chocolate</text>
+  <text x="38" y="344" font-family="'Inter', sans-serif" font-weight="400" font-size="18" fill="#fdf3f3">Relaxed Focus • VIP Pack</text>
+</svg>

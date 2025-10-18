@@ -1,5 +1,6 @@
 import React from 'react';
 import FeatherIcon from './FeatherIcon';
+import { getTxnUrl, explorerName } from '../utils/explorer';
 
 export interface TxHistoryItem {
   id: string;
@@ -54,29 +55,33 @@ export const TransactionHistoryPanel: React.FC<Props> = ({ items, onClear, enabl
         <p className="text-sm text-gray-400">No {filter === 'all' ? '' : filter + ' '}transactions.</p>
       )}
       <ul className={`overflow-y-auto pr-2 ${compact ? 'space-y-1 max-h-52 text-[11px]' : 'space-y-2 max-h-64 text-sm'}`}>
-        {filtered.map(tx => (
-          <li key={tx.id} className={`flex items-start justify-between bg-black/30 rounded-md ${compact ? 'py-1.5 px-2' : 'py-2 px-3'}`}>
-            <div className="flex flex-col pr-2">
-              <span className="text-gray-200 font-medium leading-tight break-words">{tx.label}</span>
-              <span className="text-[9px] text-gray-500 uppercase tracking-wide">{new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-              {tx.txId && (
-                <a
-                  href={`https://testnet.algoexplorer.io/tx/${tx.txId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={tx.txId}
-                  className="text-[10px] text-blue-400 hover:text-blue-300 underline break-all mt-1"
-                >{tx.txId.slice(0, 8)}…</a>
-              )}
-            </div>
-            <div className={`flex items-center space-x-1 font-semibold ${statusColor[tx.status]}`}>
-              {tx.status === 'pending' && <FeatherIcon icon="loader" className="spinning" />}
-              {tx.status === 'confirmed' && <FeatherIcon icon="check" />}
-              {tx.status === 'failed' && <FeatherIcon icon="alert-triangle" />}
-              <span className="capitalize">{tx.status}</span>
-            </div>
-          </li>
-        ))}
+        {filtered.map(tx => {
+          const explorerLabel = tx.txId ? explorerName() : null;
+          const explorerLink = tx.txId ? getTxnUrl(tx.txId) : null;
+          return (
+            <li key={tx.id} className={`flex items-start justify-between bg-black/30 rounded-md ${compact ? 'py-1.5 px-2' : 'py-2 px-3'}`}>
+              <div className="flex flex-col pr-2">
+                <span className="text-gray-200 font-medium leading-tight break-words">{tx.label}</span>
+                <span className="text-[9px] text-gray-500 uppercase tracking-wide">{new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                {explorerLabel && explorerLink && (
+                  <a
+                    href={explorerLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`${explorerLabel}: ${tx.txId}`}
+                    className="text-[10px] text-blue-400 hover:text-blue-300 underline break-all mt-1"
+                  >{explorerLabel} · {tx.txId?.slice(0, 8)}…</a>
+                )}
+              </div>
+              <div className={`flex items-center space-x-1 font-semibold ${statusColor[tx.status]}`}>
+                {tx.status === 'pending' && <FeatherIcon icon="loader" className="spinning" />}
+                {tx.status === 'confirmed' && <FeatherIcon icon="check" />}
+                {tx.status === 'failed' && <FeatherIcon icon="alert-triangle" />}
+                <span className="capitalize">{tx.status}</span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

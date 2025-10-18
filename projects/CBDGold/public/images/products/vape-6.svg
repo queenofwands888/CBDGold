@@ -1,0 +1,21 @@
+<svg width="360" height="480" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-widow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="50%" stop-color="#4b5563" />
+      <stop offset="100%" stop-color="#9ca3af" />
+    </linearGradient>
+    <radialGradient id="glow-widow" cx="30%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="rgba(156, 163, 175, 0.5)" />
+      <stop offset="100%" stop-color="rgba(156, 163, 175, 0)" />
+    </radialGradient>
+  </defs>
+  <rect width="360" height="480" rx="28" fill="url(#grad-widow)" />
+  <rect width="360" height="480" rx="28" fill="url(#glow-widow)" />
+  <circle cx="310" cy="100" r="100" fill="rgba(209, 213, 219, 0.15)" />
+  <circle cx="120" cy="200" r="150" fill="rgba(107, 114, 128, 0.15)" />
+  <text x="36" y="220" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="40" fill="#e5e7eb">White Widow</text>
+  <text x="36" y="260" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="40" fill="#e5e7eb">CBD</text>
+  <text x="36" y="306" font-family="'Inter', sans-serif" font-weight="500" font-size="19" letter-spacing="0.2em" fill="#d1d5db">Hybrid • Woody Spice</text>
+  <text x="36" y="348" font-family="'Inter', sans-serif" font-weight="400" font-size="18" fill="#f9fafb">Euphoric Balance • Elite Drop</text>
+</svg>

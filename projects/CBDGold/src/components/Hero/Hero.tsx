@@ -1,9 +1,14 @@
 import React from 'react';
 import { useAppContext } from '../../contexts';
 import logo from '../../assets/logo.svg';
+import { chainConfig } from '../../onchain/env';
+import { getNetworkLabel, isTestNet } from '../../onchain/network';
 
 const Hero: React.FC = () => {
   const { dispatch } = useAppContext();
+  const networkLabel = React.useMemo(() => getNetworkLabel(), []);
+  const onChain = chainConfig.mode === 'onchain';
+  const testNet = React.useMemo(() => isTestNet(), []);
 
   const goShopFi = () => {
     dispatch({ type: 'SET_ACTIVE_TAB', payload: 'shopfi' });
@@ -48,13 +53,19 @@ const Hero: React.FC = () => {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 font-medium leading-relaxed animate-slideUp" style={{ animationDelay: '0.2s' }}>
-              eShopping is the concept, CBD Gold is the Brand!
-              <br className="hidden md:block" />
-              <span className="inline-flex items-center gap-2 mt-2 text-red-400 font-bold text-xl">
-                THIS IS ON TEST NET - Do not send real funds!!!
-              </span>
+            <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto mb-6 font-medium leading-relaxed animate-slideUp" style={{ animationDelay: '0.2s' }}>
+              CBD Gold fuses premium hemp commerce with Algorand rails so every purchase earns on-chain rewards.
             </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10 animate-slideUp" style={{ animationDelay: '0.25s' }}>
+              <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-white/10 border border-white/15 text-white uppercase tracking-[0.35em]">
+                {onChain ? `${networkLabel} Deployment` : 'Simulation Preview'}
+              </span>
+              {testNet && (
+                <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-red-500/15 border border-red-500/40 text-red-200 uppercase tracking-[0.25em]">
+                  TestNet Only · Do Not Send MainNet Funds
+                </span>
+              )}
+            </div>
 
             {/* CTA Button */}
             <div className="flex flex-col sm:flex-row gap-4 animate-slideUp" style={{ animationDelay: '0.3s' }}>

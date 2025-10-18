@@ -1,0 +1,21 @@
+<svg width="360" height="480" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-sour" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2d1b69" />
+      <stop offset="50%" stop-color="#b45309" />
+      <stop offset="100%" stop-color="#92400e" />
+    </linearGradient>
+    <linearGradient id="shine-sour" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255, 255, 255, 0.35)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </linearGradient>
+  </defs>
+  <rect width="360" height="480" rx="28" fill="url(#grad-sour)" />
+  <rect width="360" height="480" rx="28" fill="url(#shine-sour)" opacity="0.4" />
+  <circle cx="300" cy="120" r="120" fill="rgba(252, 211, 77, 0.12)" />
+  <circle cx="90" cy="90" r="140" fill="rgba(52, 211, 153, 0.07)" />
+  <text x="40" y="220" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#fefce8">Sour Diesel</text>
+  <text x="40" y="266" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="42" fill="#fefce8">CBD</text>
+  <text x="40" y="314" font-family="'Inter', sans-serif" font-weight="500" font-size="20" letter-spacing="0.18em" fill="#fde68a">Sativa • Citrus Fuel</text>
+  <text x="40" y="354" font-family="'Inter', sans-serif" font-weight="400" font-size="18" fill="#fff7ed">Focused Energy • TestNet Drop</text>
+</svg>

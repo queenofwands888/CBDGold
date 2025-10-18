@@ -10,10 +10,6 @@ export interface PriceBarProps {
   lastLiveOracle: OraclePrices | null;
   priceDelta: PriceDelta;
   history?: PriceHistory;
-  paused?: boolean;
-  onTogglePaused?: () => void;
-  onRefresh?: () => void;
-  loading?: boolean;
 }
 
 function Delta({ value }: { value?: number }) {
@@ -23,7 +19,7 @@ function Delta({ value }: { value?: number }) {
   return <span className={cls}>{sign}{value.toFixed(2)}%</span>;
 }
 
-const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDelta, history, paused, onTogglePaused, onRefresh, loading }) => {
+const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDelta, history }) => {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -59,31 +55,6 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
             <span className={`w-2 h-2 rounded-full ${live ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`} />
             {live ? 'Live' : 'Fallback'} · {ageSec}s
           </span>
-          {onTogglePaused && (
-            <button
-              onClick={onTogglePaused}
-              className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all ${paused
-                  ? 'bg-red-500/15 text-red-300 border-red-500/30 hover:bg-red-500/25'
-                  : 'border-white/10 hover:bg-white/5 hover:border-white/20'
-                }`}
-              title="Pause/resume auto-refresh (Alt+P)"
-            >
-              {paused ? '▶ Resume' : '⏸ Pause'}
-            </button>
-          )}
-          {onRefresh && (
-            <button
-              onClick={onRefresh}
-              disabled={loading}
-              className={`text-xs px-3 py-1.5 rounded-lg font-medium border border-white/10 transition-all ${loading
-                  ? 'opacity-40 cursor-not-allowed'
-                  : 'hover:bg-white/5 hover:border-brand-emerald/30'
-                }`}
-              title="Refresh prices (Alt+R)"
-            >
-              {loading ? '⟳ Loading...' : '↻ Refresh'}
-            </button>
-          )}
         </div>
         <div className="flex items-center gap-4 md:gap-6 flex-wrap">
           <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
@@ -111,7 +82,7 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
           {sparkPath && (
             <div className="flex items-center gap-1">
               <svg width={120} height={30} className="opacity-70">
-                <path d={sparkPath} fill="none" stroke={paused ? '#f87171' : '#34d399'} strokeWidth={1.5} />
+                <path d={sparkPath} fill="none" stroke="#34d399" strokeWidth={1.5} />
               </svg>
               <span className="text-[10px] text-gray-400">ALGO trend</span>
             </div>

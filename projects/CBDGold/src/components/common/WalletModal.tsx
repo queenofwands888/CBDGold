@@ -1,9 +1,12 @@
 import React from 'react';
 import { useWallet } from '@txnlab/use-wallet-react';
+
 import { WalletId } from '@txnlab/use-wallet';
 import { useWalletManager } from '../../hooks/useWalletManager';
 import type { Wallet as UseWalletType } from '@txnlab/use-wallet-react';
 import { logger } from '../../utils/logger';
+import { chainConfig } from '../../onchain/env';
+import { getNetworkLabel, isTestNet } from '../../onchain/network';
 
 type WalletModalProps = {
   isOpen: boolean;
@@ -13,6 +16,12 @@ type WalletModalProps = {
 const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   const { wallets, activeAddress } = useWallet();
   const { connect, disconnect, connected } = useWalletManager();
+  const networkLabel = React.useMemo(() => getNetworkLabel(), []);
+  const onChain = chainConfig.mode === 'onchain';
+  const testNet = React.useMemo(() => isTestNet(), []);
+  const tipMessage = onChain
+    ? `Tip: Use WalletConnect to scan a QR from Pera on ${networkLabel}.`
+    : 'Tip: Connect a wallet provider to explore the simulation experience.';
 
   if (!isOpen) return null;
 
@@ -41,9 +50,12 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
             />
           ))}
         </div>
-        <p className="text-[11px] text-gray-400 text-center">
-          Tip: Use WalletConnect to scan a QR from Pera Mobile on TestNet.
-        </p>
+        <div className="space-y-1 text-center">
+          <p className="text-[11px] text-gray-400">{tipMessage}</p>
+          {onChain && testNet && (
+            <p className="text-[10px] text-red-300 uppercase tracking-[0.2em]">TestNet only — never send MainNet funds.</p>
+          )}
+        </div>
 
         {connected && (
           <button
