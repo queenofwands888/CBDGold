@@ -54,7 +54,7 @@ const Hero: React.FC = () => {
 
             {/* Subtitle */}
             <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto mb-6 font-medium leading-relaxed animate-slideUp" style={{ animationDelay: '0.2s' }}>
-              CBD Gold fuses premium hemp commerce with Algorand rails so every purchase earns on-chain rewards.
+              CBD Gold fuses modern hemp commerce with Algorand rails so every purchase earns on-chain rewards.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10 animate-slideUp" style={{ animationDelay: '0.25s' }}>
               <span className="px-4 py-1.5 rounded-full text-xs font-semibold bg-white/10 border border-white/15 text-white uppercase tracking-[0.35em]">

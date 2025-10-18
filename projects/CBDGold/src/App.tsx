@@ -4,7 +4,6 @@ import MainLayout from './components/Layout/MainLayout';
 import TransactionOverlay from './components/common/TransactionOverlay';
 import { useTransactionContext, useAppContext } from './contexts';
 import NavigationTabs from './components/common/NavigationTabs';
-import ChainModeBadge from './components/common/ChainModeBadge';
 import WalletStatus from './components/common/WalletStatus';
 import DashboardPanel from './components/sections/DashboardPanel';
 import StakingPanel from './components/sections/StakingPanel';
@@ -45,9 +44,8 @@ const App: React.FC = () => {
     <>
       <MainLayout>
         <Hero />
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8" data-nav-tabs>
+        <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 mb-8" data-nav-tabs>
           <NavigationTabs />
-          <ChainModeBadge />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
           <div className="lg:col-span-3 space-y-6">
@@ -82,11 +80,13 @@ const App: React.FC = () => {
                 }}
               />
             )}
+            {appState.activeTab === 'spin' && (
+              <SpinGamePanel tokenPrices={tokenPrices} />
+            )}
           </div>
           <div className="space-y-6">
             <WalletStatus />
             <TransactionHistoryPanel />
-            <SpinGamePanel tokenPrices={tokenPrices} />
           </div>
         </div>
         <div className="pt-2 lg:pt-6">

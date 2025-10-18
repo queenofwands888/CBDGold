@@ -8,7 +8,8 @@ const tabs: { key: string; label: string; icon: string }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'home' },
   { key: 'vapes', label: 'eShop', icon: 'shopping-bag' },
   { key: 'shopfi', label: 'ShopFi', icon: 'lock' },
-  { key: 'governance', label: 'Governance', icon: 'users' }
+  { key: 'governance', label: 'Governance', icon: 'users' },
+  { key: 'spin', label: 'SPIN FOR GOLD', icon: 'refresh-cw' }
 ];
 
 const NavigationTabs: React.FC = () => {

@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppContext } from '../../contexts';
 import ClaimPrizeButton from '../common/ClaimPrizeButton';
 import WalletModal from '../common/WalletModal';
+import ChainModeBadge from '../common/ChainModeBadge';
 import logo from '../../assets/logo.svg';
 
 const Header: React.FC = () => {
@@ -24,6 +25,7 @@ const Header: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <ClaimPrizeButton />
+          <ChainModeBadge />
           <button
             onClick={walletConnected ? () => setIsModalOpen(true) : () => setIsModalOpen(true)}
             className={`bg-gradient-to-r px-6 py-2 rounded-full font-semibold transition-all ${walletConnected ? 'from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700' : 'from-green-400 to-green-600 hover:from-green-500 hover:to-green-700'} `}
