@@ -18,7 +18,6 @@ import SpinGamePanel from './components/sections/SpinGamePanel';
 import PriceBar from './components/PriceBar';
 import { useOracleTicker } from './hooks/useOracleTicker';
 import { logger } from './utils/logger';
-import BrandWalletDirectory from './components/common/BrandWalletDirectory';
 
 const App: React.FC = () => {
   const { state: txState, dispatch } = useTransactionContext();
@@ -46,12 +45,6 @@ const App: React.FC = () => {
     <>
       <MainLayout>
         <Hero />
-        <PriceBar
-          oracleMeta={oracle}
-          lastLiveOracle={lastLiveOracle}
-          priceDelta={priceDelta}
-          history={oracleHistory}
-        />
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8" data-nav-tabs>
           <NavigationTabs />
           <ChainModeBadge />
@@ -92,10 +85,17 @@ const App: React.FC = () => {
           </div>
           <div className="space-y-6">
             <WalletStatus />
-            <BrandWalletDirectory />
             <TransactionHistoryPanel />
             <SpinGamePanel tokenPrices={tokenPrices} />
           </div>
+        </div>
+        <div className="pt-2 lg:pt-6">
+          <PriceBar
+            oracleMeta={oracle}
+            lastLiveOracle={lastLiveOracle}
+            priceDelta={priceDelta}
+            history={oracleHistory}
+          />
         </div>
       </MainLayout>
       {overlayStatus && (

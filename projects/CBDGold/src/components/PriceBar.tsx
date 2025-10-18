@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import type { OraclePrices } from '../services/oraclePriceService';
 import type { OracleTicker } from '../hooks/useOracleTicker';
+import { chainConfig } from '../onchain/env';
+import { getNetworkLabel } from '../onchain/network';
 
 type PriceHistory = OracleTicker['history'];
 type PriceDelta = OracleTicker['priceDelta'];
@@ -30,7 +32,11 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
   if (!oracleMeta) return null;
   const ageSec = Math.max(0, Math.round((now - oracleMeta.lastUpdated) / 1000));
   const live = !!oracleMeta.source?.backend && !oracleMeta.source?.fallback;
-  const badgeColor = live ? 'bg-green-500/20 text-green-300 border border-green-500/40' : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40';
+  const badgeTheme = live
+    ? { pill: 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/40', dot: 'bg-emerald-300' }
+    : { pill: 'bg-amber-500/15 text-amber-200 border border-amber-400/40', dot: 'bg-amber-300' };
+  const onChain = chainConfig.mode === 'onchain';
+  const networkName = onChain ? getNetworkLabel() : 'Simulation Mode';
   // Prepare sparkline (ALGO)
   let sparkPath: string | null = null;
   const algoHistory = history?.algo ?? [];
@@ -47,47 +53,97 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
       return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
     }).join(' ');
   }
+  const tokens = [
+    {
+      label: 'ALGO',
+      value: oracleMeta.algoUsd,
+      precision: 3,
+      color: 'text-blue-400',
+      delta: priceDelta?.algoPct,
+      footnote: 'Core network'
+    },
+    {
+      label: 'HEMP',
+      value: oracleMeta.hempUsd,
+      precision: 6,
+      color: 'text-brand-emerald',
+      delta: priceDelta?.hempPct,
+      footnote: 'CBD Rewards'
+    },
+    {
+      label: 'WEED',
+      value: oracleMeta.weedUsd,
+      precision: 6,
+      color: 'text-pink-400',
+      delta: priceDelta?.weedPct,
+      footnote: 'Governance'
+    },
+    {
+      label: 'USDC',
+      value: oracleMeta.usdcUsd,
+      precision: 2,
+      color: 'text-yellow-300',
+      footnote: 'Stablepair',
+      delta: undefined
+    }
+  ] as const;
+
   return (
-    <div className="w-full flex justify-center animate-slideUp">
-      <div className="w-full max-w-6xl glass-card rounded-2xl px-6 py-4 flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm backdrop-blur-xl border border-white/10">
-        <div className="flex items-center gap-2.5">
-          <span className={`badge ${badgeColor} flex items-center gap-1.5`}>
-            <span className={`w-2 h-2 rounded-full ${live ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`} />
-            {live ? 'Live' : 'Fallback'} · {ageSec}s
-          </span>
+    <div className="w-full">
+      <div className="animate-slideUp w-full max-w-6xl mx-auto rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl px-6 py-5 shadow-[0_20px_45px_rgba(0,0,0,0.35)]">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${badgeTheme.pill}`}>
+              <span className={`w-2 h-2 rounded-full ${badgeTheme.dot} animate-pulse`} />
+              {live ? 'Live Oracle Feed' : 'Fallback Feed'}
+            </span>
+            <div>
+              <p className="text-[13px] text-gray-200 font-semibold uppercase tracking-[0.16em]">Price Oracle</p>
+              <p className="text-xs text-gray-400">Updated {ageSec}s ago</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-300">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 uppercase tracking-[0.2em] text-gray-200">
+              {networkName}
+            </span>
+            {lastLiveOracle && !live && (
+              <span className="text-amber-300">Last live {Math.round((now - lastLiveOracle.lastUpdated) / 1000)}s ago</span>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-4 md:gap-6 flex-wrap">
-          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
-            <span className="text-gray-400 text-xs font-medium">ALGO</span>
-            <span className="text-blue-400 font-bold">${oracleMeta.algoUsd?.toFixed(3) ?? '0.000'}</span>
-            <Delta value={priceDelta?.algoPct} />
-          </div>
-          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
-            <span className="text-gray-400 text-xs font-medium">HEMP</span>
-            <span className="text-brand-emerald font-bold">${oracleMeta.hempUsd?.toFixed(6) ?? '0.000000'}</span>
-            <Delta value={priceDelta?.hempPct} />
-          </div>
-          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
-            <span className="text-gray-400 text-xs font-medium">WEED</span>
-            <span className="text-pink-400 font-bold">${oracleMeta.weedUsd?.toFixed(6) ?? '0.000000'}</span>
-            <Delta value={priceDelta?.weedPct} />
-          </div>
-          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
-            <span className="text-gray-400 text-xs font-medium">USDC</span>
-            <span className="text-yellow-400 font-bold">${oracleMeta.usdcUsd?.toFixed(2) ?? '1.00'}</span>
-          </div>
-          {lastLiveOracle && !live && (
-            <div className="text-xs text-orange-300">Reverted to fallback · last live {Math.round((now - lastLiveOracle.lastUpdated) / 1000)}s ago</div>
-          )}
-          {sparkPath && (
-            <div className="flex items-center gap-1">
-              <svg width={120} height={30} className="opacity-70">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {tokens.map(token => (
+            <div key={token.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition-all hover:border-white/30">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] uppercase tracking-[0.2em] text-gray-400">{token.label}</span>
+                <Delta value={token.delta} />
+              </div>
+              <p className={`mt-1 text-lg font-semibold ${token.color}`}>
+                ${token.value !== undefined && token.value !== null ? token.value.toFixed(token.precision) : '0.000'}
+              </p>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">{token.footnote}</p>
+            </div>
+          ))}
+        </div>
+        {sparkPath && (
+          <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 text-xs text-gray-300">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">
+                AL
+              </span>
+              <div>
+                <p className="uppercase tracking-[0.2em] text-[10px] text-gray-400">Algo Momentum</p>
+                <p className="text-xs text-gray-200">Sparklines from the last hour</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <svg width={160} height={36} className="opacity-80">
                 <path d={sparkPath} fill="none" stroke="#34d399" strokeWidth={1.5} />
               </svg>
-              <span className="text-[10px] text-gray-400">ALGO trend</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-emerald-200">ALGO</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

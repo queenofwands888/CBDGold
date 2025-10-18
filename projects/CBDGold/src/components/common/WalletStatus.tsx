@@ -6,10 +6,25 @@ const WalletStatus: React.FC = () => {
   const { connected, connecting, address, assets, refreshAssets } = useWalletManager();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const statusChip = connected ? (
+    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
+      <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+      Connected
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+      <span className="w-2 h-2 rounded-full bg-gray-500" />
+      Offline
+    </span>
+  );
+
   return (
     <div className="glass-card rounded-xl p-5 space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="font-bold text-lg text-brand-emerald">Wallet</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="font-bold text-lg text-brand-emerald">Wallet</h3>
+          {statusChip}
+        </div>
         {!connected ? (
           <button
             onClick={() => setIsModalOpen(true)}

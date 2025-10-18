@@ -18,8 +18,16 @@ const DashboardPanel: React.FC = () => {
         <div className="glass-card rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-white flex items-center"><FeatherIcon icon="leaf" className="mr-2 text-green-400" />Multi-Token Wallet</h3>
-            {walletConnected && (
-              <span className="text-sm text-red-400 opacity-70">Connected</span>
+            {walletConnected ? (
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+                Frontend Linked
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
+                <span className="w-2 h-2 rounded-full bg-gray-500" />
+                Offline
+              </span>
             )}
           </div>
           <div className="bg-black/30 rounded-lg p-4 space-y-3">
@@ -91,11 +99,11 @@ const DashboardPanel: React.FC = () => {
         <div className="glass-card rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-300 text-sm">LP Contributions</p>
-              <p className="text-3xl font-bold text-yellow-400">0</p>
-              <p className="text-xs text-gray-400">ALGO/HEMP & HEMP/USDC</p>
+              <p className="text-gray-300 text-sm">HEMP Winnings</p>
+              <p className="text-3xl font-bold text-yellow-400">{num(accountAssets.hemp)}</p>
+              <p className="text-xs text-gray-400">Spin rewards & loyalty drops</p>
             </div>
-            <FeatherIcon icon="trending-up" className="text-yellow-400" />
+            <FeatherIcon icon="gift" className="text-yellow-400" />
           </div>
         </div>
       </div>
