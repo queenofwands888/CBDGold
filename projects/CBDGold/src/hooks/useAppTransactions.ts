@@ -15,17 +15,22 @@ export function useAppTransactions() {
   const wallet = useWalletManager();
   const { notify } = useNotify();
 
-  const beginTx = (type: string, note?: string) => {
+  const getErrorMessage = (error: unknown, fallback: string): string => {
+    if (error instanceof Error && error.message) return error.message;
+    return fallback;
+  };
+
+  const beginTx = useCallback((type: string, note?: string) => {
     const id = `${type}-${Date.now()}`;
     txDispatch({ type: 'SET_CURRENT_TX', payload: { status: 'pending', id } });
     txDispatch({ type: 'ADD_TX', payload: { id, type, status: 'pending', note } });
     return id;
-  };
+  }, [txDispatch]);
 
-  const finalize = (id: string, success: boolean, error?: string) => {
+  const finalize = useCallback((id: string, success: boolean, error?: string) => {
     txDispatch({ type: 'UPDATE_TX', payload: { id, updates: { status: success ? 'confirmed' : 'failed', note: error } } });
     txDispatch({ type: 'SET_CURRENT_TX', payload: success ? { status: 'confirmed', id } : { status: 'failed', id, error } });
-  };
+  }, [txDispatch]);
 
   const simulateDelay = () => new Promise(r => setTimeout(r, 900 + Math.random() * 600));
 
@@ -38,7 +43,7 @@ export function useAppTransactions() {
       finalize(id, true);
       notify('Purchase (ALGO) confirmed', 'success');
     } else finalize(id, false, 'Network error');
-  }, [appDispatch]);
+  }, [appDispatch, beginTx, finalize, notify]);
 
   const purchaseUsdc = useCallback(async (amountUsdc: number) => {
     const id = beginTx('purchase_usdc', `Spend ${amountUsdc} USDC`);
@@ -49,7 +54,7 @@ export function useAppTransactions() {
       finalize(id, true);
       notify('Purchase (USDC) confirmed', 'success');
     } else finalize(id, false, 'Slippage too high');
-  }, [appDispatch]);
+  }, [appDispatch, beginTx, finalize, notify]);
 
   const claimWithHemp = useCallback(async (hempSpent: number) => {
     const id = beginTx('claim_hemp', `Spend ${hempSpent} HEMP`);
@@ -60,7 +65,7 @@ export function useAppTransactions() {
       finalize(id, true);
       notify('HEMP Claim confirmed', 'success');
     } else finalize(id, false, 'Claim window closed');
-  }, [appDispatch]);
+  }, [appDispatch, beginTx, finalize, notify]);
 
   const creditSpinHemp = useCallback(async (hempWon: number) => {
     const id = beginTx('spin_reward', `Credit ${hempWon} HEMP`);
@@ -68,7 +73,7 @@ export function useAppTransactions() {
     appDispatch({ type: 'CREDIT_SPIN_HEMP', payload: { hempWon } });
     finalize(id, true);
     notify('Spin HEMP credited', 'info');
-  }, [appDispatch]);
+  }, [appDispatch, beginTx, finalize, notify]);
 
   const stakeHemp = useCallback(async (amount: number) => {
     const id = beginTx('stake_hemp', `Stake ${amount} HEMP`);
@@ -88,11 +93,12 @@ export function useAppTransactions() {
         finalize(id, true);
         notify('Stake confirmed (simulation)', 'success');
       }
-    } catch (e: any) {
-      finalize(id, false, e.message || 'Stake failed');
-      notify('Stake failed: ' + (e.message || 'error'), 'error');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Unknown error');
+      finalize(id, false, message);
+      notify(`Stake failed: ${message}`, 'error');
     }
-  }, [appDispatch, appState.walletAddress, wallet, notify]);
+  }, [appDispatch, appState.walletAddress, wallet, notify, beginTx, finalize]);
 
   const unstakeHemp = useCallback(async (amount: number) => {
     const id = beginTx('unstake_hemp', `Unstake ${amount} HEMP`);
@@ -111,11 +117,12 @@ export function useAppTransactions() {
         finalize(id, true);
         notify('Unstake confirmed (simulation)', 'success');
       }
-    } catch (e: any) {
-      finalize(id, false, e.message || 'Unstake failed');
-      notify('Unstake failed: ' + (e.message || 'error'), 'error');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Unknown error');
+      finalize(id, false, message);
+      notify(`Unstake failed: ${message}`, 'error');
     }
-  }, [appDispatch, appState.walletAddress, wallet, notify]);
+  }, [appDispatch, appState.walletAddress, wallet, notify, beginTx, finalize]);
 
   const claimStakingRewards = useCallback(async (rewardAmount: number) => {
     const id = beginTx('claim_rewards', `Claim ~${rewardAmount} HEMP`);
@@ -134,11 +141,12 @@ export function useAppTransactions() {
         finalize(id, true);
         notify('Rewards claimed (simulation)', 'success');
       }
-    } catch (e: any) {
-      finalize(id, false, e.message || 'Claim failed');
-      notify('Claim failed: ' + (e.message || 'error'), 'error');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Unknown error');
+      finalize(id, false, message);
+      notify(`Claim failed: ${message}`, 'error');
     }
-  }, [appDispatch, appState.walletAddress, wallet, notify]);
+  }, [appDispatch, appState.walletAddress, wallet, notify, beginTx, finalize]);
 
   const voteProposal = useCallback(async (idNum: number, weedSpent: number, title?: string) => {
     const id = beginTx('vote', `Vote ${idNum}`);
@@ -157,11 +165,12 @@ export function useAppTransactions() {
         finalize(id, true);
         notify(`Vote recorded${title ? ': ' + title : ''}`, 'success');
       }
-    } catch (e: any) {
-      finalize(id, false, e.message || 'Vote failed');
-      notify('Vote failed: ' + (e.message || 'error'), 'error');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Unknown error');
+      finalize(id, false, message);
+      notify(`Vote failed: ${message}`, 'error');
     }
-  }, [appDispatch, appState.walletAddress, wallet, notify]);
+  }, [appDispatch, appState.walletAddress, wallet, notify, beginTx, finalize]);
 
   const claimPrize = useCallback(async () => {
     const id = beginTx('claim_prize', 'Claim spin prize');
@@ -188,12 +197,13 @@ export function useAppTransactions() {
         finalize(id, true);
         notify(`Prize claim confirmed! Credited ${hempReward.toLocaleString()} HEMP`, 'success');
       }
-    } catch (e: any) {
-      finalize(id, false, e.message || 'Prize claim failed');
-      notify('Prize claim failed: ' + (e.message || 'error'), 'error');
-      throw e;
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Unknown error');
+      finalize(id, false, message);
+      notify(`Prize claim failed: ${message}`, 'error');
+      throw error instanceof Error ? error : new Error(message);
     }
-  }, [appDispatch, appState.hasPrizeToClaim, appState.walletAddress, wallet, notify]);
+  }, [appDispatch, appState.hasPrizeToClaim, appState.walletAddress, wallet, notify, beginTx, finalize]);
 
   return { purchaseAlgo, purchaseUsdc, claimWithHemp, creditSpinHemp, stakeHemp, unstakeHemp, claimStakingRewards, voteProposal, claimPrize, mode: chainConfig.mode };
 }

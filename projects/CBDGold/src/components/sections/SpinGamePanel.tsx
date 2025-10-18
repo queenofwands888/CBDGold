@@ -6,6 +6,31 @@ import { useNotify } from '../../hooks/useNotify';
 import { calculateStakingTier } from '../../utils/stakingTier';
 import { ECON_CONFIG, PRIZE_TIERS } from '../../data/constants';
 
+type HempOutcome = {
+  label: string;
+  type: 'hemp';
+  amount: number;
+  weight: number;
+};
+
+type DiscountOutcome = {
+  label: string;
+  type: 'discount';
+  amount: number;
+  weight: number;
+};
+
+type PrizeOutcome = {
+  label: string;
+  type: 'prize';
+  prizeId: string;
+  discountPct?: number;
+  rarity: (typeof PRIZE_TIERS)[number]['rarity'];
+  weight: number;
+};
+
+type SpinOutcome = HempOutcome | DiscountOutcome | PrizeOutcome;
+
 const formatDuration = (ms: number) => {
   if (ms <= 0) return 'expired';
   const m = Math.floor(ms / 60000);
@@ -20,34 +45,38 @@ const SpinGamePanel: React.FC = () => {
   const { notify } = useNotify();
   const [isSpinning, setIsSpinning] = useState(false);
   const [localResult, setLocalResult] = useState<string | null>(null);
-  const [tick, setTick] = useState(0);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
 
   const stakingTier = useMemo(() => calculateStakingTier(stakedAmount), [stakedAmount]);
 
   useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 1000);
+    const id = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
     return () => clearInterval(id);
   }, []);
 
-  const remainingMs = spinBonusExpiresAt ? spinBonusExpiresAt - Date.now() : 0;
-  if (spinBonusExpiresAt && remainingMs <= 0 && spinBonusDiscount > 0) {
+  const remainingMs = spinBonusExpiresAt ? spinBonusExpiresAt - currentTime : 0;
+  useEffect(() => {
+    if (!spinBonusExpiresAt || spinBonusDiscount <= 0) return;
+    if (remainingMs > 0) return;
     dispatch({ type: 'CLEAR_SPIN_BONUS' });
-  }
+  }, [dispatch, remainingMs, spinBonusDiscount, spinBonusExpiresAt]);
 
-  const outcomes = useMemo(() => {
+  const outcomes = useMemo<SpinOutcome[]>(() => {
     // Weighted array: include prize tiers with pseudo-weights; real probability logic should be server or contract-side
-    const base = [
-      { label: '50,000 HEMP', type: 'hemp' as const, amount: 50_000, weight: 24 },
-      { label: '100,000 HEMP', type: 'hemp' as const, amount: 100_000, weight: 16 },
-      { label: '200,000 HEMP', type: 'hemp' as const, amount: 200_000, weight: 8 },
-      { label: '10% Discount', type: 'discount' as const, amount: 10, weight: 10 },
-      { label: '25% Discount', type: 'discount' as const, amount: 25, weight: 4 },
-      { label: '🎉 1M HEMP JACKPOT', type: 'hemp' as const, amount: 1_000_000, weight: 1 }
+    const base: Array<HempOutcome | DiscountOutcome> = [
+      { label: '50,000 HEMP', type: 'hemp', amount: 50_000, weight: 24 },
+      { label: '100,000 HEMP', type: 'hemp', amount: 100_000, weight: 16 },
+      { label: '200,000 HEMP', type: 'hemp', amount: 200_000, weight: 8 },
+      { label: '10% Discount', type: 'discount', amount: 10, weight: 10 },
+      { label: '25% Discount', type: 'discount', amount: 25, weight: 4 },
+      { label: '🎉 1M HEMP JACKPOT', type: 'hemp', amount: 1_000_000, weight: 1 }
     ];
 
-    const prizeWrapped = PRIZE_TIERS.map(t => ({
+    const prizeWrapped: PrizeOutcome[] = PRIZE_TIERS.map(t => ({
       label: `${t.rarity} • ${t.label}`,
-      type: 'prize' as const,
+      type: 'prize',
       prizeId: t.id,
       discountPct: t.discountPct,
       rarity: t.rarity,
@@ -55,7 +84,7 @@ const SpinGamePanel: React.FC = () => {
     }));
 
     // Expand list via weights (simple client-side approach; not secure for production odds)
-    const expanded: any[] = [];
+    const expanded: SpinOutcome[] = [];
     [...base, ...prizeWrapped].forEach(o => {
       for (let i = 0; i < (o.weight || 1); i++) expanded.push(o);
     });
@@ -73,7 +102,7 @@ const SpinGamePanel: React.FC = () => {
     // Deduct 1 ALGO from balance (simulated)
     dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: { ...state.accountAssets, algo: state.accountAssets.algo - 1 } });
     setTimeout(() => {
-      const result: any = outcomes[Math.floor(Math.random() * outcomes.length)];
+  const result = outcomes[Math.floor(Math.random() * outcomes.length)];
       setLocalResult(result.label);
       if (result.type === 'discount') {
         dispatch({ type: 'SET_SPIN_BONUS', payload: { discount: result.amount, result: result.label } });

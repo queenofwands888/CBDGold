@@ -5,10 +5,26 @@ import { getAlgodClient } from '../../onchain/algodClient';
 import { useWalletManager } from '../../hooks/useWalletManager';
 import { chainConfig } from '../../onchain/env';
 
+type SigningProvider = {
+  signTxns?: (txns: Uint8Array[]) => Promise<Array<Uint8Array | string>>;
+  signTransactions?: (txns: Uint8Array[]) => Promise<Array<Uint8Array | string>>;
+};
+
+type ProviderWindow = typeof window & {
+  algorand?: SigningProvider;
+  myAlgoConnect?: SigningProvider;
+};
+
+const getProviderWindow = (): ProviderWindow | undefined => {
+  if (typeof window === 'undefined') return undefined;
+  return window as ProviderWindow;
+};
+
 const isProviderAvailable = () => {
-  if (typeof window === 'undefined') return false;
-  const w = window as any;
-  return !!(w.algorand?.signTxns || w.algorand?.signTransactions || w.myAlgoConnect?.signTransactions);
+  const providerWindow = getProviderWindow();
+  if (!providerWindow) return false;
+  const provider = providerWindow.algorand ?? providerWindow.myAlgoConnect;
+  return Boolean(provider?.signTxns || provider?.signTransactions);
 };
 
 const TestnetTools: React.FC = () => {
@@ -43,12 +59,13 @@ const TestnetTools: React.FC = () => {
       setSending(true);
       const algod = getAlgodClient();
       const params = await algod.getTransactionParams().do();
+      const suggestedParams = params as algosdk.SuggestedParams;
       const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: address!,
         to: address!,
         amount: 100_000,
-        suggestedParams: params as any,
-      } as any);
+        suggestedParams,
+      });
 
       let signedBlob: Uint8Array | undefined;
       try {
@@ -57,22 +74,33 @@ const TestnetTools: React.FC = () => {
         signedBlob = signed;
       } catch {
         // Fallback: call provider directly if available
-        const w: any = window as any;
-        const provider = w.algorand || w.myAlgoConnect;
+        const providerWindow = getProviderWindow();
+        const provider = providerWindow?.algorand ?? providerWindow?.myAlgoConnect;
         if (!provider) throw new Error('No wallet provider available to sign');
         const encoded = txn.toByte();
-        const res: any = provider.signTxns
+        const res = provider.signTxns
           ? await provider.signTxns([encoded])
           : await provider.signTransactions([encoded]);
+        if (!res || res.length === 0) {
+          throw new Error('Wallet provider returned no signatures.');
+        }
         signedBlob = decodeSignedBlob(res[0]);
       }
 
-      const sendRes: any = await algod.sendRawTransaction(signedBlob!).do();
-      const txId: string = (sendRes && (sendRes.txId || sendRes.txid || sendRes['txId'] || sendRes['txid'])) as string;
+      if (!signedBlob) {
+        throw new Error('Wallet did not return a signed transaction.');
+      }
+
+      const sendRes = await algod.sendRawTransaction(signedBlob).do() as { txId?: string; txid?: string };
+      const txId = sendRes.txId ?? sendRes.txid;
+      if (!txId) {
+        throw new Error('Send response did not include a transaction id.');
+      }
       await algosdk.waitForConfirmation(algod, txId, 4);
       enqueueSnackbar(`Self-payment confirmed: ${txId.slice(0, 10)}…`, { variant: 'success' });
-    } catch (e: any) {
-      enqueueSnackbar(`Send failed: ${e?.message || 'error'}`, { variant: 'error' });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      enqueueSnackbar(`Send failed: ${message}`, { variant: 'error' });
     } finally {
       setSending(false);
     }

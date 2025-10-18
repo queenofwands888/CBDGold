@@ -5,7 +5,24 @@ import { useAppContext } from '../../contexts';
 import { useNotify } from '../../hooks/useNotify';
 import { useAppTransactions } from '../../hooks/useAppTransactions';
 import { ECON_CONFIG } from '../../data/constants';
-import purchaseService from '../../services/purchaseService';
+
+type PurchaseChannel = 'ALGO' | 'USDC' | 'HEMP_CLAIM';
+
+type DisplayVape = {
+  id: number;
+  name: string;
+  type: string;
+  flavor: string;
+  effects: string;
+  prices: { algo: number; usdc: number; hemp?: number };
+  potency: string;
+  terpenes: string[];
+  color: string;
+  emoji: string;
+  hempEarned?: number;
+};
+
+type TokenPriceMap = Record<'HEMP' | 'WEED' | 'ALGO' | 'USDC', number>;
 
 interface VapesSectionProps {
   walletConnected: boolean;
@@ -13,28 +30,25 @@ interface VapesSectionProps {
   algoBalance: number;
   usdcBalance: number;
   hempBalance: number;
-  weedBalance: number;
-  products: any[];
-  tokenPrices: any;
-  oracleMeta?: { source: { backend: boolean; fallback: boolean }; lastUpdated: number } | null;
-  loading?: boolean;
-  onRefreshPrices?: () => void;
-  onPurchase: (vape: any, paymentType: string, discountedPrice: string) => void;
+  products: DisplayVape[];
+  tokenPrices: TokenPriceMap;
+  onPurchase: (vape: DisplayVape, paymentType: PurchaseChannel, discountedPrice: string) => void;
 }
 
-const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedTokens, algoBalance, usdcBalance, hempBalance, products, tokenPrices, oracleMeta, loading, onRefreshPrices, onPurchase }) => {
+const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedTokens, algoBalance, usdcBalance, hempBalance, products, tokenPrices, onPurchase }) => {
   const { state, dispatch } = useAppContext();
   const { spinBonusDiscount, lastSpinResult, spinBonusExpiresAt } = state;
   const { notify } = useNotify();
   const { purchaseAlgo, purchaseUsdc, claimWithHemp, creditSpinHemp } = useAppTransactions();
   const currentStakingTier = calculateStakingTier(stakedTokens);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [spinResult, setSpinResult] = useState<string | null>(null);
-  const [, forceTick] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
+
   React.useEffect(() => {
-    const id = setInterval(() => forceTick(x => x + 1), 15000); // update badge age every 15s
-    return () => clearInterval(id);
-  }, []);
+    if (!spinBonusExpiresAt) return;
+    const id = window.setInterval(() => setNow(Date.now()), 1_000);
+    return () => window.clearInterval(id);
+  }, [spinBonusExpiresAt]);
 
   // Auto-expire spin bonus
   React.useEffect(() => {
@@ -45,94 +59,48 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
     return () => clearTimeout(timeout);
   }, [spinBonusExpiresAt, dispatch]);
 
-  const purchase = async (vape: any, currency: 'ALGO' | 'USDC') => {
+  const purchase = async (vape: DisplayVape, currency: 'ALGO' | 'USDC') => {
     const priceField = currency === 'ALGO' ? 'algo' : 'usdc';
     const discounted = (vape.prices?.[priceField] || 0) * (1 - currentStakingTier.discount / 100);
     const balanceOk = currency === 'ALGO' ? algoBalance >= discounted : usdcBalance >= discounted;
     if (!balanceOk) { notify(`Insufficient ${currency}`, 'error'); return; }
 
-    try {
-      // Call backend purchase API in background (customer view)
-      const stakeTierName = currentStakingTier.name.toLowerCase();
-      const buyerAddress = state.walletAddress || 'SIMULATION_ADDRESS';
+    if (currency === 'ALGO') await purchaseAlgo(discounted);
+    else await purchaseUsdc(discounted);
 
-      const purchaseResult = await purchaseService.createPurchase(
-        vape.id,
-        buyerAddress,
-        stakeTierName,
-        false // Customer view - no admin breakdown
-      );
+    const displayPrice = currency === 'ALGO'
+      ? `${discounted.toFixed(2)} ALGO`
+      : `$${discounted.toFixed(2)} USDC`;
 
-      // Continue with existing blockchain simulation
-      if (currency === 'ALGO') await purchaseAlgo(discounted);
-      else await purchaseUsdc(discounted);
-
-      // Display amount charged from backend (customer-friendly)
-      const displayPrice = `$${purchaseResult.amountCharged?.toFixed(2) || discounted.toFixed(2)}`;
-      onPurchase(vape, currency, displayPrice);
-
-      notify(`Purchase completed: ${displayPrice}`, 'success');
-      if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
-    } catch (error) {
-      // Fallback to local calculation if backend fails
-      console.warn('Backend purchase failed, using local calculation:', error);
-      if (currency === 'ALGO') await purchaseAlgo(discounted);
-      else await purchaseUsdc(discounted);
-      onPurchase(vape, currency, currency === 'ALGO' ? `${discounted.toFixed(2)} ALGO` : `$${discounted.toFixed(2)} USDC`);
-      if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
-    }
+    onPurchase(vape, currency, displayPrice);
+    notify(`Purchase completed: ${displayPrice}`, 'success');
+    if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
   };
 
   // Use enriched hemp price directly, applying staking discount proportionally
-  const hempEquivalentFor = (vape: any) => {
+  const hempEquivalentFor = (vape: DisplayVape) => {
     const baseHemp = vape.prices?.hemp || 0;
     if (!baseHemp) return 0;
     const discounted = baseHemp * (1 - currentStakingTier.discount / 100);
     return Math.max(0, Math.floor(discounted));
   };
 
-  const claimPrizeWithHemp = async (vape: any) => {
+  const claimPrizeWithHemp = async (vape: DisplayVape) => {
     const usdcEquivalent = (vape.prices?.usdc || 0) * (1 - currentStakingTier.discount / 100);
     const hempPrice = tokenPrices?.HEMP || 0.0001;
     const hempRequired = Math.floor(usdcEquivalent / hempPrice);
     if (hempBalance < hempRequired) { notify(`Need ${hempRequired.toLocaleString()} HEMP`, 'error'); return; }
 
-    try {
-      // Call backend purchase API for HEMP claim (customer view)
-      const stakeTierName = currentStakingTier.name.toLowerCase();
-      const buyerAddress = state.walletAddress || 'SIMULATION_ADDRESS';
-
-      const purchaseResult = await purchaseService.createPurchase(
-        vape.id,
-        buyerAddress,
-        stakeTierName,
-        false // Customer view
-      );
-
-      await claimWithHemp(hempRequired);
-
-      // Display backend amount or fallback message
-      const displayValue = purchaseResult.amountCharged ?
-        `Value: $${purchaseResult.amountCharged.toFixed(2)}` :
-        `Value: $${usdcEquivalent.toFixed(2)} USDC`;
-
-      const message = `Product: ${vape.name}\nHEMP Used: ${hempRequired.toLocaleString()} tokens\n${displayValue}`;
-      onPurchase(vape, 'HEMP_CLAIM', message);
-
-      if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
-    } catch (error) {
-      // Fallback to local calculation if backend fails
-      console.warn('Backend HEMP claim failed, using local calculation:', error);
-      await claimWithHemp(hempRequired);
-      const message = `Product: ${vape.name}\nHEMP Used: ${hempRequired.toLocaleString()} tokens\nValue: $${usdcEquivalent.toFixed(2)} USDC`;
-      onPurchase(vape, 'HEMP_CLAIM', message);
-      if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
-    }
+    await claimWithHemp(hempRequired);
+    const message = `Product: ${vape.name}\nHEMP Used: ${hempRequired.toLocaleString()} tokens\nValue: $${usdcEquivalent.toFixed(2)} USDC`;
+    onPurchase(vape, 'HEMP_CLAIM', message);
+    notify('HEMP redemption recorded', 'success');
+    if (spinBonusDiscount) dispatch({ type: 'CLEAR_SPIN_BONUS' });
   };
 
   const spinForGold = () => {
     if (isSpinning) return;
-    setIsSpinning(true); setSpinResult(null);
+    setIsSpinning(true);
     setTimeout(() => {
       const outcomes = [
         { label: '50,000 HEMP', type: 'hemp', amount: 50000 },
@@ -143,7 +111,6 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
         { label: '🎉 JACKPOT: 1M HEMP!', type: 'hemp', amount: 1_000_000 }
       ];
       const result = outcomes[Math.floor(Math.random() * outcomes.length)];
-      setSpinResult(result.label);
       if (result.type === 'discount') {
         dispatch({ type: 'SET_SPIN_BONUS', payload: { discount: result.amount, result: result.label } });
         notify(`Bonus ${result.amount}% discount active for next purchase!`, 'info');
@@ -155,8 +122,28 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
     }, 3000);
   };
 
+  const bonusSecondsRemaining = spinBonusExpiresAt ? Math.max(0, Math.round((spinBonusExpiresAt - now) / 1000)) : 0;
+  const formatRemaining = (seconds: number) => {
+    if (seconds <= 0) return 'ending soon';
+    if (seconds >= 60) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${minutes}m ${secs}s remaining`;
+    }
+    return `${seconds}s remaining`;
+  };
+
   return (
     <div className="space-y-8">
+      {spinBonusDiscount > 0 && (
+        <div className="glass-card border border-purple-500/30 bg-purple-500/10 text-sm text-purple-100 rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <span className="font-semibold">{spinBonusDiscount}% spin bonus active</span>
+          <span className="text-xs text-purple-200">
+            {bonusSecondsRemaining ? formatRemaining(bonusSecondsRemaining) : 'ending soon'}
+            {lastSpinResult ? ` · Last win: ${lastSpinResult}` : ''}
+          </span>
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map(vape => {
           const totalDiscount = Math.min(ECON_CONFIG.MAX_TOTAL_DISCOUNT, currentStakingTier.discount + spinBonusDiscount);
@@ -168,7 +155,9 @@ const VapesSection: React.FC<VapesSectionProps> = ({ walletConnected, stakedToke
               <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${vape.color} opacity-20 rounded-full -mr-10 -mt-10`}></div>
               <div className="relative">
                 <div className="flex items-center justify-between mb-4">
-                  <img src="https://huggingface.co/spaces/CBDGold/cbdgold/resolve/main/images/vape%20cart%20white%20top.jpeg" alt={vape.name} className="w-12 h-12 rounded-full object-cover" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-black/30 border border-white/10">
+                    <span role="img" aria-label={vape.name}>{vape.emoji}</span>
+                  </div>
                   <div className={`px-3 py-1 rounded-full text-xs font-semibold ${vape.type.includes('Indica') ? 'bg-purple-600 text-white' : vape.type.includes('Sativa') ? 'bg-yellow-600 text-black' : 'bg-green-600 text-white'}`}>{vape.type}</div>
                 </div>
                 <h3 className="font-bold text-white text-lg mb-1">{vape.name}</h3>

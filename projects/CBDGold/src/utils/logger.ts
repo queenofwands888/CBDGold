@@ -3,8 +3,6 @@ const PREFIX = '[CBDGold]';
 
 type LogArgs = unknown[];
 
-const noop = () => undefined;
-
 const sanitizeArg = (arg: unknown, allowDetails: boolean): unknown => {
   if (arg instanceof Error) {
     if (!allowDetails) {
@@ -16,7 +14,7 @@ const sanitizeArg = (arg: unknown, allowDetails: boolean): unknown => {
   if (!allowDetails && typeof arg === 'object' && arg !== null) {
     try {
       return JSON.stringify(arg);
-    } catch (error) {
+    } catch {
       return '[object]';
     }
   }

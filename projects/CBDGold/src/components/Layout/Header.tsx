@@ -1,21 +1,19 @@
 import React from 'react';
 import { useAppContext } from '../../contexts';
-import FeatherIcon from '../FeatherIcon';
 import ClaimPrizeButton from '../common/ClaimPrizeButton';
-import { useWalletManager } from '../../hooks/useWalletManager';
 import WalletModal from '../common/WalletModal';
+import logo from '../../assets/logo.svg';
 
 const Header: React.FC = () => {
-  const { state, dispatch } = useAppContext();
-  const { walletConnected, walletAddress, accountAssets } = state;
-  const { connect, disconnect, address, assets } = useWalletManager();
+  const { state } = useAppContext();
+  const { walletConnected } = state;
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   return (
     <>
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center">
-          <img src="https://huggingface.co/spaces/CBDGold/cbdgold/resolve/main/images/CBD%20Logo%20-%20PNG%20File%20-%20Black%20Background%20-%2072dpi%20-%20Web%20Use.png" alt="CBD Gold Logo" className="h-10 w-10 rounded-full" />
+          <img src={logo} alt="CBD Gold Logo" className="h-10 w-10" />
         </div>
         <div className="flex items-center gap-3">
           <ClaimPrizeButton />

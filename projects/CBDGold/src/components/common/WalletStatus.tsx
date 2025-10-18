@@ -5,7 +5,7 @@ import TreasuryWallet from './TreasuryWallet';
 import HotWallet from './HotWallet';
 
 const WalletStatus: React.FC = () => {
-  const { connect, disconnect, connected, connecting, address, assets, refreshAssets } = useWalletManager();
+  const { connected, connecting, address, assets, refreshAssets } = useWalletManager();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (

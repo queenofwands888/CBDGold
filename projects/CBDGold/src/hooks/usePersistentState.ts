@@ -2,29 +2,74 @@ import { useEffect } from 'react';
 import { useAppContext } from '../contexts';
 import { secureStorage } from '../utils/storage';
 import { logger } from '../utils/logger';
+import type { AccountAssets } from '../types';
+
+interface StoredGovernanceProposal {
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+  timeLeft: string;
+  weedRequired: number;
+  votes?: number;
+}
+
+interface StoredAppState {
+  accountAssets?: Partial<AccountAssets>;
+  stakedAmount?: number;
+  governance?: { proposals?: StoredGovernanceProposal[] };
+  walletConnected?: boolean;
+  walletAddress?: string;
+  spinBonusDiscount?: number;
+  lastSpinResult?: string;
+  spinBonusExpiresAt?: number;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+
+const isAccountAssets = (value: unknown): value is AccountAssets => (
+  isRecord(value) &&
+  typeof value.algo === 'number' &&
+  typeof value.hemp === 'number' &&
+  typeof value.weed === 'number' &&
+  typeof value.usdc === 'number'
+);
+
+const isGovernanceProposals = (value: unknown): value is StoredGovernanceProposal[] => (
+  Array.isArray(value) && value.every(item => (
+    isRecord(item) &&
+    typeof item.id === 'number' &&
+    typeof item.title === 'string' &&
+    typeof item.description === 'string' &&
+    typeof item.status === 'string' &&
+    typeof item.timeLeft === 'string' &&
+    typeof item.weedRequired === 'number'
+  ))
+);
 
 // Persists selected slices of global app state via secureStorage and hydrates on mount.
 export const usePersistentState = () => {
   const { state, dispatch } = useAppContext();
   // Hydrate once
   useEffect(() => {
-    const stored = secureStorage.getJSON<any>('app_state');
-    if (!stored) return;
+    const raw = secureStorage.getJSON<unknown>('app_state');
+    if (!isRecord(raw)) return;
+    const stored = raw as StoredAppState;
 
     try {
-      if (stored.accountAssets && typeof stored.accountAssets === 'object') {
+      if (stored.accountAssets && isAccountAssets(stored.accountAssets)) {
         dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: stored.accountAssets });
       }
       if (typeof stored.stakedAmount === 'number') {
         dispatch({ type: 'SET_STAKED_AMOUNT', payload: stored.stakedAmount });
       }
-      if (Array.isArray(stored.governance?.proposals)) {
+      if (stored.governance?.proposals && isGovernanceProposals(stored.governance.proposals)) {
         dispatch({ type: 'SET_GOVERNANCE_PROPOSALS', payload: stored.governance.proposals });
       }
       if (stored.walletConnected && typeof stored.walletAddress === 'string') {
         dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address: stored.walletAddress } });
       }
-      if (typeof stored.spinBonusDiscount === 'number' && stored.spinBonusDiscount > 0 && stored.lastSpinResult) {
+      if (typeof stored.spinBonusDiscount === 'number' && stored.spinBonusDiscount > 0 && typeof stored.lastSpinResult === 'string') {
         dispatch({ type: 'SET_SPIN_BONUS', payload: { discount: stored.spinBonusDiscount, result: stored.lastSpinResult } });
         if (stored.spinBonusExpiresAt && Date.now() > stored.spinBonusExpiresAt) {
           dispatch({ type: 'CLEAR_SPIN_BONUS' });
@@ -33,8 +78,7 @@ export const usePersistentState = () => {
     } catch (error) {
       logger.warn('Persistence hydration failed', error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   // Persist whenever relevant slices change
   useEffect(() => {

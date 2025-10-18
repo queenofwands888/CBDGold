@@ -27,8 +27,9 @@ const GovernanceSection: React.FC<GovernanceSectionProps> = ({ walletConnected, 
       const tx = await voteProposal(walletAddress, proposal.id, requiredWeed);
       onTxStatus?.('confirmed', tx.txId);
       onVote(proposal, requiredWeed);
-    } catch (e: any) {
-      onTxStatus?.('failed', undefined, e?.message || 'Voting failed');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Voting failed';
+      onTxStatus?.('failed', undefined, message);
     } finally {
       setVotingPending(false);
     }
@@ -75,7 +76,7 @@ const GovernanceSection: React.FC<GovernanceSectionProps> = ({ walletConnected, 
       <div className="glass-card rounded-2xl p-6">
         <h3 className="text-xl font-bold text-white mb-4 flex items-center"><FeatherIcon icon="info" className="mr-2 text-blue-400" /> How Governance Works</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div><h4 className="font-semibold text-green-400 mb-2">Voting Process</h4><ul className="text-sm text-gray-300 space-y-1"><li>• Hold WEED tokens to participate in governance</li><li>• Each WEED token provides 1,000 voting power</li><li>• Vote on proposals that shape CBD Gold's future</li><li>• Proposals require minimum WEED thresholds</li></ul></div>
+          <div><h4 className="font-semibold text-green-400 mb-2">Voting Process</h4><ul className="text-sm text-gray-300 space-y-1"><li>• Hold WEED tokens to participate in governance</li><li>• Each WEED token provides 1,000 voting power</li><li>• Vote on proposals that shape CBD Gold&apos;s future</li><li>• Proposals require minimum WEED thresholds</li></ul></div>
           <div><h4 className="font-semibold text-purple-400 mb-2">Proposal Types</h4><ul className="text-sm text-gray-300 space-y-1"><li>• New product launches and strain additions</li><li>• Market expansion and distribution decisions</li><li>• Community events and airdrop proposals</li><li>• Platform upgrades and feature requests</li></ul></div>
         </div>
       </div>

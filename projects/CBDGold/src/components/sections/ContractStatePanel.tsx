@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { chainConfig } from '../../onchain/env';
-import { fetchStakingGlobalState, fetchStakingLocalState } from '../../onchain/stakingTransactions';
+import { fetchStakingGlobalState, fetchStakingLocalState, type StakingGlobalState, type StakingLocalState } from '../../onchain/stakingTransactions';
 import { useAppContext } from '../../contexts';
 
 const ContractStatePanel: React.FC = () => {
   const { state } = useAppContext();
   const [loading, setLoading] = useState(false);
-  const [g, setG] = useState<any>(null);
-  const [l, setL] = useState<any>(null);
+  const [globalState, setGlobalState] = useState<StakingGlobalState | undefined>();
+  const [localState, setLocalState] = useState<StakingLocalState | undefined>();
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     if (chainConfig.mode !== 'onchain' || !state.walletConnected) return;
     setLoading(true);
     try {
@@ -17,12 +17,14 @@ const ContractStatePanel: React.FC = () => {
         fetchStakingGlobalState(),
         fetchStakingLocalState(state.walletAddress)
       ]);
-      setG(gState);
-      setL(lState);
-    } finally { setLoading(false); }
-  };
+      setGlobalState(gState);
+      setLocalState(lState);
+    } finally {
+      setLoading(false);
+    }
+  }, [state.walletConnected, state.walletAddress]);
 
-  useEffect(() => { refresh(); }, [state.walletConnected]);
+  useEffect(() => { refresh(); }, [refresh]);
 
   if (chainConfig.mode !== 'onchain') return null;
 
@@ -36,13 +38,13 @@ const ContractStatePanel: React.FC = () => {
       {state.walletConnected && (
         <div className="text-xs font-mono space-y-2 bg-black/20 rounded-lg p-3">
           <div><span className="text-gray-400">Staking App:</span> <span className="text-white">{chainConfig.stakingAppId}</span></div>
-          <div><span className="text-gray-400">Asset ID:</span> <span className="text-white">{g?.assetId ?? '—'}</span></div>
-          <div><span className="text-gray-400">Total Staked:</span> <span className="text-white">{g?.totalStaked ?? '—'}</span></div>
-          <div><span className="text-gray-400">Reward Rate:</span> {g?.rewardRate ?? '—'}</div>
+          <div><span className="text-gray-400">Asset ID:</span> <span className="text-white">{globalState?.assetId ?? '—'}</span></div>
+          <div><span className="text-gray-400">Total Staked:</span> <span className="text-white">{globalState?.totalStaked ?? '—'}</span></div>
+          <div><span className="text-gray-400">Reward Rate:</span> {globalState?.rewardRate ?? '—'}</div>
           <div className="border-t border-white/10 pt-2" />
-          <div><span className="text-gray-400">Your Staked:</span> {l?.staked ?? '—'}</div>
-          <div><span className="text-gray-400">Your Tier:</span> {l?.tier ?? '—'}</div>
-          <div><span className="text-gray-400">Pending Rewards:</span> {l?.pending ?? '—'}</div>
+          <div><span className="text-gray-400">Your Staked:</span> {localState?.staked ?? '—'}</div>
+          <div><span className="text-gray-400">Your Tier:</span> {localState?.tier ?? '—'}</div>
+          <div><span className="text-gray-400">Pending Rewards:</span> {localState?.pending ?? '—'}</div>
         </div>
       )}
     </div>

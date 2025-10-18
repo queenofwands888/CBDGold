@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { fetchWallets } from '../../services/walletsService';
+import { logger } from '../../utils/logger';
 
 // Lightweight QR generator using data URL (avoids React type conflicts)
 async function toQrDataUrl(text: string): Promise<string> {
@@ -15,7 +16,8 @@ async function toQrDataUrl(text: string): Promise<string> {
 const DEFAULT_FALLBACK = 'GFLK62N2S7EERTGITVJAEQZRRYOMVXBRCKA7H72PRYXNIIRV3NL53I7BBU';
 
 const HotWallet: React.FC = () => {
-    const envFallback = (import.meta as any).env.VITE_HOT_WALLET_ADDRESS as string | undefined;
+    const { VITE_HOT_WALLET, VITE_HOT_WALLET_ADDRESS } = import.meta.env;
+    const envFallback = VITE_HOT_WALLET || VITE_HOT_WALLET_ADDRESS;
     const fallback = useMemo(() => envFallback || DEFAULT_FALLBACK, [envFallback]);
     const [address, setAddress] = useState<string>('');
     const [qr, setQr] = useState<string | null>(null);
@@ -30,7 +32,8 @@ const HotWallet: React.FC = () => {
                 setAddress(addr);
                 const url = await toQrDataUrl(addr);
                 if (!cancelled) setQr(url);
-            } catch (_) {
+            } catch (error) {
+                logger.warn('Wallet API unavailable, using HOT fallback', error);
                 if (cancelled) return;
                 setAddress(fallback);
                 const url = await toQrDataUrl(fallback);

@@ -7,18 +7,23 @@ const realFetch = global.fetch;
 describe('oraclePriceService', () => {
   beforeEach(() => {
     clearOracleCache();
-    global.fetch = realFetch as any; // reset
+    global.fetch = realFetch;
   });
 
   it('returns fallback on network error', async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error('net fail')) as any;
+  const rejectedFetch = vi.fn<typeof fetch>().mockRejectedValue(new Error('net fail'));
+    global.fetch = rejectedFetch as unknown as typeof fetch;
     const p = await getOraclePrices('http://fake');
     expect(p.algoUsd).toBeGreaterThan(0);
     expect(p.source.fallback).toBe(true);
   });
 
   it('returns live prices when backend responds', async () => {
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ prices: { ALGO: 0.5, HEMP: 0.0002, WEED: 0.00009, USDC: 1 } }) }) as any;
+    const payload = { prices: { ALGO: 0.5, HEMP: 0.0002, WEED: 0.00009, USDC: 1 } };
+    const resolvedFetch = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+    global.fetch = resolvedFetch as unknown as typeof fetch;
     const p = await getOraclePrices('http://fake');
     expect(p.algoUsd).toBe(0.5);
     expect(p.hempUsd).toBe(0.0002);
@@ -27,8 +32,11 @@ describe('oraclePriceService', () => {
   });
 
   it('caches within TTL', async () => {
-    const mock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ prices: { ALGO: 0.3, HEMP: 0.00015, WEED: 0.00007 } }) });
-    global.fetch = mock as any;
+    const payload = { prices: { ALGO: 0.3, HEMP: 0.00015, WEED: 0.00007 } };
+  const mock = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+    global.fetch = mock as unknown as typeof fetch;
     const a = await getOraclePrices('http://fake');
     const b = await getOraclePrices('http://fake');
     expect(mock).toHaveBeenCalledTimes(1);

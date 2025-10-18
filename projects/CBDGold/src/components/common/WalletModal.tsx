@@ -1,7 +1,9 @@
 import React from 'react';
 import { useWallet } from '@txnlab/use-wallet-react';
+import { WalletId } from '@txnlab/use-wallet';
 import { useWalletManager } from '../../hooks/useWalletManager';
 import type { Wallet as UseWalletType } from '@txnlab/use-wallet-react';
+import { logger } from '../../utils/logger';
 
 type WalletModalProps = {
   isOpen: boolean;
@@ -10,7 +12,7 @@ type WalletModalProps = {
 
 const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   const { wallets, activeAddress } = useWallet();
-  const { disconnect, connected } = useWalletManager();
+  const { connect, disconnect, connected } = useWalletManager();
 
   if (!isOpen) return null;
 
@@ -30,8 +32,13 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
         )}
 
         <div className="space-y-2">
-          {wallets?.map((wallet) => (
-            <WalletRow key={wallet.id} wallet={wallet as UseWalletType} onClose={onClose} />
+          {wallets?.map((wallet: UseWalletType) => (
+            <WalletRow
+              key={wallet.id}
+              wallet={wallet}
+              onConnect={connect}
+              onClose={onClose}
+            />
           ))}
         </div>
         <p className="text-[11px] text-gray-400 text-center">
@@ -54,7 +61,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   );
 };
 
-const WalletRow: React.FC<{ wallet: UseWalletType; onClose: () => void }> = ({ wallet, onClose }) => {
+const WalletRow: React.FC<{ wallet: UseWalletType; onConnect: (walletId: WalletId) => Promise<void>; onClose: () => void }> = ({ wallet, onConnect, onClose }) => {
   const isActive = wallet.isActive;
   const meta = wallet.metadata;
   return (
@@ -62,12 +69,10 @@ const WalletRow: React.FC<{ wallet: UseWalletType; onClose: () => void }> = ({ w
       className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${isActive ? 'border-green-500/40 bg-green-500/10' : 'border-white/10 hover:border-white/30 bg-black/20'}`}
       onClick={async () => {
         try {
-          if (!isActive) {
-            await wallet.connect();
-          }
+          await onConnect(wallet.id);
           onClose();
-        } catch {
-          // no-op
+        } catch (error) {
+          logger.warn('wallet connect failed', error);
         }
       }}
     >

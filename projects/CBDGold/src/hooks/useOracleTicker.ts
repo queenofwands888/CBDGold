@@ -99,6 +99,7 @@ export function useOracleTicker(pollInterval: number = POLL_INTERVAL_MS): Oracle
       updateStateFromPrices({ ...data, lastUpdated: Date.now() });
     } catch (error) {
       if (!isMounted.current) return;
+      console.warn('Failed to refresh oracle prices; using fallback', error);
       updateStateFromPrices(buildFallback());
     } finally {
       if (isMounted.current) {
@@ -109,8 +110,7 @@ export function useOracleTicker(pollInterval: number = POLL_INTERVAL_MS): Oracle
 
   useEffect(() => {
     refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     if (paused) return;
@@ -123,8 +123,8 @@ export function useOracleTicker(pollInterval: number = POLL_INTERVAL_MS): Oracle
   const togglePaused = useCallback(() => setPaused(prev => !prev), []);
 
   const memoisedOracle = useMemo(() => oracle, [oracle]);
-  const memoHistory = useMemo(() => history, [history.algo, history.hemp]);
-  const memoDelta = useMemo(() => priceDelta, [priceDelta?.algoPct, priceDelta?.hempPct, priceDelta?.weedPct]);
+  const memoHistory = useMemo(() => history, [history]);
+  const memoDelta = useMemo(() => priceDelta, [priceDelta]);
 
   return {
     oracle: memoisedOracle,

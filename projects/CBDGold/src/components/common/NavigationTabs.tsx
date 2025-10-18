@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppContext } from '../../contexts';
 import FeatherIcon from '../FeatherIcon';
 
-// Map to HuggingFace space tab naming & order
+// Tab definitions for primary app sections
 // Internal keys: dashboard, vapes (CBD Gold products), shopfi (staking), governance
 const tabs: { key: string; label: string; icon: string }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'home' },

@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import type { OraclePrices } from '../services/oraclePriceService';
+import type { OracleTicker } from '../hooks/useOracleTicker';
 
-interface PriceBarProps {
-  oracleMeta: any;
-  lastLiveOracle: any;
-  priceDelta: { algoPct?: number; hempPct?: number; weedPct?: number } | null;
-  history?: { algo: { t: number; v: number }[]; hemp: { t: number; v: number }[] };
+type PriceHistory = OracleTicker['history'];
+type PriceDelta = OracleTicker['priceDelta'];
+
+export interface PriceBarProps {
+  oracleMeta: OraclePrices | null | undefined;
+  lastLiveOracle: OraclePrices | null;
+  priceDelta: PriceDelta;
+  history?: PriceHistory;
   paused?: boolean;
   onTogglePaused?: () => void;
   onRefresh?: () => void;
@@ -19,14 +24,22 @@ function Delta({ value }: { value?: number }) {
 }
 
 const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDelta, history, paused, onTogglePaused, onRefresh, loading }) => {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   if (!oracleMeta) return null;
-  const ageSec = Math.max(0, Math.round((Date.now() - oracleMeta.lastUpdated) / 1000));
+  const ageSec = Math.max(0, Math.round((now - oracleMeta.lastUpdated) / 1000));
   const live = !!oracleMeta.source?.backend && !oracleMeta.source?.fallback;
   const badgeColor = live ? 'bg-green-500/20 text-green-300 border border-green-500/40' : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40';
   // Prepare sparkline (ALGO)
   let sparkPath: string | null = null;
-  if (history && history.algo.length > 1) {
-    const pts = history.algo.slice(-60); // last 60 points
+  const algoHistory = history?.algo ?? [];
+  if (algoHistory.length > 1) {
+    const pts = algoHistory.slice(-60); // last 60 points
     const values = pts.map(p => p.v);
     const min = Math.min(...values);
     const max = Math.max(...values);
@@ -93,7 +106,7 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
             <span className="text-yellow-400 font-bold">${oracleMeta.usdcUsd?.toFixed(2) ?? '1.00'}</span>
           </div>
           {lastLiveOracle && !live && (
-            <div className="text-xs text-orange-300">Reverted to fallback · last live {Math.round((Date.now() - lastLiveOracle.lastUpdated) / 1000)}s ago</div>
+            <div className="text-xs text-orange-300">Reverted to fallback · last live {Math.round((now - lastLiveOracle.lastUpdated) / 1000)}s ago</div>
           )}
           {sparkPath && (
             <div className="flex items-center gap-1">
@@ -110,3 +123,4 @@ const PriceBar: React.FC<PriceBarProps> = ({ oracleMeta, lastLiveOracle, priceDe
 };
 
 export default PriceBar;
+export type { PriceBarProps };

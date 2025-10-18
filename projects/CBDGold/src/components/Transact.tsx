@@ -48,7 +48,8 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
       })
       enqueueSnackbar(`Transaction sent: ${result.txIds[0]}`, { variant: 'success' })
       setReceiverAddress('')
-    } catch (e) {
+    } catch (error) {
+      console.error('Failed to send transaction', error)
       enqueueSnackbar('Failed to send transaction', { variant: 'error' })
     }
 

@@ -2,24 +2,59 @@ import React from 'react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 // Mark testing mode before App import so component code can optionally read it
-// @ts-ignore
+// @ts-expect-error: Testing flag for component behavior
 globalThis.__TESTING__ = true;
 import App from '../../App';
 import { AppProviders } from '../../providers';
 import { secureStorage } from '../../utils/storage';
 
-// Provide mocks to prevent network & animation libs from causing side effects
-vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ products: [], tokenPrices: {} }) })));
-// Mock setInterval to count calls; we'll allow it but fast-forward only once
+type MockFetchResponse = {
+  ok: boolean;
+  json: () => Promise<{ products: unknown[]; tokenPrices: Record<string, number> }>;
+  arrayBuffer: () => Promise<ArrayBuffer>;
+  text: () => Promise<string>;
+  headers: {
+    forEach: (callback: (value: string, key: string) => void) => void;
+    get: (key: string) => string | null | undefined;
+  };
+};
 
-// Mock canvas context for lottie
-class MockCanvasContext { fillStyle: any; } // minimal shape
-// @ts-ignore
-HTMLCanvasElement.prototype.getContext = () => new MockCanvasContext();
-// @ts-ignore
-if (typeof OffscreenCanvas === 'undefined') {
-  // @ts-ignore
-  globalThis.OffscreenCanvas = function () { return { getContext: () => ({}) }; };
+vi.mock('../../onchain/env', () => ({
+  chainConfig: {
+    mode: 'simulation',
+    network: 'testnet'
+  }
+}));
+
+vi.mock('../../onchain/stakingTransactions', () => ({
+  fetchStakingGlobalState: vi.fn(async () => ({ assetId: 0, totalStaked: 0, rewardRate: 0 })),
+  fetchStakingLocalState: vi.fn(async () => ({ staked: 0, tier: 'none', pending: 0 }))
+}));
+
+// Provide mocks to prevent network & animation libs from causing side effects
+vi.stubGlobal('fetch', vi.fn(async () => ({
+  ok: true,
+  json: async () => ({ products: [], tokenPrices: {} }),
+  arrayBuffer: async () => new TextEncoder().encode('{}').buffer,
+  text: async () => '{}',
+  headers: {
+    forEach: () => undefined,
+    get: () => null
+  }
+} satisfies MockFetchResponse)));
+
+HTMLCanvasElement.prototype.getContext = () => null;
+
+const globalWithCanvas = globalThis as Record<string, unknown>;
+if (typeof globalWithCanvas.OffscreenCanvas === 'undefined') {
+  class MockOffscreenCanvas {
+    width = 0;
+    height = 0;
+    getContext() {
+      return null;
+    }
+  }
+  globalWithCanvas.OffscreenCanvas = MockOffscreenCanvas;
 }
 
 function flushMicrotasks() { return act(async () => { await Promise.resolve(); }); }
@@ -82,7 +117,11 @@ describe('Persistence (localStorage)', () => {
     ); // re-mount to reload and persist trimmed history
     await flushMicrotasks();
 
-    const stored = secureStorage.getJSON<any[]>('tx_history') ?? [];
+    type StoredTx = {
+      id: string;
+      [key: string]: unknown;
+    };
+    const stored = secureStorage.getJSON<StoredTx[]>('tx_history') ?? [];
     expect(stored.length).toBeLessThanOrEqual(25);
   });
 });

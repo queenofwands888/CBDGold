@@ -19,8 +19,9 @@ const ClaimPrizeButton: React.FC = () => {
       await claimPrize();
       dispatch({ type: 'SET_PRIZE_CLAIM_STATUS', payload: false });
       notify('Prize claimed!', 'success');
-    } catch (e: any) {
-      notify('Prize claim failed: ' + (e.message || 'error'), 'error');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      notify(`Prize claim failed: ${message}`, 'error');
     } finally {
       setLoading(false);
     }

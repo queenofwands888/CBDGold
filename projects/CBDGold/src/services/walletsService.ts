@@ -1,29 +1,40 @@
-// Service to fetch configured wallet addresses from backend
+// Wallets service now relies on environment variables or optional API endpoint.
+import { logger } from '../utils/logger';
+
 export type WalletsResponse = {
   hot: string;
   treasury: string;
   operational?: string;
 };
 
-const baseUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:3001';
+const {
+  VITE_API_URL,
+  VITE_HOT_WALLET,
+  VITE_TREASURY_ADDRESS,
+  VITE_OPERATIONAL_WALLET,
+} = import.meta.env;
+
+const apiBase = VITE_API_URL?.trim();
+
+const envWallets: WalletsResponse = {
+  hot: VITE_HOT_WALLET ?? '',
+  treasury: VITE_TREASURY_ADDRESS ?? '',
+  operational: VITE_OPERATIONAL_WALLET || undefined,
+};
 
 export async function fetchWallets(): Promise<WalletsResponse> {
-  const res = await fetch(`${baseUrl}/api/wallets`);
-  if (!res.ok) throw new Error(`Failed to fetch wallets: ${res.status}`);
-  return res.json();
+  if (!apiBase) {
+    return envWallets;
+  }
+
+  try {
+    const res = await fetch(`${apiBase}/api/wallets`);
+    if (!res.ok) throw new Error(`Failed to fetch wallets: ${res.status}`);
+    return res.json();
+  } catch (error) {
+    logger.warn('Wallet API unavailable, falling back to env-configured addresses.', error);
+    return envWallets;
+  }
 }
 
-// Use named exports to avoid default export conflicts
-// Service to fetch backend-configured wallets for display
-class WalletsService {
-  private baseUrl: string;
-  constructor() {
-    this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-  }
-  async fetchWallets() {
-    const res = await fetch(`${this.baseUrl}/api/wallets`);
-    if (!res.ok) throw new Error(`Failed to fetch wallets: ${res.status}`);
-    return res.json() as Promise<{ hot: string; treasury: string; operational: string }>;
-  }
-}
-export default new WalletsService();
+export default { fetchWallets };

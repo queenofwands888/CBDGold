@@ -95,7 +95,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } catch (error) {
       logger.warn('Failed to hydrate tx history from storage', error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // Persist
@@ -112,11 +112,11 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     </TransactionContext.Provider>
   );
 };
-
-export const useTransactionContext = () => {
+// eslint-disable-next-line react-refresh/only-export-components
+export function useTransactionContext() {
   const context = useContext(TransactionContext);
   if (!context) {
     throw new Error('useTransactionContext must be used within TransactionProvider');
   }
   return context;
-};
+}

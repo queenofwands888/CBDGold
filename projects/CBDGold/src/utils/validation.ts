@@ -5,7 +5,11 @@ export const MAX_TEXT_LENGTH = 500;
 export function sanitizeText(value: string, maxLength = MAX_TEXT_LENGTH): string {
   if (!value) return '';
   let sanitized = value.normalize('NFKC');
-  sanitized = sanitized.replace(/[\u0000-\u001F\u007F]/g, ' ');
+  // Remove control characters (0-31 and 127)
+  sanitized = sanitized.split('').filter(char => {
+    const code = char.charCodeAt(0);
+    return code >= 32 && code !== 127;
+  }).join('');
   sanitized = sanitized.replace(/[<>'"`$]/g, '');
   sanitized = sanitized.replace(/javascript:/gi, '');
   sanitized = sanitized.replace(/on\w+=/gi, '');

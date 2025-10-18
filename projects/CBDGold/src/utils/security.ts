@@ -26,7 +26,7 @@ export const sanitizeInput = (input: string): string => {
   if (!input || typeof input !== 'string') return '';
 
   return input
-    .replace(/[<>\"'&]/g, '') // Remove HTML/XML characters
+    .replace(/[<>"'&]/g, '') // Remove HTML/XML characters
     .replace(/javascript:/gi, '') // Remove javascript: protocols
     .replace(/on\w+=/gi, '') // Remove event handlers
     .trim()

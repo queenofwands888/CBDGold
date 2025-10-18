@@ -1,5 +1,7 @@
 import { MutableRefObject, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useWallet } from '@txnlab/use-wallet-react';
+import type { Wallet as UseWallet } from '@txnlab/use-wallet-react';
+import { WalletId, type SignTxnsResponse } from '@txnlab/use-wallet';
 import algosdk from 'algosdk';
 import { useAppContext } from '../contexts';
 import { chainConfig } from '../onchain/env';
@@ -22,6 +24,7 @@ type WalletAdapter = {
 
 const SIMULATION_DELAY_MS = 600;
 const SIMULATED_PREFIX = 'FAKE';
+const isTestEnvironment = typeof globalThis !== 'undefined' && Boolean((globalThis as { __TESTING__?: boolean }).__TESTING__);
 
 const createSimulatedAddress = () => `${SIMULATED_PREFIX}-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
 
@@ -53,6 +56,19 @@ const decodeSignedBlob = (blob: string | Uint8Array): Uint8Array => {
   throw new Error('Unable to decode signed transaction blob');
 };
 
+const normalizeSignedValue = (value: string | Uint8Array | number[] | null | undefined): Uint8Array => {
+  if (!value) {
+    throw new Error('Wallet returned an empty signature');
+  }
+  if (value instanceof Uint8Array) {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return Uint8Array.from(value);
+  }
+  return decodeSignedBlob(value);
+};
+
 function createSimulationAdapter(): WalletAdapter {
   return {
     name: 'simulation-adapter',
@@ -64,7 +80,8 @@ function createSimulationAdapter(): WalletAdapter {
     async disconnect() {
       return Promise.resolve();
     },
-    async refreshAssets(_address: string) {
+    async refreshAssets(address: string) {
+      void address;
       await new Promise((resolve) => setTimeout(resolve, 150));
       return createSimulatedBalances();
     },
@@ -74,9 +91,22 @@ function createSimulationAdapter(): WalletAdapter {
   };
 }
 
-function getWindowProvider(): any | undefined {
+type WindowWalletAccount = { address: string };
+type WindowWalletProvider = {
+  connect?: () => Promise<string[] | WindowWalletAccount[] | { accounts?: WindowWalletAccount[] } | undefined>;
+  accounts?: WindowWalletAccount[];
+  disconnect?: () => Promise<void>;
+  signTxns?: (this: WindowWalletProvider, txns: Uint8Array[]) => Promise<SignTxnsResponse>;
+  signTransactions?: (this: WindowWalletProvider, txns: Uint8Array[]) => Promise<SignTxnsResponse>;
+};
+
+function getWindowProvider(): WindowWalletProvider | undefined {
   if (typeof window === 'undefined') return undefined;
-  return (window as any).algorand || (window as any).myAlgoConnect || undefined;
+  const candidates = window as typeof window & {
+    algorand?: WindowWalletProvider;
+    myAlgoConnect?: WindowWalletProvider;
+  };
+  return candidates.algorand ?? candidates.myAlgoConnect;
 }
 
 function createOnChainAdapter(simulationAdapter: WalletAdapter, hasWarnedNoProvider: MutableRefObject<boolean>): WalletAdapter {
@@ -93,9 +123,20 @@ function createOnChainAdapter(simulationAdapter: WalletAdapter, hasWarnedNoProvi
       }
 
       const response = await provider.connect?.();
-      const address = Array.isArray(response) && response.length > 0
-        ? response[0]
-        : provider.accounts?.[0]?.address;
+      let address: string | undefined;
+      if (Array.isArray(response) && response.length > 0) {
+        const first = response[0] as string | WindowWalletAccount;
+        address = typeof first === 'string' ? first : first?.address;
+      }
+
+      if (!address && response && typeof response === 'object' && 'accounts' in response) {
+        const accounts = (response as { accounts?: WindowWalletAccount[] }).accounts;
+        address = accounts?.[0]?.address;
+      }
+
+      if (!address && provider.accounts?.length) {
+        address = provider.accounts[0].address;
+      }
 
       if (!address) {
         throw new Error('Wallet provider did not return an address');
@@ -132,8 +173,12 @@ function createOnChainAdapter(simulationAdapter: WalletAdapter, hasWarnedNoProvi
 
       const encodedTxns = txns.map((txn) => txn.toByte());
       const signer = provider.signTxns ?? provider.signTransactions;
-      const signed = await signer.call(provider, encodedTxns);
-      return signed.map(decodeSignedBlob);
+      if (!signer) {
+        throw new Error('Connected wallet does not expose a transaction signer.');
+      }
+      const boundSigner = signer.bind(provider);
+      const signed = await boundSigner(encodedTxns);
+      return signed.map(normalizeSignedValue);
     }
   };
 }
@@ -147,45 +192,57 @@ export function useWalletManager() {
   const onChainAdapter = useMemo(() => createOnChainAdapter(simulationAdapter, hasWarnedNoProvider), [simulationAdapter]);
   const adapter = chainConfig.mode === 'onchain' ? onChainAdapter : simulationAdapter;
 
-  const connect = useCallback(async () => {
+  const connect = useCallback(async (preferredWalletId?: WalletId) => {
     if (state.walletConnected || state.isConnecting) return;
     dispatch({ type: 'SET_CONNECTING', payload: true });
 
     try {
-      // Prefer official use-wallet provider if initialized
-      if (uw && uw.wallets && uw.wallets.length > 0) {
-        // ensure providers init complete
-        // attempt to connect the first available wallet (Pera)
-        const pera = uw.wallets.find(w => (w as any).id === 'pera' || (w as any).metadata?.name?.toLowerCase?.() === 'pera');
-        const target = pera ?? uw.wallets[0];
-        await target.connect();
-        const active = uw.activeAddress || (target as any).activeAccount?.address;
-        if (!active) throw new Error('Failed to obtain active address from wallet');
-        const assets = await adapter.refreshAssets(active);
-        dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address: active } });
-        dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: assets });
-        return;
+      if (!isTestEnvironment && uw?.wallets?.length) {
+        const targetId = preferredWalletId ?? WalletId.PERA;
+        const wallets = uw.wallets as UseWallet[];
+        const target = wallets.find((wallet) => wallet.id === targetId) ?? wallets[0];
+
+        if (target) {
+          try {
+            await target.connect();
+            const active = uw.activeAddress
+              || target.activeAccount?.address
+              || target.accounts[0]?.address;
+
+            if (active) {
+              const assets = await adapter.refreshAssets(active);
+              dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address: active } });
+              dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: assets });
+              return;
+            }
+
+            logger.warn('[wallet] provider did not supply an address; falling back to simulation');
+          } catch (walletError) {
+            logger.warn('[wallet] provider connect failed; falling back to simulation', walletError);
+          }
+        }
       }
 
-      const { address, assets } = await adapter.connect();
+  const { address, assets } = await adapter.connect();
       dispatch({ type: 'SET_WALLET_CONNECTION', payload: { connected: true, address } });
       dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: assets });
     } catch (error) {
       logger.error(`[wallet:${adapter.name}] connect failed`, error);
-      dispatch({ type: 'SET_CONNECTING', payload: false });
       throw error;
+    } finally {
+      dispatch({ type: 'SET_CONNECTING', payload: false });
     }
-  }, [adapter, dispatch, state.isConnecting, state.walletConnected]);
+  }, [adapter, dispatch, state.isConnecting, state.walletConnected, uw]);
 
   const disconnect = useCallback(() => {
     dispatch({ type: 'RESET_WALLET' });
     if (uw && uw.activeWallet) {
-      uw.activeWallet.disconnect().catch((e: any) => logger.warn('[use-wallet] disconnect failed', e));
+      uw.activeWallet.disconnect().catch((error: unknown) => logger.warn('[use-wallet] disconnect failed', error));
     }
     adapter.disconnect().catch((error) => {
       logger.warn(`[wallet:${adapter.name}] disconnect failed`, error);
     });
-  }, [adapter, dispatch]);
+  }, [adapter, dispatch, uw]);
 
   const refreshAssets = useCallback(async () => {
     const address = state.walletAddress;
@@ -202,9 +259,8 @@ export function useWalletManager() {
     // Prefer library's signer when available
     if (uw && uw.signTransactions) {
       const blobs = txns.map((t) => t.toByte());
-      const signed = await uw.signTransactions(blobs as any);
-      // uw.signTransactions may return Uint8Array[] already
-      return signed as unknown as Uint8Array[];
+      const signed = await uw.signTransactions(blobs);
+      return signed.map((value) => normalizeSignedValue(value));
     }
     return adapter.signTransactions(txns);
   }, [adapter, uw]);

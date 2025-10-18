@@ -19,11 +19,11 @@ export type TxStatusCallback = (status: 'pending' | 'confirmed' | 'failed', txId
 
 export function simulateTransaction(cb: TxStatusCallback, opts: SimulatedTxOptions = {}): { cancel: () => void; promise: Promise<SimulatedTxResult>; } {
   // Allow overriding default fail rate via Vite env var (e.g. VITE_TX_SIM_FAIL_RATE=0)
-  const envFailRate = typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_TX_SIM_FAIL_RATE;
-  const parsedEnvFailRate = envFailRate !== undefined ? Number(envFailRate) : undefined;
+  const envFailRateRaw = import.meta?.env?.VITE_TX_SIM_FAIL_RATE;
+  const parsedEnvFailRate = envFailRateRaw !== undefined ? Number(envFailRateRaw) : undefined;
   const resolvedFailRate: number = typeof opts.failRate === 'number' && !Number.isNaN(opts.failRate)
     ? opts.failRate
-    : (Number.isFinite(parsedEnvFailRate) ? (parsedEnvFailRate as number) : 0.1);
+    : (typeof parsedEnvFailRate === 'number' && Number.isFinite(parsedEnvFailRate) ? parsedEnvFailRate : 0.1);
   const { minDelayMs = 900, maxDelayMs = 1900 } = opts;
   let cancelled = false;
   cb('pending');

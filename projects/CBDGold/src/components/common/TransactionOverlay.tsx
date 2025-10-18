@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTransactionContext } from '../../contexts';
 
 interface TransactionOverlayProps {
   open: boolean;

@@ -5,7 +5,6 @@ import { useWallet, WalletId } from '@txnlab/use-wallet-react';
 const WalletConnectButton: React.FC = () => {
   const {
     wallets,
-    activeWallet,
     activeAccount,
     isReady
   } = useWallet();

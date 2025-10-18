@@ -17,7 +17,6 @@ interface AppState {
     weed: boolean;
     usdc: boolean;
   };
-  backendStatus: 'unknown' | 'up' | 'down';
   loadingProducts: boolean;
   hasPrizeToClaim: boolean;
   governance: {
@@ -32,7 +31,6 @@ type AppAction =
   | { type: 'SET_ACCOUNT_ASSETS'; payload: AccountAssets }
   | { type: 'SET_STAKED_AMOUNT'; payload: number }
   | { type: 'SET_ASSET_OPT_INS'; payload: AppState['assetOptIns'] }
-  | { type: 'SET_BACKEND_STATUS'; payload: AppState['backendStatus'] }
   | { type: 'SET_LOADING_PRODUCTS'; payload: boolean }
   | { type: 'SET_PRIZE_CLAIM_STATUS'; payload: boolean }
   | { type: 'SET_GOVERNANCE_PROPOSALS'; payload: AppState['governance']['proposals'] }
@@ -59,7 +57,6 @@ const initialState: AppState = {
   spinBonusDiscount: 0,
   spinBonusExpiresAt: undefined,
   assetOptIns: { hemp: true, weed: true, usdc: true },
-  backendStatus: 'unknown',
   loadingProducts: true,
   hasPrizeToClaim: false,
   governance: { proposals: [] }
@@ -84,8 +81,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, stakedAmount: action.payload };
     case 'SET_ASSET_OPT_INS':
       return { ...state, assetOptIns: action.payload };
-    case 'SET_BACKEND_STATUS':
-      return { ...state, backendStatus: action.payload };
     case 'SET_LOADING_PRODUCTS':
       return { ...state, loadingProducts: action.payload };
     case 'SET_PRIZE_CLAIM_STATUS':
@@ -171,6 +166,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) {

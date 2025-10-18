@@ -41,8 +41,9 @@ const StakingSection: React.FC<StakingSectionProps> = ({ walletConnected, hempBa
       enqueueSnackbar('Staking successful!', { variant: 'success' });
       onStake(pool, amount);
       setStakingAmounts({ ...stakingAmounts, [pool.id]: '' });
-    } catch (err: any) {
-      onTxStatus?.('failed', undefined, err?.message || 'Staking failed');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Staking failed';
+      onTxStatus?.('failed', undefined, message);
       enqueueSnackbar('Staking failed', { variant: 'error' });
     }
   };
@@ -64,8 +65,9 @@ const StakingSection: React.FC<StakingSectionProps> = ({ walletConnected, hempBa
       enqueueSnackbar('Unstake successful (simulated)', { variant: 'success' });
       onUnstake?.(pool, amount);
       setStakingAmounts({ ...stakingAmounts, [pool.id]: '' });
-    } catch (err: any) {
-      onTxStatus?.('failed', undefined, err?.message || 'Unstake failed');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unstake failed';
+      onTxStatus?.('failed', undefined, message);
       enqueueSnackbar('Unstake failed', { variant: 'error' });
     }
   };

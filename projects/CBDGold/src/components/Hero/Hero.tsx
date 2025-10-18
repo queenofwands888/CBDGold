@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAppContext } from '../../contexts';
+import logo from '../../assets/logo.svg';
 
 const Hero: React.FC = () => {
   const { dispatch } = useAppContext();
@@ -30,11 +31,13 @@ const Hero: React.FC = () => {
             {/* Logo with glow effect */}
             <div className="relative mb-8 animate-slideUp">
               <div className="absolute inset-0 bg-brand-emerald/30 rounded-full blur-2xl animate-glow" />
-              <img
-                src="https://huggingface.co/spaces/CBDGold/cbdgold/resolve/main/images/CBD%20Logo%20-%20PNG%20File%20-%20Black%20Background%20-%2072dpi%20-%20Web%20Use.png"
-                alt="CBD Gold Logo"
-                className="relative w-36 h-36 rounded-full shadow-card border-2 border-white/10 bg-gradient-to-br from-surface to-surface-elevated object-cover backdrop-blur-sm"
-              />
+              <div className="relative w-36 h-36 rounded-full shadow-card border-2 border-white/10 bg-gradient-to-br from-surface to-surface-elevated flex items-center justify-center">
+                <img
+                  src={logo}
+                  alt="CBD Gold Logo"
+                  className="w-24 h-24 object-contain"
+                />
+              </div>
             </div>
 
             {/* Heading with gradient text */}

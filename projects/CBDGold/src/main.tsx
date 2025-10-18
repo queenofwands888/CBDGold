@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './styles/tailwind.css'
 import './styles/App.css'
-import './styles/hf-style.css'
 import { AppProviders } from './providers'
 
 if (import.meta.env.PROD && window.location.protocol === 'http:') {

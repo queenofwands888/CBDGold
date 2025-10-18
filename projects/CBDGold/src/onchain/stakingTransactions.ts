@@ -95,7 +95,7 @@ export async function fetchStakingLocalState(address: string): Promise<StakingLo
       tier: local.tier !== undefined ? Number(local.tier) : 0,
       pending: local.pending !== undefined ? Number(local.pending) : 0,
     };
-  } catch (_e) {
+  } catch {
     return undefined;
   }
 }

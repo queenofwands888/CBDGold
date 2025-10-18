@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { chainConfig } from '../onchain/env';
-import { fetchStakingGlobalState, fetchStakingLocalState } from '../onchain/stakingTransactions';
+import { fetchStakingLocalState } from '../onchain/stakingTransactions';
 import { useAppContext } from '../contexts';
 import { fetchAsaBalances } from '../onchain/assetBalances';
 
@@ -14,8 +14,7 @@ export function useOnChainSync(intervalMs = 20000) {
 
     const run = async () => {
       try {
-        const [g, l, balances] = await Promise.all([
-          fetchStakingGlobalState(),
+        const [localState, balances] = await Promise.all([
           fetchStakingLocalState(state.walletAddress),
           fetchAsaBalances(state.walletAddress)
         ]);
@@ -23,13 +22,13 @@ export function useOnChainSync(intervalMs = 20000) {
         if (balances) {
           dispatch({ type: 'SET_ACCOUNT_ASSETS', payload: balances });
         }
-        if (l) {
+        if (localState) {
           // Update stakedAmount from chain authoritative value
-          dispatch({ type: 'SET_STAKED_AMOUNT', payload: l.staked });
+          dispatch({ type: 'SET_STAKED_AMOUNT', payload: localState.staked });
         }
-      } catch (e) {
+      } catch (error) {
         // swallow errors to avoid spamming UI
-        console.warn('On-chain sync error', e);
+        console.warn('On-chain sync error', error);
       }
     };
     run();

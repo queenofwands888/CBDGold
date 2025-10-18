@@ -1,13 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-// @ts-ignore JS module with d.ts
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import productService from '../productService';
 import * as oracleMod from '../oraclePriceService';
 
 // Helper to access private enrich via fetching fallback with mocked oracle
 
+const realFetch = global.fetch;
+
 describe('productService enrichment', () => {
   beforeEach(() => {
     productService.clearCache();
+    global.fetch = realFetch;
+  });
+
+  afterEach(() => {
+    global.fetch = realFetch;
+    vi.restoreAllMocks();
   });
 
   it('enriches fallback products using oracle rates', async () => {
@@ -20,7 +27,8 @@ describe('productService enrichment', () => {
       lastUpdated: Date.now()
     });
     // Force fetchProducts to fallback path by mocking fetch failing
-    global.fetch = vi.fn().mockRejectedValue(new Error('fail')) as any;
+  const rejectedFetch = vi.fn<typeof fetch>().mockRejectedValue(new Error('fail'));
+  global.fetch = rejectedFetch as unknown as typeof fetch;
     const data = await productService.fetchProducts();
     expect(data.products.length).toBeGreaterThan(0);
     const sample = data.products[0];
@@ -41,7 +49,32 @@ describe('productService enrichment', () => {
       source: { backend: true, fallback: false },
       lastUpdated: Date.now()
     });
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true, products: [{ id: 99, name: 'Test', strain: '', type: '', flavor: '', effects: '', basePrice: 10, prices: { usd: 10 }, hempEarned: 1, potency: '', terpenes: [], color: '', emoji: '', category: 'vape', inStock: true }] }) }) as any;
+    const responsePayload = {
+      success: true,
+      products: [
+        {
+          id: 99,
+          name: 'Test',
+          strain: '',
+          type: '',
+          flavor: '',
+          effects: '',
+          basePrice: 10,
+          prices: { usd: 10 },
+          hempEarned: 1,
+          potency: '',
+          terpenes: [],
+          color: '',
+          emoji: '',
+          category: 'vape',
+          inStock: true,
+        }
+      ]
+    };
+    const resolvedFetch = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify(responsePayload), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+    global.fetch = resolvedFetch as unknown as typeof fetch;
     const first = await productService.fetchProducts();
     const second = await productService.fetchProducts();
     expect(first.products[0].prices.algo).toBeCloseTo(10 / 0.4, 4);

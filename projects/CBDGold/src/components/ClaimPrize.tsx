@@ -19,6 +19,45 @@ const ClaimPrize: React.FC<ClaimPrizeProps> = ({ userAddress, prizeId, onClaimed
   const [loading, setLoading] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
 
+  type SignatureValue = Uint8Array | string | null | undefined;
+
+  const toBase64 = (input: SignatureValue): string | null => {
+    if (!input) return null;
+    if (typeof input === 'string') return input;
+    if (typeof Buffer !== 'undefined') {
+      return Buffer.from(input).toString('base64');
+    }
+    let binary = '';
+    input.forEach(byte => {
+      binary += String.fromCharCode(byte);
+    });
+    return btoa(binary);
+  };
+
+  interface SignatureObject {
+    signature?: SignatureValue;
+    sig?: SignatureValue;
+  }
+
+  type SignResponse = SignatureValue | SignatureObject | Array<SignatureValue | SignatureObject>;
+
+  const extractSignature = (response: SignResponse): string | null => {
+    const resolveValue = (value: SignatureValue | SignatureObject): SignatureValue => {
+      if (value && typeof value === 'object' && !('length' in value)) {
+        const obj = value as SignatureObject;
+        return obj.signature ?? obj.sig ?? null;
+      }
+      return value as SignatureValue;
+    };
+
+    if (Array.isArray(response)) {
+      const [first] = response;
+      return toBase64(resolveValue(first ?? null));
+    }
+
+    return toBase64(resolveValue(response));
+  };
+
   const handleClaim = async () => {
     const sanitizedAddress = sanitizeText(address, 300);
 
@@ -61,31 +100,7 @@ const ClaimPrize: React.FC<ClaimPrizeProps> = ({ userAddress, prizeId, onClaimed
             encoding: 'utf8'
           };
           const signResponse = await wallet.signData(message, metadata);
-
-          const toBase64 = (input: Uint8Array | string | undefined | null): string | null => {
-            if (!input) return null;
-            if (typeof input === 'string') return input;
-            if (typeof Buffer !== 'undefined') {
-              return Buffer.from(input).toString('base64');
-            }
-            let binary = '';
-            input.forEach(byte => {
-              binary += String.fromCharCode(byte);
-            });
-            return btoa(binary);
-          };
-
-          if (Array.isArray(signResponse)) {
-            const first = signResponse[0] as any;
-            signedMsg = toBase64(first?.signature ?? first?.sig ?? first);
-          } else if (signResponse && typeof signResponse === 'object') {
-            signedMsg = toBase64((signResponse as any).signature ?? (signResponse as any).sig);
-            if (!signedMsg && 'signature' in signResponse) {
-              signedMsg = toBase64((signResponse as any).signature);
-            }
-          } else {
-            signedMsg = toBase64(signResponse as any);
-          }
+          signedMsg = extractSignature(signResponse as SignResponse);
         } catch (err) {
           logger.error('Failed to sign prize claim message', err);
           throw new Error('Wallet declined to sign the prize claim message.');
@@ -106,7 +121,7 @@ const ClaimPrize: React.FC<ClaimPrizeProps> = ({ userAddress, prizeId, onClaimed
           signature: signedMsg
         })
       });
-      const data = await res.json();
+      const data = (await res.json()) as { qrCode?: string; error?: string };
       if (res.ok && data.qrCode) {
         setStatus('Claim submitted! Show this QR code to Royal Mail for dispatch.');
         setQrCode(data.qrCode);
@@ -115,10 +130,16 @@ const ClaimPrize: React.FC<ClaimPrizeProps> = ({ userAddress, prizeId, onClaimed
         setStatus(data.error || 'Claim failed. Please try again.');
         if (typeof onTxStatus === 'function') onTxStatus('failed', tx.txId, data.error);
       }
-    } catch (e: any) {
-      logger.error('Prize claim submission failed', e);
-      setStatus('Error submitting claim.');
-      if (typeof onTxStatus === 'function') onTxStatus('failed', undefined, e?.message || 'Error submitting claim');
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        logger.error('Prize claim submission failed', e);
+        setStatus('Error submitting claim.');
+        if (typeof onTxStatus === 'function') onTxStatus('failed', undefined, e.message);
+      } else {
+        logger.error('Prize claim submission failed', e);
+        setStatus('Error submitting claim.');
+        if (typeof onTxStatus === 'function') onTxStatus('failed', undefined, 'Unknown error submitting claim');
+      }
     }
     setLoading(false);
   };

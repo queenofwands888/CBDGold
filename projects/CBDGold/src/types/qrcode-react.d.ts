@@ -7,10 +7,17 @@ declare module 'qrcode.react' {
     fgColor?: string;
     level?: 'L' | 'M' | 'Q' | 'H';
     includeMargin?: boolean;
-    imageSettings?: any;
+    imageSettings?: {
+      src: string;
+      height?: number;
+      width?: number;
+      excavate?: boolean;
+      x?: number;
+      y?: number;
+    };
   }
   export const QRCodeSVG: React.FC<QRProps>;
   export const QRCodeCanvas: React.FC<QRProps>;
-  const _default: any;
+  const _default: React.FC<QRProps>;
   export default _default;
 }

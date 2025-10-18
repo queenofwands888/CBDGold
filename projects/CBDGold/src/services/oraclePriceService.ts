@@ -25,7 +25,12 @@ const TTL = 30_000; // 30s cache
 
 export async function getOraclePrices(baseUrl?: string): Promise<OraclePrices> {
   if (cache && Date.now() - cache.lastUpdated < TTL) return cache;
-  const apiBase = baseUrl || (import.meta.env.VITE_API_URL || 'http://localhost:3001');
+  const envBase = import.meta.env.VITE_API_URL?.trim();
+  const apiBase = baseUrl || envBase;
+  if (!apiBase) {
+    cache = { ...FALLBACK, lastUpdated: Date.now() };
+    return cache;
+  }
   try {
     const res = await fetch(`${apiBase}/api/prices`, { method: 'GET' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -56,7 +61,7 @@ export async function getOraclePrices(baseUrl?: string): Promise<OraclePrices> {
   }
 }
 
-function numberOr(...vals: any[]): number {
+function numberOr(...vals: Array<number | string | null | undefined>): number {
   for (const v of vals) {
     if (v === undefined || v === null) continue;
     const n = Number(v);

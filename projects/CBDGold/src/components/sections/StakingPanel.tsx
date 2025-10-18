@@ -7,7 +7,7 @@ import { useAppTransactions } from '../../hooks/useAppTransactions';
 import { normalizeTokenInput, parsePositiveNumber } from '../../utils/validation';
 
 const StakingPanel: React.FC = () => {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
   const { notify } = useNotify();
   const { accountAssets, stakedAmount } = state;
   const { stakeHemp, unstakeHemp, claimStakingRewards } = useAppTransactions();

@@ -1,2 +1,2 @@
-// TypeScript declaration for huggingface.js
-export default function queryModel(text: string): Promise<any>;
+// Legacy HuggingFace declarations removed.
+export {};

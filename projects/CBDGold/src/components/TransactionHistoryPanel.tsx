@@ -25,19 +25,21 @@ const statusColor: Record<TxHistoryItem['status'], string> = {
 
 export const TransactionHistoryPanel: React.FC<Props> = ({ items, onClear, enableFilter = true, compact = false }) => {
   const [filter, setFilter] = React.useState<'all' | TxHistoryItem['kind']>('all');
+  const filters: Array<'all' | TxHistoryItem['kind']> = ['all', 'purchase', 'stake', 'unstake', 'vote', 'other'];
   const filtered = filter === 'all' ? items : items.filter(i => i.kind === filter);
   return (
     <div className={`glass-card rounded-2xl ${compact ? 'p-4' : 'p-6'} h-full flex flex-col`}>
       <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-4'}`}>
-        <h3 className={`${compact ? 'text-base' : 'text-lg'} font-bold flex items-center text-white`}>          <FeatherIcon icon="clock" className="mr-2 text-blue-400" /> Recent Tx
+        <h3 className={`${compact ? 'text-base' : 'text-lg'} font-bold flex items-center text-white`}>
+          <FeatherIcon icon="clock" className="mr-2 text-blue-400" /> Recent Tx
         </h3>
         <div className="flex items-center space-x-2">
           {enableFilter && items.length > 0 && (
             <div className="flex space-x-1 text-[10px]">
-              {['all', 'purchase', 'stake', 'unstake', 'vote', 'other'].map(f => (
+              {filters.map(f => (
                 <button
                   key={f}
-                  onClick={() => setFilter(f as any)}
+                  onClick={() => setFilter(f)}
                   className={`px-2 py-1 rounded-md capitalize transition border border-transparent ${filter === f ? 'bg-blue-600 text-white' : 'bg-black/30 text-gray-300 hover:border-blue-500'}`}
                 >{f}</button>
               ))}
