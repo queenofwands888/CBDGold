@@ -12,7 +12,6 @@ const socialLinks = [
 const partnerLinks = [
   { label: 'CBD Gold® eShop', href: 'https://cbdgold.life' },
   { label: 'CBD Gold Wallet (OptoPay)', href: 'https://www.optopay.me/cbdgold' },
-  { label: 'CBDGold Web3', href: 'https://cbdgold.io' },
   { label: 'THC Life', href: 'https://www.thc.life/' }
 ];
 

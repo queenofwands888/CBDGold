@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppContext } from '../../contexts';
-import logo from '../../assets/logo.svg';
+import logo from '../../assets/cbdgold-logo.png';
 import { chainConfig } from '../../onchain/env';
 import { getNetworkLabel, isTestNet } from '../../onchain/network';
 
@@ -26,16 +26,16 @@ const Hero: React.FC = () => {
         <div className="relative flex flex-col items-center justify-center min-h-[70vh] w-full text-center">
           {/* Animated background layers */}
           <div className="absolute inset-0 bg-gradient-to-br from-surface via-brand-midnight to-surface-elevated" />
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-green/10 via-brand-emerald/5 to-brand-purple/10 animate-pulse-slow blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-400/15 via-yellow-500/10 to-emerald-400/10 animate-pulse-slow blur-3xl" />
 
           {/* Accent orbs */}
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-emerald/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-brand-purple/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-amber-300/25 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-yellow-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
 
           <div className="relative z-10 flex flex-col items-center justify-center px-6 py-16 md:py-20 max-w-5xl mx-auto w-full">
             {/* Logo with glow effect */}
             <div className="relative mb-8 animate-slideUp">
-              <div className="absolute inset-0 bg-brand-emerald/30 rounded-full blur-2xl animate-glow" />
+              <div className="absolute inset-0 bg-amber-300/30 rounded-full blur-2xl animate-glow" />
               <div className="relative w-36 h-36 rounded-full shadow-card border-2 border-white/10 bg-gradient-to-br from-surface to-surface-elevated flex items-center justify-center">
                 <img
                   src={logo}
@@ -47,7 +47,7 @@ const Hero: React.FC = () => {
 
             {/* Heading with gradient text */}
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tight leading-tight animate-slideUp" style={{ animationDelay: '0.1s' }}>
-              <span className="bg-gradient-to-r from-white via-brand-emerald to-white bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
                 Welcome to ShopFi
               </span>
             </h1>

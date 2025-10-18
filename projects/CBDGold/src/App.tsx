@@ -4,7 +4,6 @@ import MainLayout from './components/Layout/MainLayout';
 import TransactionOverlay from './components/common/TransactionOverlay';
 import { useTransactionContext, useAppContext } from './contexts';
 import NavigationTabs from './components/common/NavigationTabs';
-import WalletStatus from './components/common/WalletStatus';
 import DashboardPanel from './components/sections/DashboardPanel';
 import StakingPanel from './components/sections/StakingPanel';
 import GovernancePanel from './components/sections/GovernancePanel';
@@ -39,6 +38,7 @@ const App: React.FC = () => {
   const overlayStatus = (currentTx.status === 'pending' || currentTx.status === 'confirmed' || currentTx.status === 'failed')
     ? currentTx.status
     : null;
+  const showTransactions = appState.activeTab === 'dashboard';
 
   return (
     <>
@@ -48,7 +48,7 @@ const App: React.FC = () => {
           <NavigationTabs />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-          <div className="lg:col-span-3 space-y-6">
+          <div className={`${showTransactions ? 'lg:col-span-3' : 'lg:col-span-4'} space-y-6`}>
             {appState.activeTab === 'dashboard' && <DashboardPanel />}
             {appState.activeTab === 'shopfi' && <StakingPanel />}
             {appState.activeTab === 'governance' && <GovernancePanel />}
@@ -84,10 +84,11 @@ const App: React.FC = () => {
               <SpinGamePanel tokenPrices={tokenPrices} />
             )}
           </div>
-          <div className="space-y-6">
-            <WalletStatus />
-            <TransactionHistoryPanel />
-          </div>
+          {showTransactions && (
+            <div className="space-y-6">
+              <TransactionHistoryPanel />
+            </div>
+          )}
         </div>
         <div className="pt-2 lg:pt-6">
           <PriceBar

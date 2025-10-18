@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppContext } from '../../contexts';
 import FeatherIcon from '../FeatherIcon';
 import { calculateStakingTier } from '../../utils/stakingTier';
+import TransactionHistoryPanel from './TransactionHistoryPanel';
 
 const num = (v: number) => v.toLocaleString();
 
@@ -107,6 +108,8 @@ const DashboardPanel: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <TransactionHistoryPanel />
     </div>
   );
 };
