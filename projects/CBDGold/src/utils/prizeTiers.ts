@@ -1,8 +1,8 @@
 // Prize tier configuration for spins
 export const PRIZES = [
   // Medium: Tokens
-  { type: 'token', assetId: 2675148574, amount: 100, odds: 0.30, usdcValue: 5, label: '100 HEMP Tokens' },
-  { type: 'token', assetId: 2675148574, amount: 500, odds: 0.10, usdcValue: 25, label: '500 HEMP Tokens' },
+  { type: 'token', assetId: 748025551, amount: 100, odds: 0.30, usdcValue: 5, label: '100 HEMP Tokens' },
+  { type: 'token', assetId: 748025551, amount: 500, odds: 0.10, usdcValue: 25, label: '500 HEMP Tokens' },
 
   // Hard: Product NFT/ASA
   { type: 'product', assetId: 4000000001, amount: 1, odds: 0.02, usdcValue: 100, label: 'CBD Vape (NFT)' },

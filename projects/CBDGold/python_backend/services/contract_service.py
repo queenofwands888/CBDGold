@@ -26,8 +26,8 @@ class ContractService:
         self.prize_app_id = 123456791
 
         # Asset IDs
-        self.hemp_asset_id = 2675148574
-        self.weed_asset_id = 2676316280
+        self.hemp_asset_id = 748025551
+        self.weed_asset_id = 748025552
         self.usdc_asset_id = 31566704
 
         # Mock data

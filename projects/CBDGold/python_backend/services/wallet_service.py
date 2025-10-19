@@ -19,8 +19,8 @@ class WalletService:
         self.indexer_client = indexer.IndexerClient(self.indexer_token, self.indexer_address)
 
         # Asset IDs
-        self.hemp_asset_id = 2675148574
-        self.weed_asset_id = 2676316280
+        self.hemp_asset_id = 748025551
+        self.weed_asset_id = 748025552
         self.usdc_asset_id = 31566704
 
         # Cache for wallet info

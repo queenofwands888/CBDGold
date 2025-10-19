@@ -204,10 +204,12 @@ export function useWalletManager() {
 
         if (target) {
           try {
-            await target.connect();
+            const connectedAccounts = await target.connect();
+            target.setActive();
             const active = uw.activeAddress
               || target.activeAccount?.address
-              || target.accounts[0]?.address;
+              || target.accounts[0]?.address
+              || connectedAccounts?.[0]?.address;
 
             if (active) {
               const assets = await adapter.refreshAssets(active);

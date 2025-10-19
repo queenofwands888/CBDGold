@@ -142,8 +142,8 @@ export const CONTRACT_EXPLORER_LINKS = Object.freeze({
 
 // Asset IDs for TestNet
 export const ASSET_IDS = {
-  HEMP: 2675148574,
-  WEED: 2676316280,
+  HEMP: 748025551,
+  WEED: 748025552,
   USDC: 31566704
 } as const;
 

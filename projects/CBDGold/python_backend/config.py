@@ -20,8 +20,8 @@ class Settings(BaseSettings):
     indexer_token: str = Field(default="", env="INDEXER_TOKEN")
 
     # Asset IDs
-    hemp_asset_id: int = Field(default=2675148574, env="HEMP_ASSET_ID")
-    weed_asset_id: int = Field(default=2676316280, env="WEED_ASSET_ID")
+    hemp_asset_id: int = Field(default=748025551, env="HEMP_ASSET_ID")
+    weed_asset_id: int = Field(default=748025552, env="WEED_ASSET_ID")
     usdc_asset_id: int = Field(default=31566704, env="USDC_ASSET_ID")
 
     # Contract IDs

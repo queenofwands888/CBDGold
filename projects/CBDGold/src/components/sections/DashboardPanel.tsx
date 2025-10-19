@@ -37,8 +37,8 @@ const DashboardPanel: React.FC = () => {
               <p className="font-mono text-xs text-green-400 break-all">{walletConnected ? walletAddress : 'Not connected'}</p>
             </div>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div><p className="text-gray-300">HEMP:</p><p className="text-green-400 font-bold">{num(accountAssets.hemp)}</p><p className="text-xs text-gray-500">ASA: 2675148574</p></div>
-              <div><p className="text-gray-300">WEED:</p><p className="text-purple-400 font-bold">{num(accountAssets.weed)}</p><p className="text-xs text-gray-500">ASA: 2676316280</p></div>
+              <div><p className="text-gray-300">HEMP:</p><p className="text-green-400 font-bold">{num(accountAssets.hemp)}</p><p className="text-xs text-gray-500">ASA: 748025551</p></div>
+              <div><p className="text-gray-300">WEED:</p><p className="text-purple-400 font-bold">{num(accountAssets.weed)}</p><p className="text-xs text-gray-500">ASA: 748025552</p></div>
               <div><p className="text-gray-300">ALGO:</p><p className="text-blue-400 font-bold">{accountAssets.algo.toFixed(2)}</p></div>
               <div><p className="text-gray-300">USDC:</p><p className="text-yellow-400 font-bold">${accountAssets.usdc.toFixed(2)}</p></div>
             </div>
